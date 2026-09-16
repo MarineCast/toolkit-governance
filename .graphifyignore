@@ -1,0 +1,4 @@
+# Generated products and caches are also excluded by .gitignore.
+.ipynb_checkpoints/
+htmlcov/
+coverage/

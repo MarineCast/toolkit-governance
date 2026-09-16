@@ -1,0 +1,693 @@
+GOVERNANCE FEATURE-LAYER ROADMAP
+================================
+
+Current state
+-------------
+
+Phase 1 is in progress. Cross-layer infrastructure now lives in the explicit
+``governance/shared`` package: native-geometry contracts, deterministic
+``full_area`` clipping, acquisition/publication helpers, source/coverage
+manifests, catalog validation, and map-layer descriptors. The governance root is
+reserved for the consolidated inspector and package-level artifacts. Six
+source-native collections now build: reconciled IBC/NOAA/NRCan international-
+boundary references with derived country-water support, current NOAA dynamic
+U.S. maritime-zone limits with the available NRCan/DFO-lineage Canadian EEZ
+reference, the national BOEM state seaward boundary line, WDFW recreational
+marine-area polygons, NOAA/DFO marine-protected-area references, and the complete
+current NOAA West Coast national-marine-sanctuary roster with source-vintage GIS
+polygons linked to controlling current CFR references. The single governance
+inspector keeps source and jurisdiction delineations independently selectable
+instead of flattening each collection into one map checkbox.
+
+The release remains explicitly partial. Current public machine-readable
+authoritative Canadian internal-water, territorial-sea, and contiguous-zone
+geometry was not identified; these remain explicit unavailable states. PFMAs,
+California/Oregon/Alaska fishery systems, and other federal/council management
+areas are not yet acquired. No Phase 1 artifact should be interpreted as complete
+full-Pacific legal coverage merely because it has been clipped to ``full_area``.
+
+Priority labels are sequencing guidance:
+
+* ``P0`` - shared contracts or time-varying layers directly relevant to SRKW
+  analysis and operational maps.
+* ``P1`` - important spatial context needed after the P0 contracts are stable.
+* ``P2`` - useful administrative or conservation context that should not block
+  the first governance release.
+
+
+Definition of done for every feature family
+-------------------------------------------
+
+[ ] Add ``download.py``, ``build.py``, ``normalize.py``, ``inspect.py``,
+    ``config.py``, and ``DATA_SOURCES.md`` in the leaf package, plus fixture-based
+    tests. Source-specific interpretation belongs in the leaf normalizer; only
+    contracts used by multiple feature families belong in ``governance/shared``.
+
+[ ] Mirror the package path under ``config/data/governance/``,
+    ``data/raw/governance/``, ``data/processed/domain/governance/``, and
+    ``outputs/domains/governance/``.
+
+[ ] Preserve two canonical products: source/normalized geometry and normalized
+    legal/rule records. A mapped boundary is evidence about a rule; it is not
+    itself the legal authority. Model-specific spatial projections are optional
+    downstream artifacts, not governance feature-family deliverables.
+
+[ ] Pin source URL/service layer, query, download time, source ``as_of`` time,
+    checksum, license, attribution, legal citation, and redistribution terms in
+    manifests. Archive each acquired snapshot instead of silently replacing it.
+
+[ ] Represent both valid time (``EFFECTIVE_START`` and ``EFFECTIVE_END``) and
+    system time (when the producer learned or published the record). Retain proposed,
+    enacted, active, suspended, expired, repealed, and unknown states.
+
+[ ] Keep ``mandatory``, ``voluntary``, and ``advisory`` rules distinct. Preserve
+    regulating authority, regulated activity, vessel/gear/species applicability,
+    exceptions, and source wording rather than collapsing them into a score.
+
+[ ] Preserve native source geometry and publish a validated normalized geometry
+    without coupling the governance artifact to a model grid or resolution.
+    Record source coverage and geometry QC separately.
+
+[ ] Keep source unavailability and unknown legal coverage explicit at the record
+    and collection level. Only complete authoritative coverage may establish a
+    true absence; an empty spatial join is not automatically false or zero.
+
+[ ] Preserve overlapping authorities and designations as one-to-many records.
+    Do not resolve overlap using an undocumented precedence rule or discard a
+    lower-level authority merely because a federal polygon is present.
+
+[ ] Validate CRS, geometry repair, duplicate IDs, effective-date intervals,
+    legal-citation presence, cross-border coverage, source-to-normalized geometry
+    conservation, temporal conflicts, and null/QC semantics.
+
+[ ] Have each leaf ``inspect.py`` expose one or more reusable map-layer
+    descriptors for source/normalized geometry, temporal state, source gaps, and
+    legal-source links. Leaf inspectors do not write standalone maps by default;
+    the root governance inspector composes them under the shared map contract.
+
+[ ] Add an artifact-verified ``governance/feature_catalog.yaml`` and generator.
+    Classify each field as predictor, state, evidence, coverage, provenance,
+    support, or QC, with observed/derived/estimated/fallback/unavailable status.
+    Mark all governance fields model-ineligible by default.
+
+[ ] Add completed producers and catalog verification to
+    the standalone ``governance build`` CLI only after each family can build
+    from pinned local inputs without network access.
+
+[ ] Perform temporal-leakage and circularity review before model eligibility.
+    Critical habitat, SRKW recovery closures, and whale-protection zones may
+    encode prior whale occurrence or policy response and are model-ineligible by
+    default even when their geometry is static.
+
+
+Shared full-AOI spatial scope - P0
+----------------------------------
+
+[ ] Preserve acquired raw files/services exactly as received. Spatially filter or
+    clip every normalized point, line, and polygon product to ``full_area`` before
+    publishing it under ``data/processed/domain/governance/``; raw archives are
+    not destructively cropped.
+
+[ ] Keep rules only when their linked applicability geometry or explicit legal
+    scope intersects the full AOI. Preserve the complete rule text/record even
+    when its mapped geometry is clipped, and prevent orphan geometry-to-rule or
+    rule-to-authority relationships after slicing.
+
+[ ] Fail validation when a normalized geometry lies outside ``full_area`` beyond
+    the configured numerical tolerance, or when an in-scope source feature is
+    dropped without a recorded exclusion reason. An empty in-AOI collection is
+    valid only with explicit complete-source or unavailable-source evidence.
+
+
+Shared governance inspection map - P0
+-------------------------------------
+
+[ ] Resolve time-varying layers for an explicit ``--as-of`` date before mapping.
+    Display that date prominently and keep proposed, active, expired, and unknown
+    states visually distinct. Never mix later rule corrections into an earlier
+    inspection snapshot.
+
+[ ] Base any split on recorded thresholds and a map manifest, not preference:
+    test generated HTML size, load time, layer-toggle responsiveness, feature
+    count, and legibility with representative overlapping selections. Keep one
+    map when those checks pass.
+
+[ ] Test that all implemented catalog layers are selectable, overlay selection is
+    non-exclusive, category grouping and default visibility match config, tooltips
+    render, temporal filtering honors ``--as-of``, missing layers remain explicit,
+    output paths are canonical, and repeated builds are deterministic.
+
+
+Shared governance contracts - P0
+--------------------------------
+
+[ ] Define a stable source-feature schema with ``GOVERNANCE_FEATURE_ID``,
+    ``SOURCE_FEATURE_ID``, ``FEATURE_FAMILY``, ``FEATURE_TYPE``, ``NAME``,
+    ``COUNTRY_CODE``, ``SUBDIVISION_CODE``, ``AUTHORITY``, ``LEGAL_CITATION``,
+    ``LEGAL_STATUS``, ``BINDING_STATUS``, effective/system dates, source fields,
+    coverage fields, QC fields, and geometry.
+
+[ ] Define normalized many-to-many tables for geometry-to-authority,
+    geometry-to-rule, rule-to-species, rule-to-gear, rule-to-vessel-class, and
+    rule-to-exception relationships. Do not encode lists in opaque text columns.
+
+[ ] Establish stable cross-border vocabularies without asserting false legal
+    equivalence: U.S. federal/state/Tribal and Canadian federal/provincial/First
+    Nations authorities retain their native meanings and source terminology.
+
+[ ] Define source precedence by field, not by dataset. A regulatory text may be
+    authoritative for dates and prohibitions while an agency GIS service is the
+    preferred spatial representation; conflicts remain visible in QC.
+
+[ ] Add a source inventory recording ``candidate``, ``approved``, ``blocked``,
+    ``research_only``, or ``superseded`` status and the reason for that status.
+
+[ ] Decide the temporal publication grain. Prefer change intervals and an
+    as-of-date query API over dense daily copies. Any daily/weekly model panel is
+    materialized downstream only for a declared experiment or application need.
+
+
+Conditional modeling adapter - not a governance release requirement
+-------------------------------------------------------------------
+
+
+[ ] Promote a field to modeling only after documenting the ecological/operational
+    mechanism, historical availability, source completeness, temporal leakage,
+    policy-response circularity, and intended interpretation.
+
+[ ] For an approved spatial covariate, project only the selected geometry to the
+    experiment's configured model resolution and canonical marine support. Do
+    not hard-code R8 or R6 in the governance producer.
+
+[ ] Cache an optional sparse crosswalk containing ``GOVERNANCE_FEATURE_ID``,
+    ``H3_INDEX``, ``H3_RESOLUTION``, spatial relation/overlap fields,
+    ``SUPPORT_HASH``, geometry checksum, and projection method. The crosswalk is
+    owned by feature/model preparation and is reproducible from native geometry.
+
+[ ] Resolve time-varying rules as they were knowable at each training/forecast
+    cutoff, then join the selected crosswalk to the model's H3-by-week panel.
+    Never use a later correction or annual rule snapshot retrospectively.
+
+[ ] Keep administrative IDs, reporting regions, critical habitat, MPAs, and
+    whale-protection areas out of the default predictor matrix. Shipping/TSS or
+    regulation-derived candidates still require a mechanism-specific experiment;
+    observed AIS/activity or prey evidence is preferred when it measures the
+    hypothesized process directly.
+
+[ ] Require paired rolling-origin evaluation against the identical base model,
+    cells, labels, origins, and folds before retaining a governance covariate.
+    Record negative results and do not publish unused model projections.
+
+
+Protected Areas
+---------------
+
+[ ] Define an overlap-preserving designation ontology: protected area, marine
+    refuge/OECM, sanctuary, wildlife refuge, critical habitat, and other
+    conservation designation remain separate types with native authority and
+    protection purpose.
+
+
+Critical Habitat - P0
+~~~~~~~~~~~~~~~~~~~~~
+
+Path: ``protected_areas/critical_habitat/``
+
+[ ] Acquire NOAA West Coast and Alaska ESA critical-habitat geometry and DFO
+    aquatic SARA critical-habitat geometry for the full AOI, with the final
+    rule/recovery document and explicit exclusions for each species or population
+    segment.
+
+[ ] Publish species/population-specific source geometry and identifiers; keep
+    proposed, final, excluded, and unmapped legal descriptions distinct rather
+    than emitting one presence flag or precomputed model-grid fraction.
+
+[ ] Verify legal descriptions against the GIS representation and flag source
+    geometries that are general guidance, omit exclusions, or cannot reproduce
+    the controlling text.
+
+[ ] Keep critical-habitat fields out of the default model matrix pending an
+    explicit circularity and designation-date leakage analysis.
+
+
+Wildlife Refuges - P2
+~~~~~~~~~~~~~~~~~~~~~
+
+Path: ``protected_areas/wildlife_refuges/``
+
+[ ] Evaluate USFWS National Wildlife Refuge System realty tracts and Canadian
+    National Wildlife Areas/Marine National Wildlife Areas for water-overlapping
+    units in scope; preserve acquisition boundary versus administered interest.
+
+[ ] Publish refuge/NWA ID, authority, designation type, and normalized boundary.
+    Flag private inholdings, external acquisition boundaries, and partially
+    administered polygons rather than treating them as uniform refuge.
+
+
+Conservation Designations - P2
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Path: ``protected_areas/conservation_designations/``
+
+[ ] Inventory authoritative California, Oregon, Washington, Alaska, B.C., U.S.
+    federal, and Canadian federal conservation programs, including aquatic
+    reserves, parks/ecological reserves/conservancies, CPCAD, and DFO marine
+    refuges/OECMs. De-duplicate reporting inventories without erasing the
+    original designating authority.
+
+[ ] Publish designation-specific geometries and a normalized designation
+    crosswalk. Keep conservation designation, fishery closure, and private/NGO
+    conservation interest separate.
+
+
+Jurisdiction
+------------
+
+[ ] Define boundary precision, authority, effective date, disputed/undelimited
+    state, offshore applicability, and precedence before publishing normalized
+    jurisdiction geometry or any downstream spatial assignment.
+
+
+State and Provincial Waters - P0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Path: ``jurisdiction/state_provincial_waters/``
+
+[ ] Acquire the BOEM Submerged Lands Act federal/state boundary and authoritative
+    California, Oregon, Washington, and Alaska marine-jurisdiction sources.
+    Establish the legal meaning and source of every state-water polygon before
+    normalization or downstream use.
+
+[ ] Research Canadian/Province of B.C. marine administrative applicability and
+    explicitly document that it is not automatically equivalent to U.S. state
+    territorial waters. Leave unsupported province-water fields unavailable.
+
+[ ] Publish native jurisdiction geometry, type, authority, legal basis, and
+    source vintage with no inferred offshore extensions.
+
+
+County and Regional Boundaries - P2
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Path: ``jurisdiction/county_regional_boundaries/``
+
+[ ] Acquire current Census TIGER/Line county-equivalent boundaries for every U.S.
+    state intersecting the coastal full AOI and official Canadian/B.C. regional
+    boundaries, with vintages and stable identifiers.
+
+[ ] Decide whether source polygons legally include marine water. Where they do
+    not, publish adjacent/nearest coastal administration and shoreline evidence
+    rather than projecting land boundaries across the sea.
+
+[ ] Publish authoritative water-inclusive polygons as supplied. Otherwise record
+    coastal adjacency evidence and assignment method/QC without constructing an
+    offshore administrative polygon.
+
+
+Tribal and First Nations Areas - P1
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Path: ``jurisdiction/tribal_first_nations_areas/``
+
+[ ] Separate reservations/trust lands, treaty areas, usual-and-accustomed fishing
+    areas, modern treaty settlement lands, asserted traditional territories, and
+    co-management areas. These concepts are not interchangeable jurisdictions.
+
+[ ] Evaluate BIA/Census land representations and CIRNAC modern-treaty data only
+    for the concepts they actually encode. Obtain Nation-published or approved
+    sources and consultation guidance for fishing or traditional-use areas.
+
+[ ] Document sensitivity, consent, redistribution, precision, and dispute rules
+    before acquisition. Do not derive boundaries from community points, names,
+    or third-party generalized maps.
+
+[ ] Publish native area geometry/type, Nation, source/consent status, and
+    legal/interpretive caveat; keep unsupported or sensitive geometry out of
+    public artifacts.
+
+
+Fisheries Management
+--------------------
+
+[ ] Define normalized rules for fishery sector, species/stock, life stage, gear,
+    vessel/license class, retention state, size/bag/quota, season, exception,
+    authority, supersession, and emergency/in-season amendment.
+
+[ ] Build an as-of-date resolver that combines base regulations with later
+    emergency notices without rewriting history. Conflicts or incomplete source
+    capture fail closed and remain visible in QC.
+
+
+Management Areas - P0
+~~~~~~~~~~~~~~~~~~~~~
+
+Path: ``fisheries_management/management_areas/``
+
+[ ] Acquire authoritative California, Oregon, Washington, Alaska, U.S. federal,
+    and DFO Pacific fishery-management boundaries, including WDFW Marine Areas
+    and DFO PFMAs/Subareas. Validate geometry against each controlling state,
+    federal/council, or Canadian rule.
+
+[ ] Publish source-native area/subarea geometry and identifiers, sector
+    applicability, and cross-border adjacency. Do not merge WA Marine Area 7 and
+    DFO PFMA 18/19 into a synthetic common management area.
+
+[ ] Add a stable geometry-version crosswalk so later rule snapshots can refer to
+    the exact boundary vintage that was in effect.
+
+
+Seasonal Closures - P0
+~~~~~~~~~~~~~~~~~~~~~~
+
+Path: ``fisheries_management/seasonal_closures/``
+
+[ ] Acquire and archive applicable California, Oregon, Washington, Alaska, U.S.
+    federal/council, and Canadian base rules plus emergency/in-season updates,
+    including DFO Integrated Fisheries Management Plans and Fishery Notices.
+    Record retrieval gaps and notices that only amend an earlier rule.
+
+[ ] Normalize closed/open/partial/non-retention states by species, fishery sector,
+    area, and effective interval. Preserve in-season and quota-triggered states
+    instead of assuming the announced end date was realized.
+
+[ ] Publish time-resolved closure-to-area rule records with ``CLOSURE_STATUS``,
+    applicable species and sector IDs, authority, effective interval, source
+    completeness, and QC. Unknown coverage is not open.
+
+
+Gear Restrictions - P1
+~~~~~~~~~~~~~~~~~~~~~~
+
+Path: ``fisheries_management/gear_restrictions/``
+
+[ ] Extract gear prohibitions/requirements from the same versioned rule corpus,
+    including barbless-hook, hook-count, net, trap, trawl, depth, and method
+    constraints with sector/species applicability.
+
+[ ] Publish normalized rule records and area/time joins. Avoid one scalar
+    ``GEAR_RESTRICTION_INTENSITY`` because incomparable restrictions and
+    exceptions cannot be ranked defensibly.
+
+
+Harvest Regulations - P1
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Path: ``fisheries_management/harvest_regulations/``
+
+[ ] Normalize retention, minimum/maximum size, daily/annual limits, quota,
+    hatchery/wild status, sex, species/stock, and possession rules with their
+    units and applicability.
+
+[ ] Publish rule-level tables and explicit as-of-date state. Any later modeling
+    adapter must retain applicable rule IDs and categorical states rather than
+    emitting an opaque harvest-opportunity score.
+
+
+Salmon Management Zones - P0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Path: ``fisheries_management/salmon_management_zones/``
+
+[ ] Define this layer's meaning before building it: distinguish state salmon
+    areas, Alaska and Pacific council/federal areas, DFO PFMAs, commercial salmon
+    licence areas, Pacific Salmon Commission management units, terminal areas,
+    and stock-specific conservation zones.
+
+[ ] Select only zones with an authoritative reproducible geometry and a direct
+    salmon-management role. Preserve source-native zone type and do not create a
+    synthetic cross-border equivalence.
+
+[ ] Publish zone/species/stock/sector applicability and effective dates; crosswalk
+    to ``management_areas`` without duplicating its base polygons.
+
+
+Vessel Management
+-----------------
+
+[ ] Define route, TSS element, regulated area, reporting area, and mobile
+    whale-relative rule as distinct geometry/rule types. Retain vessel class,
+    length, service, exemption, direction, speed unit, and binding status.
+
+
+Shipping Lanes - P1
+~~~~~~~~~~~~~~~~~~~
+
+Path: ``vessel_management/shipping_lanes/``
+
+[ ] Acquire current NOAA ENC Direct Shipping Lanes and Regulations data and the
+    Canadian Hydrographic Service/Canadian Coast Guard equivalent for every
+    ``full_area`` coastal/offshore segment; pin ENC edition/update metadata and
+    source object class.
+
+[ ] Publish lane/route centerline or polygon, direction, route class, and source
+    coverage. Keep observed AIS traffic in the human domain and do not infer a
+    legal lane from vessel-density tracks.
+
+
+Traffic Separation Schemes - P0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Path: ``vessel_management/traffic_separation_schemes/``
+
+[ ] Acquire every TSS intersecting ``full_area`` from official U.S./Canadian ENCs
+    and validate each against 33 CFR Part 167 or the applicable Canadian/IMO
+    authority; include the Strait of Juan de Fuca/Puget Sound scheme as one case,
+    not the geographic limit.
+
+[ ] Preserve traffic lane, separation zone/line, precautionary area, inshore
+    traffic zone, deep-water route, and direction as separate feature types.
+
+[ ] Publish each element's native geometry and identifiers; do not dissolve a
+    whole TSS into a single binary polygon.
+
+
+Exclusion Zones - P0
+~~~~~~~~~~~~~~~~~~~~
+
+Path: ``vessel_management/exclusion_zones/``
+
+[ ] Define the included concepts: vessel-restricted/no-entry zones, security
+    zones, regulated navigation areas, danger/restricted areas, anchoring
+    prohibitions, and fishery-only closures must remain distinguishable.
+
+[ ] Acquire official geometry and the controlling order/CFR/Canada Gazette or
+    interim order, including vessel classes, exceptions, activation condition,
+    binding status, and effective interval.
+
+[ ] Publish time-resolved exclusion type/status and applicable rule IDs. Do not
+    treat voluntary or conditionally activated areas as continuously mandatory.
+
+
+Speed Restriction Zones - P0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Path: ``vessel_management/speed_restriction_zones/``
+
+[ ] Acquire mandatory Transport Canada SRKW speed-restricted-zone geometry and
+    ECHO voluntary slowdown geometry as separate sources, plus any applicable
+    U.S. regulated zones. Archive annual boundaries and orders.
+
+[ ] Publish speed limit, unit, speed definition, vessel applicability,
+    mandatory/voluntary state, season/effective interval, exemptions, and zone
+    geometry. Never collapse ECHO guidance and a legal speed limit into one flag.
+
+
+Whale Approach Regulation Zones - P0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Path: ``vessel_management/whale_approach_regulation_zones/``
+
+[ ] Normalize federal U.S., California, Oregon, Washington, Alaska, and Canadian
+    whale-approach rules with species/population, approach distance, vessel class,
+    exceptions, geographic applicability, and effective interval.
+
+[ ] Store static rule-applicability areas separately from mobile whale-relative
+    distance rules. Never buffer sightings or predicted whales to manufacture a
+    governance layer; that would leak the forecast outcome into the feature.
+
+[ ] Use the 2026 Transport Canada SRKW Interim Order as the first versioned test
+    fixture, then verify annual refresh/supersession and historical as-of queries.
+
+[ ] Publish rule applicability and IDs as governance state; keep real-time vessel
+    compliance and whale-relative distance outside this static feature family.
+
+
+Administrative Context
+----------------------
+
+[ ] Treat these as operational/reporting context, not default biological
+    predictors. Preserve each agency's own region type rather than creating one
+    cross-border hierarchy.
+
+
+Ports - P2
+~~~~~~~~~~
+
+Path: ``administrative_context/ports/``
+
+[ ] Reuse/crosswalk the seascape anthropogenic port locations rather than
+    duplicating them. Governance owns port authority, statutory port/harbour
+    boundary, port-of-entry status, UN/LOCODE, and reporting jurisdiction.
+
+[ ] Evaluate USACE Navigation Data Center facilities/ports, official Canadian/B.C.
+    ports and terminals, and individual port-authority boundaries across the full
+    AOI. Keep facility points, port complexes, and legal port boundaries distinct.
+
+[ ] Publish stable port/authority crosswalks and authoritative port boundaries
+    only where geometry exists; do not create port jurisdictions by buffering a
+    terminal point.
+
+
+Coast Guard Sectors - P2
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Path: ``administrative_context/coast_guard_sectors/``
+
+[ ] Build every U.S. Coast Guard Sector/Captain of the Port zone intersecting
+    ``full_area`` from official boundaries and 33 CFR Part 3, and acquire the
+    applicable Canada Coast Guard regional/operational data.
+
+[ ] Preserve ``COTP_ZONE``, ``USCG_SECTOR``, and ``CCG_REGION`` as non-equivalent
+    types. Publish authority, native geometry, region/sector ID, source vintage,
+    and QC.
+
+
+Management Regions - P2
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Path: ``administrative_context/management_regions/``
+
+[ ] Inventory only regions used by a named governance producer or application,
+    across California, Oregon, Washington, Alaska, and Canada/B.C. Avoid a grab
+    bag of agency districts with no declared consumer.
+
+[ ] Publish agency, native region geometry/type/ID, and effective vintage; record
+    adjacency rather than constructing offshore projections for land-only
+    regions.
+
+
+Reporting Areas - P1
+~~~~~~~~~~~~~~~~~~~~
+
+Path: ``administrative_context/reporting_areas/``
+
+[ ] Acquire every U.S. VTS and Canadian MCTS service/reporting geometry
+    intersecting ``full_area``, including Puget Sound VTS/CVTS, from current
+    official manuals and 33 CFR Part 161 or Canadian authority.
+
+[ ] Preserve service area, reporting sector, entry line, reporting point, and
+    calling-in requirement as separate feature types with direction and vessel
+    applicability.
+
+[ ] Publish native reporting-area, line, and point geometry; keep operational
+    contact text as metadata and do not treat a reporting area as a traffic lane
+    or exclusion zone.
+
+
+Candidate authoritative source registry
+---------------------------------------
+
+Unchecked entries have not passed full-AOI source approval. Some are already
+used as explicitly partial, source-native inputs for implemented Phase 1
+collections; that provisional use does not establish license, legal-authority,
+temporal-completeness, geometry, or cross-jurisdiction coverage approval. A
+checkbox is completed only after those source-matrix gates pass.
+
+[ ] Build a family-by-jurisdiction full-AOI source matrix before approving any
+    collection. Track California, Oregon, Washington, Alaska, U.S. federal,
+    British Columbia/Canada, Canadian federal, international, and not-applicable
+    coverage with current vintage, authority, license, and blocking gap.
+
+[ ] Discover and validate official California, Oregon, and Alaska state sources
+    for protected/conserved areas, state waters, fisheries areas/regulations,
+    vessel rules, counties/boroughs, ports, and administrative regions. The
+    Washington and B.C. candidates below are not full-AOI coverage by themselves.
+
+[ ] Add NOAA Alaska-region and U.S. West Coast/Alaska federal sources where the
+    national inventory is incomplete, including critical habitat and fisheries
+    management boundaries/rules administered through the Pacific and North
+    Pacific councils.
+
+[ ] Canadian Protected and Conserved Areas Database:
+    https://open.canada.ca/data/en/dataset/6c343726-1e92-451a-876a-76e17d398a1c
+
+[ ] DFO Other Effective Area-Based Conservation Measures:
+    https://open.canada.ca/data/en/dataset/44769543-7a23-4991-a53f-c2cf7c7a946f
+
+[ ] NOAA West Coast critical-habitat maps and GIS:
+    https://www.fisheries.noaa.gov/resource/map/critical-habitat-maps-and-gis-data-west-coast-region
+
+[ ] DFO aquatic Species at Risk critical habitat:
+    https://open.canada.ca/data/en/dataset/db177a8c-5d7d-49eb-8290-31e6a45d786c
+
+[ ] USFWS National Wildlife Refuge System GIS data:
+    https://www.fws.gov/service/national-wildlife-refuge-system-gis-data-and-mapping-tools
+
+[ ] International Boundary Commission digital boundary:
+    https://internationalboundarycommission.org/en/maps-coordinates.php
+
+[ ] NOAA U.S. Maritime Limits and Boundaries:
+    https://maritimeboundaries.noaa.gov/
+
+[ ] U.S. Census TIGER/Line counties and American Indian areas:
+    https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html
+
+[ ] BIA land-area data and governance guidance:
+    https://www.bia.gov/service/tribal-consultations/bia-data-governance-bia-open-data-and-bia-tract-viewer
+
+[ ] CIRNAC modern treaties:
+    https://open.canada.ca/data/en/dataset/be54680b-ea62-46f3-aaa9-7644ed970aef
+
+[ ] WDFW Marine Areas GIS service (Washington component only):
+    https://geodataservices.wdfw.wa.gov/arcgis/rest/services/ApplicationServices/Marine_Areas/MapServer
+
+[ ] WDFW base and emergency fishing regulations (Washington component only):
+    https://wdfw.wa.gov/fishing/regulations
+    https://wdfw.wa.gov/fishing/regulations/emergency-rules
+
+[ ] DFO Pacific Fishery Management Area maps and Fishery Notices:
+    https://www.pac.dfo-mpo.gc.ca/fm-gp/maps-cartes/areas-secteurs/index-eng.html
+    https://notices.dfo-mpo.gc.ca/fns-sap/index-eng.cfm
+
+[ ] NOAA ENC Direct to GIS shipping/navigation layers:
+    https://nauticalcharts.noaa.gov/learn/encdirect/
+
+[ ] Transport Canada 2026 SRKW Interim Order (first temporal fixture):
+    https://tc.canada.ca/en/interim-order-protection-killer-whale-orcinus-orca-waters-southern-british-columbia
+
+[ ] U.S. Coast Guard sector/COTP and VTS sources for every in-AOI zone; use
+    Sector Puget Sound and Puget Sound VTS as initial fixtures:
+    https://www.pacificarea.uscg.mil/Our-Organization/Northwest-District/Units/Sector-Puget-Sound/
+    https://www.pacificarea.uscg.mil/VTSPugetSound/
+
+[ ] Canada Coast Guard Regions:
+    https://open.canada.ca/data/en/dataset/02b9fc39-cd07-46ed-a413-42257e7ad717
+
+[ ] USACE Navigation Data Center plus official Canadian/B.C. ports and terminals
+    for full-AOI port/authority discovery; approve only current records with
+    stable IDs and record state/province/authority gaps.
+
+
+Suggested implementation order
+------------------------------
+
+[ ] Phase 1: shared contracts, full-AOI source/coverage matrix, deterministic
+    ``full_area`` slicing, international/federal/state jurisdiction, fisheries
+    management-area geometry, catalog skeleton, and the consolidated governance
+    inspection-map framework.
+
+[ ] Phase 2: critical habitat, seasonal closures, salmon zones, TSS, exclusion,
+    speed-restriction, and whale-approach rule history with as-of-date queries.
+
+[ ] Phase 3: shipping lanes, gear/harvest rules, MPAs, conservation designations,
+    and Tribal/First Nations areas after consent and semantic review.
+
+[ ] Phase 4: refuges, counties/regions, ports, Coast Guard sectors,
+    management regions, and reporting areas.
+
+[ ] Before calling the governance domain complete, run a clean local rebuild,
+    verify every catalog path against canonical artifacts, inspect cross-border
+    maps and temporal rule snapshots, and record all partial/blocked source
+    coverage. Verify that the master map contains every implemented catalog layer
+    clipped to the configured ``full_area`` and no more than the allowed companion
+    maps. Model-projection artifacts are not a governance release gate.

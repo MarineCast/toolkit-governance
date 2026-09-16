@@ -1,0 +1,9 @@
+# Default regional extent retained by this extraction; no species-model ranges.
+areas:
+  full_area:
+    description: Northeast Pacific governance processing extent.
+    bbox_wgs84:
+      min_lon: -180.0
+      min_lat: 32.0
+      max_lon: -109.0
+      max_lat: 72.0

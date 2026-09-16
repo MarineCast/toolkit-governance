@@ -1,0 +1,864 @@
+schema_version: 1
+area: full_area
+common_config_path: config/common.yaml
+
+clipping:
+  crs: EPSG:4326
+  method: antimeridian_safe_shapely_intersection_v1
+  tolerance_degrees: 1.0e-9
+
+raw:
+  snapshot_root: data/raw/governance
+
+output:
+  processed_root: data/processed/domain/governance
+  coverage_matrix_path: data/processed/domain/governance/source_coverage_matrix.json
+
+inspection:
+  map_path: outputs/domains/governance/governance_layers.html
+  map_manifest_path: outputs/domains/governance/governance_layers_map_manifest.json
+  presentation_config_path: config/data/presentation_settings.yaml
+  simplify_tolerance_meters: 250
+  category_colors:
+    protected_areas: '#33A02C'
+    jurisdiction: '#1F78B4'
+    fisheries_management: '#E31A1C'
+    vessel_management: '#FF7F00'
+    administrative_context: '#6A3D9A'
+
+catalog_path: config/data/governance/feature_catalog.yaml
+
+coverage_regions:
+  california:
+    label: California
+  oregon:
+    label: Oregon
+  washington:
+    label: Washington
+  alaska:
+    label: Alaska
+  british_columbia_canada:
+    label: British Columbia and Canada
+  us_federal_offshore:
+    label: U.S. federal and offshore
+  canadian_federal_offshore:
+    label: Canadian federal and offshore
+  international_boundary:
+    label: International boundary
+
+sources:
+  international_boundary_commission_v1_3:
+    provider: International Boundary Commission
+    acquisition_type: direct_archive
+    url: https://www.internationalboundarycommission.org/uploads/shapefile/us-canada-boundary-v1-3.zip
+    snapshot_path: data/raw/governance/international_boundary_commission/us-canada-boundary-v1-3.zip
+    archive_member: US-Canada_Boundary_v1.3.shp
+    expected_sha256: eb327459528b87cbc27e55ccc6bfd6982562c75559823a00b6dc50c04abcaab1
+    source_as_of: '2018-04-19'
+    license: International Boundary Commission terms and source disclaimer apply
+    attribution: International Boundary Commission, Canada and United States
+    legal_citation: Treaty of 1908 and International Boundary Commission Act authorities; controlling monuments, coordinates, treaties, and official records prevail
+    redistribution: Public digital mapping reference; retain IBC attribution and mapping-only disclaimer
+    authority_scope: Commission-published digital representation of the Canada-United States international boundary
+    source_status: available_after_download
+    server_filter: false
+    source_limitation: IBC states that the digital line is for mapping purposes only and must not be used to define the boundary; source section scale is retained and no segment is snapped.
+    coverage:
+      california: not_applicable
+      oregon: not_applicable
+      washington: partial
+      alaska: partial
+      british_columbia_canada: partial
+      us_federal_offshore: not_applicable
+      canadian_federal_offshore: not_applicable
+      international_boundary: partial
+
+  noaa_us_maritime_limits:
+    provider: NOAA Office of Coast Survey
+    acquisition_type: local_vector_or_arcgis
+    url: https://maritimeboundaries.noaa.gov/arcgis/rest/services/MaritimeBoundaries/US_Maritime_Limits_Boundaries/MapServer/0
+    local_path: data/raw/gis/marine/USMaritimeLimitsAndBoundariesSHP/USMaritimeLimitsNBoundaries.shp
+    snapshot_path: data/raw/governance/noaa_us_maritime_limits/overview.pages.json
+    source_as_of: '2013-09-13'
+    license: U.S. Government work; source terms and NOAA disclaimers apply
+    attribution: NOAA/NOS Office of Coast Survey
+    legal_citation: Source attributes contain feature-specific treaty or proclamation citations
+    redistribution: Public reference data; retain attribution and source disclaimer
+    authority_scope: U.S. maritime limit and international-boundary reference lines
+    source_status: available
+    server_filter: true
+    source_limitation: Not for legal use; official depiction is on controlling NOAA charts and legal instruments.
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: unavailable
+      us_federal_offshore: partial
+      canadian_federal_offshore: unavailable
+      international_boundary: partial
+
+  noaa_us_territorial_sea_dynamic:
+    provider: NOAA/NOS Office of Coast Survey
+    acquisition_type: arcgis
+    url: https://maritimeboundaries.noaa.gov/arcgis/rest/services/MaritimeBoundaries/US_Maritime_Limits_Boundaries/MapServer/1
+    snapshot_path: data/raw/governance/noaa_us_territorial_sea_dynamic/features.pages.json
+    source_as_of: dynamic_at_retrieval
+    license: U.S. Government work; source terms and NOAA disclaimers apply
+    attribution: NOAA/NOS Office of Coast Survey
+    legal_citation: Territorial Sea of the United States of America, Presidential Proclamation 5928 of December 27, 1988; feature-specific authorities are retained from the source
+    redistribution: Public reference data; retain NOAA attribution and source disclaimer
+    authority_scope: NOAA-published current dynamic 12 nautical mile U.S. territorial-sea limit and associated international-boundary segments
+    source_status: available_after_download
+    server_filter: true
+    source_limitation: NOAA publishes source-native limit lines, not legal zone polygons, and marks the GIS service as not for legal use; controlling charts and legal instruments prevail.
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: not_applicable
+      us_federal_offshore: partial
+      canadian_federal_offshore: not_applicable
+      international_boundary: partial
+
+  noaa_us_contiguous_zone_dynamic:
+    provider: NOAA/NOS Office of Coast Survey
+    acquisition_type: arcgis
+    url: https://maritimeboundaries.noaa.gov/arcgis/rest/services/MaritimeBoundaries/US_Maritime_Limits_Boundaries/MapServer/2
+    snapshot_path: data/raw/governance/noaa_us_contiguous_zone_dynamic/features.pages.json
+    source_as_of: dynamic_at_retrieval
+    license: U.S. Government work; source terms and NOAA disclaimers apply
+    attribution: NOAA/NOS Office of Coast Survey
+    legal_citation: Contiguous Zone of the United States, Presidential Proclamation 7219 of September 2, 1999; feature-specific authorities are retained from the source
+    redistribution: Public reference data; retain NOAA attribution and source disclaimer
+    authority_scope: NOAA-published current dynamic 24 nautical mile U.S. contiguous-zone limit and associated international-boundary segments
+    source_status: available_after_download
+    server_filter: true
+    source_limitation: NOAA publishes source-native limit lines, not legal zone polygons, and marks the GIS service as not for legal use; controlling charts and legal instruments prevail.
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: not_applicable
+      us_federal_offshore: partial
+      canadian_federal_offshore: not_applicable
+      international_boundary: partial
+
+  noaa_us_eez_dynamic:
+    provider: NOAA/NOS Office of Coast Survey
+    acquisition_type: arcgis
+    url: https://maritimeboundaries.noaa.gov/arcgis/rest/services/MaritimeBoundaries/US_Maritime_Limits_Boundaries/MapServer/3
+    snapshot_path: data/raw/governance/noaa_us_eez_dynamic/features.pages.json
+    source_as_of: dynamic_at_retrieval
+    license: U.S. Government work; source terms and NOAA disclaimers apply
+    attribution: NOAA/NOS Office of Coast Survey
+    legal_citation: Exclusive Economic Zone of the United States of America, Presidential Proclamation 5030 of March 10, 1983; feature-specific authorities are retained from the source
+    redistribution: Public reference data; retain NOAA attribution and source disclaimer
+    authority_scope: NOAA-published current dynamic U.S. EEZ limit and associated international-maritime-boundary segments
+    source_status: available_after_download
+    server_filter: true
+    source_limitation: NOAA publishes source-native limit lines, not legal zone polygons, and marks the GIS service as not for legal use; controlling charts and legal instruments prevail.
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: not_applicable
+      us_federal_offshore: partial
+      canadian_federal_offshore: not_applicable
+      international_boundary: partial
+
+  nrcan_canadian_geopolitical_boundaries_lines:
+    provider: Natural Resources Canada, GeoBase Canadian Geopolitical Boundaries Level 1
+    acquisition_type: direct_archive
+    url: https://www.download-telecharger.services.geo.ca/pub/nrcan_rncan/archive/vector/geobase_cgb_lgc/cgb_lgc_canada_shp_en.zip
+    snapshot_path: data/raw/governance/nrcan_canadian_geopolitical_boundaries/cgb_lgc_canada_shp_en.zip
+    archive_member: can_ab_l_geo83_e.shp
+    expected_sha256: 305bfb2445fdf408922b320740e66c79786fb35e81116dd21ca0c9a43f968381
+    source_as_of: '2013-12-17'
+    license: Open Government Licence - Canada; archived GeoBase product terms apply
+    attribution: Natural Resources Canada; source agencies retained per feature
+    legal_citation: GeoBase Canadian Geopolitical Boundaries Level 1 product specification; IBC and DFO source lineage retained per feature
+    redistribution: Public archived cartographic reference; retain attribution and limitations
+    authority_scope: Canadian-government cartographic international-boundary and maritime-boundary reference lines
+    source_status: available_after_download
+    server_filter: false
+    source_limitation: Archived cartographic product, not a controlling legal boundary; source positional accuracy and agency are retained and conflicts remain visible.
+    coverage:
+      california: not_applicable
+      oregon: not_applicable
+      washington: partial
+      alaska: partial
+      british_columbia_canada: partial
+      us_federal_offshore: not_applicable
+      canadian_federal_offshore: partial
+      international_boundary: partial
+
+  nrcan_canadian_geopolitical_country_area:
+    provider: Natural Resources Canada, GeoBase Canadian Geopolitical Boundaries Level 1
+    acquisition_type: direct_archive
+    url: https://www.download-telecharger.services.geo.ca/pub/nrcan_rncan/archive/vector/geobase_cgb_lgc/cgb_lgc_canada_shp_en.zip
+    snapshot_path: data/raw/governance/nrcan_canadian_geopolitical_boundaries/cgb_lgc_canada_shp_en.zip
+    archive_member: can_ab_p_geo83_e.shp
+    expected_sha256: 305bfb2445fdf408922b320740e66c79786fb35e81116dd21ca0c9a43f968381
+    source_as_of: '2013-12-17'
+    license: Open Government Licence - Canada; archived GeoBase product terms apply
+    attribution: Natural Resources Canada
+    legal_citation: GeoBase Canadian Geopolitical Boundaries Level 1 product specification
+    redistribution: Public archived cartographic reference; retain attribution and limitations
+    authority_scope: Canadian-government country-area reference used only to check country allocation of water-support polygons
+    source_status: available_after_download
+    server_filter: false
+    source_limitation: Archived cartographic country area, not a controlling legal water-jurisdiction polygon; it is comparison support only.
+    coverage:
+      california: not_applicable
+      oregon: not_applicable
+      washington: partial
+      alaska: partial
+      british_columbia_canada: partial
+      us_federal_offshore: not_applicable
+      canadian_federal_offshore: partial
+      international_boundary: partial
+
+  dfo_federal_marine_bioregions_support:
+    provider: Fisheries and Oceans Canada
+    acquisition_type: local_vector
+    url: https://open.canada.ca/data/en/dataset/23eb8b56-dac8-4efc-be7c-b8fa11ba62e9
+    local_path: data/raw/gis/marine/FederalMarineBioregions_SHP/FederalMarineBioregions.shp
+    source_as_of: unknown
+    license: Open Government Licence - Canada
+    attribution: Fisheries and Oceans Canada
+    legal_citation: None; ecosystem-planning geometry is not a legal international boundary
+    redistribution: Open Government Licence - Canada; retain attribution
+    authority_scope: Canadian federal marine bioregion geometry used by canonical seascape water support
+    source_status: available
+    server_filter: false
+    source_limitation: DFO describes marine bioregion boundaries as ecosystem-planning boundaries that may be fuzzy; use only for reconciliation context and support, never legal authority.
+    coverage:
+      california: not_applicable
+      oregon: not_applicable
+      washington: partial
+      alaska: partial
+      british_columbia_canada: partial
+      us_federal_offshore: not_applicable
+      canadian_federal_offshore: partial
+      international_boundary: partial
+
+  seascape_territorial_water_support:
+    provider: OrcaCast environmental seascape spatial-support pipeline
+    acquisition_type: local_vector
+    url: data/processed/domain/environmental_layer/seascape/spatial_support/water_geometry/water_geometry_manifest.json
+    local_path: data/processed/domain/environmental_layer/seascape/spatial_support/water_geometry/TERRITORIAL_WATER_POLYGON.parquet
+    source_as_of: unknown
+    license: Derived artifact; upstream source licenses and attribution are recorded in the water-geometry manifest
+    attribution: OrcaCast derived support from DFO, NOAA, Marine Regions, U.S. Census, and shoreline inputs
+    legal_citation: None; assembled model support is not a legal jurisdiction authority
+    redistribution: Follow the upstream source terms recorded in the water-geometry manifest
+    authority_scope: Canonical full-domain water support used only for clipping and derived country-water reference polygons
+    source_status: available
+    server_filter: false
+    source_limitation: Assembled territorial-water support is a modeling/spatial-support product; its exterior and country partition must not be interpreted as controlling legal boundaries.
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: partial
+      us_federal_offshore: partial
+      canadian_federal_offshore: partial
+      international_boundary: partial
+
+  noaa_mpa_inventory_states:
+    provider: NOAA National Marine Protected Areas Center
+    acquisition_type: arcgis
+    url: https://maritimeboundaries.noaa.gov/arcgis/rest/services/survey_priorities2_national/MPA_Inventory_Separates/MapServer/0
+    snapshot_path: data/raw/governance/noaa_mpa_inventory_states/features.pages.json
+    source_as_of: '2023'
+    license: U.S. Government public-domain data; not for navigation
+    attribution: NOAA National MPA Center and U.S. Department of the Interior; contributing management agencies retained per feature
+    legal_citation: Executive Order 13158; the inventory classification is not the site-specific governing authority
+    redistribution: Public domain; retain attribution and source limitations
+    authority_scope: Discovery inventory of state, Tribal, territorial, and local U.S. MPAs; management agency retained per feature
+    source_status: available_after_download
+    server_filter: true
+    page_size: 25
+    source_limitation: NOAA describes the inventory as a dynamic reference compilation, not a legal document; site-specific governing rules are not supplied and require management-agency verification.
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: not_applicable
+      us_federal_offshore: not_applicable
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+
+  noaa_mpa_inventory_nerrs:
+    provider: NOAA National Estuarine Research Reserve System
+    acquisition_type: arcgis
+    url: https://maritimeboundaries.noaa.gov/arcgis/rest/services/survey_priorities2_national/MPA_Inventory_Separates/MapServer/1
+    snapshot_path: data/raw/governance/noaa_mpa_inventory_nerrs/features.pages.json
+    source_as_of: '2023'
+    license: U.S. Government public-domain data; not for navigation
+    attribution: NOAA National MPA Center; NERRS and site management agencies retained per feature
+    legal_citation: Coastal Zone Management Act section 315; site-specific designation and management instruments control
+    redistribution: Public domain; retain attribution and source limitations
+    authority_scope: NOAA MPA Inventory discovery representation of National Estuarine Research Reserves
+    source_status: available_after_download
+    server_filter: true
+    page_size: 25
+    source_limitation: Inventory polygon and classifications are reference metadata; the reserve designation and approved management plan control.
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: not_applicable
+      us_federal_offshore: partial
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+
+  noaa_mpa_inventory_boem:
+    provider: Bureau of Ocean Energy Management
+    acquisition_type: arcgis
+    url: https://maritimeboundaries.noaa.gov/arcgis/rest/services/survey_priorities2_national/MPA_Inventory_Separates/MapServer/2
+    snapshot_path: data/raw/governance/noaa_mpa_inventory_boem/features.pages.json
+    source_as_of: '2023'
+    license: U.S. Government public-domain data; not for navigation
+    attribution: NOAA National MPA Center; BOEM and management agencies retained per feature
+    legal_citation: Outer Continental Shelf Lands Act program framework; site-specific governing instrument must be verified
+    redistribution: Public domain; retain attribution and source limitations
+    authority_scope: NOAA MPA Inventory discovery representation of BOEM-managed protected areas
+    source_status: available_after_download
+    server_filter: true
+    page_size: 25
+    source_limitation: Inventory geometry and classifications are reference metadata and do not substitute for a site-specific BOEM instrument.
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: not_applicable
+      us_federal_offshore: partial
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+
+  noaa_mpa_inventory_marine_national_monuments:
+    provider: NOAA and U.S. Fish and Wildlife Service
+    acquisition_type: arcgis
+    url: https://maritimeboundaries.noaa.gov/arcgis/rest/services/survey_priorities2_national/MPA_Inventory_Separates/MapServer/3
+    snapshot_path: data/raw/governance/noaa_mpa_inventory_marine_national_monuments/features.pages.json
+    source_as_of: '2023'
+    license: U.S. Government public-domain data; not for navigation
+    attribution: NOAA National MPA Center; monument management agencies retained per feature
+    legal_citation: Antiquities Act and site-specific presidential proclamation; proclamation controls
+    redistribution: Public domain; retain attribution and source limitations
+    authority_scope: NOAA MPA Inventory discovery representation of marine national monuments
+    source_status: available_after_download
+    server_filter: true
+    page_size: 25
+    source_limitation: Inventory geometry and classification do not replace the monument proclamation, amendments, or regulations.
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: not_applicable
+      us_federal_offshore: partial
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+
+  noaa_mpa_inventory_national_marine_sanctuaries:
+    provider: NOAA Office of National Marine Sanctuaries
+    acquisition_type: arcgis
+    url: https://maritimeboundaries.noaa.gov/arcgis/rest/services/survey_priorities2_national/MPA_Inventory_Separates/MapServer/4
+    snapshot_path: data/raw/governance/noaa_mpa_inventory_national_marine_sanctuaries/features.pages.json
+    source_as_of: '2023'
+    license: U.S. Government public-domain data; not for navigation
+    attribution: NOAA National MPA Center and Office of National Marine Sanctuaries
+    legal_citation: National Marine Sanctuaries Act and site-specific 15 CFR part 922 subpart; site regulation controls
+    redistribution: Public domain; retain attribution and source limitations
+    authority_scope: NOAA MPA Inventory discovery representation of national marine sanctuaries
+    source_status: available_after_download
+    server_filter: true
+    page_size: 25
+    source_limitation: Inventory geometry and classification do not replace current ONMS boundary data or site regulations.
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: not_applicable
+      us_federal_offshore: partial
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+
+  noaa_onms_channel_islands_boundary:
+    provider: NOAA Office of National Marine Sanctuaries
+    acquisition_type: direct_archive
+    url: https://sanctuaries.noaa.gov/library/imast/cinms_py2.zip
+    snapshot_path: data/raw/governance/noaa_onms_national_marine_sanctuaries/cinms_py2.zip
+    archive_member: cinms_py.shp
+    expected_sha256: 9c4162b0ec8d95b5872e4548ab0f4d804a06485ec8cdb4e9def21266b6f657ee
+    source_as_of: '2008-06-18'
+    license: U.S. Government work; NOAA source terms and disclaimers apply
+    attribution: NOAA Office of National Marine Sanctuaries
+    legal_citation: National Marine Sanctuaries Act, 16 U.S.C. 1431 et seq.; 15 CFR part 922 subpart G, section 922.70 and appendix A
+    redistribution: Publicly downloadable NOAA boundary reference; retain attribution and the not-for-legal-use disclaimer
+    authority_scope: NOAA-published GIS representation of the Channel Islands National Marine Sanctuary boundary
+    source_status: available_after_download
+    server_filter: false
+    source_limitation: GIS boundary representation only; the current 15 CFR part 922 subpart G boundary description and coordinates control.
+    coverage:
+      california: complete
+      oregon: not_applicable
+      washington: not_applicable
+      alaska: not_applicable
+      british_columbia_canada: not_applicable
+      us_federal_offshore: complete
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+
+  noaa_onms_chumash_heritage_boundary:
+    provider: NOAA Office of National Marine Sanctuaries
+    acquisition_type: direct_archive
+    url: https://sanctuaries.noaa.gov/media/gis/chnms_py.zip
+    snapshot_path: data/raw/governance/noaa_onms_national_marine_sanctuaries/chnms_py.zip
+    archive_member: CHNMS_py.shp
+    expected_sha256: b15ad1f67af16972cb491cbfdf242bc9213c6b793c6876e22223350279bcc7bf
+    source_as_of: '2024-12-02'
+    license: U.S. Government work; NOAA source terms and disclaimers apply
+    attribution: NOAA Office of National Marine Sanctuaries
+    legal_citation: National Marine Sanctuaries Act, 16 U.S.C. 1431 et seq.; 15 CFR part 922 subpart V, section 922.230 and appendix A; 89 FR 83554
+    redistribution: Publicly downloadable NOAA boundary reference; retain attribution and the not-for-legal-use disclaimer
+    authority_scope: NOAA-published GIS representation of the Chumash Heritage National Marine Sanctuary boundary
+    source_status: available_after_download
+    server_filter: false
+    source_limitation: GIS boundary representation only; the current 15 CFR part 922 subpart V boundary description and coordinates control.
+    coverage:
+      california: complete
+      oregon: not_applicable
+      washington: not_applicable
+      alaska: not_applicable
+      british_columbia_canada: not_applicable
+      us_federal_offshore: complete
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+
+  noaa_onms_cordell_bank_boundary:
+    provider: NOAA Office of National Marine Sanctuaries
+    acquisition_type: direct_archive
+    url: https://sanctuaries.noaa.gov/library/imast/cbnms_py2.zip
+    snapshot_path: data/raw/governance/noaa_onms_national_marine_sanctuaries/cbnms_py2.zip
+    archive_member: CBNMS_py.shp
+    expected_sha256: 41ba549976c5860085f9996727c86c9bcbac0eccd6fbfd80026a2f42db63b612
+    source_as_of: '2015-06-10'
+    license: U.S. Government work; NOAA source terms and disclaimers apply
+    attribution: NOAA Office of National Marine Sanctuaries
+    legal_citation: National Marine Sanctuaries Act, 16 U.S.C. 1431 et seq.; 15 CFR part 922 subpart K, section 922.110 and appendix A
+    redistribution: Publicly downloadable NOAA boundary reference; retain attribution and the not-for-legal-use disclaimer
+    authority_scope: NOAA-published GIS representation of the expanded Cordell Bank National Marine Sanctuary boundary
+    source_status: available_after_download
+    server_filter: false
+    source_limitation: GIS boundary representation only; the current 15 CFR part 922 subpart K boundary description and coordinates control.
+    coverage:
+      california: complete
+      oregon: not_applicable
+      washington: not_applicable
+      alaska: not_applicable
+      british_columbia_canada: not_applicable
+      us_federal_offshore: complete
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+
+  noaa_onms_greater_farallones_boundary:
+    provider: NOAA Office of National Marine Sanctuaries
+    acquisition_type: direct_archive
+    url: https://sanctuaries.noaa.gov/library/imast/gfnms_py2.zip
+    snapshot_path: data/raw/governance/noaa_onms_national_marine_sanctuaries/gfnms_py2.zip
+    archive_member: GFNMS_py.shp
+    expected_sha256: 838f4b901c0dea98d37027dad87260855112a3654623e690bbdd376ac45b4e47
+    source_as_of: '2015-06-10'
+    license: U.S. Government work; NOAA source terms and disclaimers apply
+    attribution: NOAA Office of National Marine Sanctuaries
+    legal_citation: National Marine Sanctuaries Act, 16 U.S.C. 1431 et seq.; 15 CFR part 922 subpart H, section 922.80 and appendix A
+    redistribution: Publicly downloadable NOAA boundary reference; retain attribution and the not-for-legal-use disclaimer
+    authority_scope: NOAA-published GIS representation of the expanded Greater Farallones National Marine Sanctuary boundary
+    source_status: available_after_download
+    server_filter: false
+    source_limitation: GIS boundary representation only; the current 15 CFR part 922 subpart H boundary description and coordinates control.
+    coverage:
+      california: complete
+      oregon: not_applicable
+      washington: not_applicable
+      alaska: not_applicable
+      british_columbia_canada: not_applicable
+      us_federal_offshore: complete
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+
+  noaa_onms_monterey_bay_boundary:
+    provider: NOAA Office of National Marine Sanctuaries
+    acquisition_type: direct_archive
+    url: https://sanctuaries.noaa.gov/library/imast/mbnms_py2.zip
+    snapshot_path: data/raw/governance/noaa_onms_national_marine_sanctuaries/mbnms_py2.zip
+    archive_member: mbnms_py.shp
+    expected_sha256: 83338c1bce533a4280629c36e6c505776087830678aef2ba980068ef3c7c922d
+    source_as_of: '2014-09-12'
+    license: U.S. Government work; NOAA source terms and disclaimers apply
+    attribution: NOAA Office of National Marine Sanctuaries
+    legal_citation: National Marine Sanctuaries Act, 16 U.S.C. 1431 et seq.; 15 CFR part 922 subpart M, section 922.130 and appendix A
+    redistribution: Publicly downloadable NOAA boundary reference; retain attribution and the not-for-legal-use disclaimer
+    authority_scope: NOAA-published GIS representation of the Monterey Bay National Marine Sanctuary boundary including Davidson Seamount
+    source_status: available_after_download
+    server_filter: false
+    source_limitation: GIS boundary representation only; the current 15 CFR part 922 subpart M boundary description and coordinates control.
+    coverage:
+      california: complete
+      oregon: not_applicable
+      washington: not_applicable
+      alaska: not_applicable
+      british_columbia_canada: not_applicable
+      us_federal_offshore: complete
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+
+  noaa_onms_olympic_coast_boundary:
+    provider: NOAA Office of National Marine Sanctuaries
+    acquisition_type: direct_archive
+    url: https://sanctuaries.noaa.gov/library/imast/ocnms_py2.zip
+    snapshot_path: data/raw/governance/noaa_onms_national_marine_sanctuaries/ocnms_py2.zip
+    archive_member: ocnms_py.shp
+    expected_sha256: 5fdc270b972ddd53f2be767ee561c62bf892630d85cb7510b4c2583112e69673
+    source_as_of: '2004-12-01'
+    license: U.S. Government work; NOAA source terms and disclaimers apply
+    attribution: NOAA Office of National Marine Sanctuaries
+    legal_citation: National Marine Sanctuaries Act, 16 U.S.C. 1431 et seq.; 15 CFR part 922 subpart O, section 922.150 and appendix A
+    redistribution: Publicly downloadable NOAA boundary reference; retain attribution and the not-for-legal-use disclaimer
+    authority_scope: NOAA-published GIS representation of the Olympic Coast National Marine Sanctuary boundary
+    source_status: available_after_download
+    server_filter: false
+    source_limitation: GIS boundary representation only; the current 15 CFR part 922 subpart O boundary description and coordinates control.
+    coverage:
+      california: not_applicable
+      oregon: not_applicable
+      washington: complete
+      alaska: not_applicable
+      british_columbia_canada: not_applicable
+      us_federal_offshore: complete
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+
+  noaa_mpa_inventory_national_park_service:
+    provider: U.S. National Park Service
+    acquisition_type: arcgis
+    url: https://maritimeboundaries.noaa.gov/arcgis/rest/services/survey_priorities2_national/MPA_Inventory_Separates/MapServer/5
+    snapshot_path: data/raw/governance/noaa_mpa_inventory_national_park_service/features.pages.json
+    source_as_of: '2023'
+    license: U.S. Government public-domain data; not for navigation
+    attribution: NOAA National MPA Center; National Park Service and park authority retained per feature
+    legal_citation: National Park Service Organic Act and site-specific enabling law and regulations
+    redistribution: Public domain; retain attribution and source limitations
+    authority_scope: NOAA MPA Inventory discovery representation of National Park Service marine units
+    source_status: available_after_download
+    server_filter: true
+    page_size: 25
+    source_limitation: Inventory geometry and classification are reference metadata; NPS authoritative boundaries and site rules control.
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: not_applicable
+      us_federal_offshore: partial
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+
+  noaa_mpa_inventory_national_wildlife_refuge_system:
+    provider: U.S. Fish and Wildlife Service
+    acquisition_type: arcgis
+    url: https://maritimeboundaries.noaa.gov/arcgis/rest/services/survey_priorities2_national/MPA_Inventory_Separates/MapServer/6
+    snapshot_path: data/raw/governance/noaa_mpa_inventory_national_wildlife_refuge_system/features.pages.json
+    source_as_of: '2023'
+    license: U.S. Government public-domain data; not for navigation
+    attribution: NOAA National MPA Center; U.S. Fish and Wildlife Service and refuge authority retained per feature
+    legal_citation: National Wildlife Refuge System Administration Act and site-specific establishment instrument and regulations
+    redistribution: Public domain; retain attribution and source limitations
+    authority_scope: NOAA MPA Inventory discovery representation of National Wildlife Refuge System marine units
+    source_status: available_after_download
+    server_filter: true
+    page_size: 25
+    source_limitation: Inventory geometry and classification are reference metadata; FWS authoritative boundaries and refuge rules control.
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: not_applicable
+      us_federal_offshore: partial
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+
+  noaa_mpa_inventory_national_forest_service:
+    provider: U.S. Forest Service
+    acquisition_type: arcgis
+    url: https://maritimeboundaries.noaa.gov/arcgis/rest/services/survey_priorities2_national/MPA_Inventory_Separates/MapServer/7
+    snapshot_path: data/raw/governance/noaa_mpa_inventory_national_forest_service/features.pages.json
+    source_as_of: '2023'
+    license: U.S. Government public-domain data; not for navigation
+    attribution: NOAA National MPA Center; U.S. Forest Service and unit authority retained per feature
+    legal_citation: National Forest Management Act and site-specific forest order or management plan
+    redistribution: Public domain; retain attribution and source limitations
+    authority_scope: NOAA MPA Inventory discovery representation of U.S. Forest Service marine units
+    source_status: available_after_download
+    server_filter: true
+    page_size: 25
+    source_limitation: Inventory geometry and classification are reference metadata; Forest Service authoritative boundaries, orders, and plans control.
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: not_applicable
+      us_federal_offshore: partial
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+
+  noaa_mpa_inventory_2023:
+    provider: NOAA National Marine Protected Areas Center
+    acquisition_type: direct_archive
+    url: https://marineprotectedareas.noaa.gov/media/data/NOAA_Marine_Protected_Areas_Inventory_2023.zip
+    snapshot_path: data/raw/governance/noaa_mpa_inventory_2023/NOAA_Marine_Protected_Areas_Inventory_2023.zip
+    archive_member: NOAA_Marine_Protected_Areas_Inventory_2023/NOAA_MPAI_2023.gdb
+    archive_layer: NOAA_MPA_Inventory
+    expected_sha256: 2774f66f11dec5a65d9fe163a77b241306a63abda6a1e38881b3e175ee8d512d
+    source_as_of: '2023'
+    license: U.S. Government public-domain data; not for navigation
+    attribution: NOAA National MPA Center and U.S. Department of the Interior; contributing management agencies retained per feature
+    legal_citation: Executive Order 13158; inventory classifications and program frameworks do not replace site-specific governing instruments
+    redistribution: Public domain; retain attribution and source limitations
+    authority_scope: National discovery inventory of U.S. MPAs with management-agency and classification reference metadata
+    source_status: available_after_download
+    server_filter: false
+    source_limitation: NOAA describes the inventory as a dynamic reference compilation, not a legal document; site-specific governing rules are not supplied and require management-agency verification. The exact 2023 archive is pinned and clipped locally to full_area after raw preservation.
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: not_applicable
+      us_federal_offshore: partial
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+
+  dfo_oceans_act_marine_protected_areas:
+    provider: Fisheries and Oceans Canada, Marine Planning and Conservation Directorate
+    acquisition_type: arcgis
+    url: https://egisp.dfo-mpo.gc.ca/arcgis/rest/services/open_data_donnees_ouvertes/oceans_act_marine_protected_areas_zones_de_protection_marines_de_la_loi_sur_les_oceans/MapServer/0
+    snapshot_path: data/raw/governance/dfo_oceans_act_marine_protected_areas/features.pages.json
+    source_as_of: dynamic_at_retrieval
+    license: Open Government Licence - Canada
+    attribution: Fisheries and Oceans Canada, Marine Planning and Conservation Directorate
+    legal_citation: Oceans Act, S.C. 1996, c. 31, section 35; feature-specific regulation retained
+    redistribution: Open Government Licence - Canada; retain attribution and legal-use limitation
+    authority_scope: DFO-published reference polygons for designated Oceans Act MPAs and their zones
+    source_status: available_after_download
+    server_filter: true
+    page_size: 100
+    source_limitation: DFO states that the GIS boundaries are visual reference only and not legally authoritative; official regulation coordinates control.
+    coverage:
+      california: not_applicable
+      oregon: not_applicable
+      washington: not_applicable
+      alaska: not_applicable
+      british_columbia_canada: partial
+      us_federal_offshore: not_applicable
+      canadian_federal_offshore: partial
+      international_boundary: not_applicable
+
+  dfo_oceans_act_areas_of_interest:
+    provider: Fisheries and Oceans Canada, Marine Planning and Conservation Directorate
+    acquisition_type: arcgis
+    url: https://egisp.dfo-mpo.gc.ca/arcgis/rest/services/open_data_donnees_ouvertes/oceans_act_areas_of_interest_sites_dinteret_de_la_loi_sur_les_oceans/MapServer/0
+    snapshot_path: data/raw/governance/dfo_oceans_act_areas_of_interest/features.pages.json
+    source_as_of: dynamic_at_retrieval
+    license: Open Government Licence - Canada
+    attribution: Fisheries and Oceans Canada, Marine Planning and Conservation Directorate
+    legal_citation: Oceans Act MPA establishment process; an Area of Interest is not a designated MPA
+    redistribution: Open Government Licence - Canada; retain attribution and proposal-status caveat
+    authority_scope: DFO-published point locations for Oceans Act MPA Areas of Interest
+    source_status: available_after_download
+    server_filter: true
+    page_size: 100
+    source_limitation: The source publishes point locations, not proposed legal boundaries; Areas of Interest remain separate from active designations.
+    coverage:
+      california: not_applicable
+      oregon: not_applicable
+      washington: not_applicable
+      alaska: not_applicable
+      british_columbia_canada: partial
+      us_federal_offshore: not_applicable
+      canadian_federal_offshore: partial
+      international_boundary: not_applicable
+
+  boem_submerged_lands_boundary:
+    provider: Bureau of Ocean Energy Management
+    acquisition_type: arcgis
+    url: https://gis.boem.gov/server/rest/services/BOEM_BSEE/MMC_Layers/MapServer/8
+    snapshot_path: data/raw/governance/boem_submerged_lands_boundary/features.pages.json
+    source_as_of: unknown
+    license: U.S. Government work; BOEM source terms apply
+    attribution: BOEM/BSEE
+    legal_citation: Submerged Lands Act, 43 U.S.C. 1301-1315; controlling OPDs and SOBDs
+    redistribution: Public reference data; retain attribution and source disclaimer
+    authority_scope: State seaward and federal OCS boundary reference line
+    source_status: available_after_download
+    server_filter: false
+    source_limitation: GIS line is approximate and is not the controlling official boundary record.
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: not_applicable
+      us_federal_offshore: partial
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+
+  wdfw_recreational_marine_areas:
+    provider: Washington Department of Fish and Wildlife
+    acquisition_type: arcgis
+    url: https://geodataservices.wdfw.wa.gov/arcgis/rest/services/ApplicationServices/Major_Fishing_Area/MapServer/6
+    snapshot_path: data/raw/governance/wdfw_recreational_marine_areas/features.pages.json
+    source_as_of: unknown
+    license: Washington State public data terms apply
+    attribution: Washington Department of Fish and Wildlife
+    legal_citation: WAC 220-56-185
+    redistribution: Public reference data; retain attribution and legal-source link
+    authority_scope: Washington recreational marine catch reporting areas
+    source_status: available_after_download
+    server_filter: true
+    source_limitation: One Washington recreational area system; not complete fisheries-management coverage.
+    coverage:
+      california: unavailable
+      oregon: unavailable
+      washington: partial
+      alaska: unavailable
+      british_columbia_canada: unavailable
+      us_federal_offshore: unavailable
+      canadian_federal_offshore: unavailable
+      international_boundary: not_applicable
+
+  dfo_pacific_fishery_management_areas:
+    provider: Fisheries and Oceans Canada
+    acquisition_type: reference_only
+    url: https://www.pac.dfo-mpo.gc.ca/fm-gp/maps-cartes/areas-secteurs/index-eng.html
+    source_as_of: unknown
+    license: Open Government Licence - Canada where applicable
+    attribution: Fisheries and Oceans Canada
+    legal_citation: Pacific Fishery Management Area Regulations, 2007
+    redistribution: Machine-readable authoritative geometry source not yet pinned
+    authority_scope: DFO Pacific Fishery Management Areas and Subareas
+    source_status: unavailable
+    server_filter: false
+    source_limitation: Official maps and legal descriptions are known, but no approved machine-readable geometry snapshot is configured.
+    coverage:
+      california: not_applicable
+      oregon: not_applicable
+      washington: not_applicable
+      alaska: not_applicable
+      british_columbia_canada: unavailable
+      us_federal_offshore: not_applicable
+      canadian_federal_offshore: unavailable
+      international_boundary: not_applicable
+
+collections:
+  marine_protected_areas:
+    category: protected_areas
+    display_name: Marine protected areas
+    normalization_profile: noaa_dfo_marine_protected_areas
+    source_ids:
+      - noaa_mpa_inventory_2023
+      - dfo_oceans_act_marine_protected_areas
+      - dfo_oceans_act_areas_of_interest
+    artifact_path: data/processed/domain/governance/protected_areas/marine_protected_areas/marine_protected_areas.parquet
+    manifest_path: data/processed/domain/governance/protected_areas/marine_protected_areas/manifest.json
+    color: '#33A02C'
+    default_visible: false
+    implementation_status: implemented_partial
+
+  national_marine_sanctuaries:
+    category: protected_areas
+    display_name: NOAA national marine sanctuaries
+    normalization_profile: noaa_onms_west_coast_sanctuaries
+    source_ids:
+      - noaa_onms_channel_islands_boundary
+      - noaa_onms_chumash_heritage_boundary
+      - noaa_onms_cordell_bank_boundary
+      - noaa_onms_greater_farallones_boundary
+      - noaa_onms_monterey_bay_boundary
+      - noaa_onms_olympic_coast_boundary
+    artifact_path: data/processed/domain/governance/protected_areas/national_marine_sanctuaries/national_marine_sanctuaries.parquet
+    manifest_path: data/processed/domain/governance/protected_areas/national_marine_sanctuaries/manifest.json
+    color: '#006D2C'
+    default_visible: false
+    implementation_status: implemented
+
+  international_boundaries:
+    category: jurisdiction
+    display_name: International boundaries
+    normalization_profile: reconciled_us_canada_international_boundaries
+    source_ids:
+      - international_boundary_commission_v1_3
+      - noaa_us_maritime_limits
+      - nrcan_canadian_geopolitical_boundaries_lines
+      - nrcan_canadian_geopolitical_country_area
+      - dfo_federal_marine_bioregions_support
+      - seascape_territorial_water_support
+    artifact_path: data/processed/domain/governance/jurisdiction/international_boundaries/international_boundaries.parquet
+    manifest_path: data/processed/domain/governance/jurisdiction/international_boundaries/manifest.json
+    color: '#1F78B4'
+    default_visible: true
+    implementation_status: implemented
+
+  federal_waters:
+    category: jurisdiction
+    display_name: U.S. and Canadian maritime zone limits
+    normalization_profile: reconciled_us_canada_federal_maritime_zone_limits
+    source_ids:
+      - noaa_us_territorial_sea_dynamic
+      - noaa_us_contiguous_zone_dynamic
+      - noaa_us_eez_dynamic
+      - nrcan_canadian_geopolitical_boundaries_lines
+    artifact_path: data/processed/domain/governance/jurisdiction/federal_waters/federal_maritime_limits.parquet
+    manifest_path: data/processed/domain/governance/jurisdiction/federal_waters/manifest.json
+    color: '#1F78B4'
+    default_visible: true
+    implementation_status: implemented_partial
+
+  state_provincial_waters:
+    category: jurisdiction
+    display_name: State seaward boundary lines
+    normalization_profile: boem_submerged_lands_boundary
+    source_ids:
+      - boem_submerged_lands_boundary
+    artifact_path: data/processed/domain/governance/jurisdiction/state_provincial_waters/state_seaward_boundaries.parquet
+    manifest_path: data/processed/domain/governance/jurisdiction/state_provincial_waters/manifest.json
+    color: '#1F78B4'
+    default_visible: false
+    implementation_status: implemented_partial
+
+  management_areas:
+    category: fisheries_management
+    display_name: Fisheries management areas
+    normalization_profile: wdfw_recreational_marine_areas
+    source_ids:
+      - wdfw_recreational_marine_areas
+      - dfo_pacific_fishery_management_areas
+    artifact_path: data/processed/domain/governance/fisheries_management/management_areas/management_areas.parquet
+    manifest_path: data/processed/domain/governance/fisheries_management/management_areas/manifest.json
+    color: '#E31A1C'
+    default_visible: false
+    implementation_status: implemented_partial

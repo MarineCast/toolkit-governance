@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.venv/
+build/
+dist/
+/data/
+/outputs/
+/migration-local/
+/graphify-out/
+.DS_Store
