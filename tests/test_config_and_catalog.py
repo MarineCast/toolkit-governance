@@ -71,6 +71,7 @@ def test_governance_root_is_public_surface_and_shared_code_is_packaged() -> None
         "__main__.py",
         "cli.py",
         "workspace.py",
+        "h3_matrix.py",
     }
     assert {
         "acquisition.py",

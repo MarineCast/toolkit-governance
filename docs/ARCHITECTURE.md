@@ -1,13 +1,17 @@
 # Architecture and navigation
 
 `governance` owns acquisition, source normalization, native-geometry publication and inspection.
-Applications own ecological interpretation and optional spatial/temporal overlays. There is no
+Applications own ecological interpretation, grid selection and temporal eligibility. The optional
+`h3_matrix` module performs a species-neutral geometric overlay only on an explicit consumer grid;
+it produces a separate model-ineligible context product, retaining canonical native products.
+There is no
 application runtime dependency, sibling-path import, shared core package or implicit source download.
 
 | Surface | Ownership |
 | --- | --- |
 | `governance.__init__` | Public configuration and workspace initializer |
 | `governance.cli` / `python -m governance` | CLI routing and explicit workspace selection |
+| `governance.h3_matrix` | Optional explicit H3 overlay export; see [contract](h3-matrix.md) |
 | `protected_areas/*`, `jurisdiction/*`, `fisheries_management/*` | Six family-owned source, build and inspection workflows |
 | `shared/` | Native schema, acquisition, clipping, coverage, manifests, catalog and map descriptors |
 | `_config/` | Private composed YAML, redaction, path and presentation support |

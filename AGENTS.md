@@ -60,6 +60,12 @@ that smoke test. Documentation-only work needs references and `git diff --check`
 State acquisition, regional rebuild, map visual QA, platform and integration boundaries accurately.
 No network or regional science run was established by the extraction's offline tests.
 
+For the optional explicit H3 overlay, read `docs/h3-matrix.md`, install `.[test,h3]`,
+and run `python -m pytest -q tests/test_h3_matrix.py` followed by the full suite.
+It derives a separate model-ineligible consumer-grid product; canonical native
+schemas and manifests retain their no-H3 contract. A regional overlay requires
+verified native products, an explicit grid and an explicit metre-based length CRS.
+
 ## Codebase navigation
 
 Use `graphify-out/graph.json` for structural questions, then read authoritative source/tests.

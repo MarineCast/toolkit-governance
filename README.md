@@ -72,6 +72,7 @@ config = load_governance_config()
 - [Architecture](docs/ARCHITECTURE.md): ownership, APIs, configuration and developer navigation.
 - [Contracts](docs/CONTRACTS.md): grain, geometry, missingness, time and provenance.
 - [Workflows](docs/WORKFLOWS.md): acquisition, building, inspection and validation.
+- [Explicit H3 matrix](docs/h3-matrix.md): optional consumer-grid overlays with retained native authority and missingness.
 - [Migration and validation](docs/MIGRATION.md): extraction inventory and acceptance limits.
 - [Roadmap](src/governance/TODO.txt): inherited research backlog; current extraction status is in
   the migration report rather than inferred from historical checkboxes.

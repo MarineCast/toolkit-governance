@@ -11,11 +11,12 @@ requires-python = ">=3.11"
 license = "Apache-2.0"
 dependencies = [
   "folium>=0.20", "geopandas>=1", "numpy>=1.26", "pandas>=2.1",
-  "pyarrow>=14", "pydantic>=2", "PyYAML>=6", "requests>=2.31", "shapely>=2",
+  "pyarrow>=14", "pydantic>=2", "pyproj>=3.6", "PyYAML>=6", "requests>=2.31", "shapely>=2",
 ]
 
 [project.optional-dependencies]
-test = ["pytest>=8"]
+test = ["pytest>=8", "h3>=4"]
+h3 = ["h3>=4"]
 
 [project.scripts]
 governance = "governance.cli:main"

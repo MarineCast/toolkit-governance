@@ -18,6 +18,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument('--workspace', type=Path, help='Data workspace (default: GOVERNANCE_WORKSPACE or cwd).')
     commands = parser.add_subparsers(dest='command', required=True)
     commands.add_parser('init', help='Copy missing configuration defaults; no downloads.')
+    sub = commands.add_parser('export-h3-matrix', help='Derive an explicit H3 context overlay from verified native products.')
+    sub.add_argument('--grid', required=True, type=Path)
+    sub.add_argument('--output', required=True, type=Path)
+    sub.add_argument('--length-crs', required=True)
+    sub.add_argument('--config', default=DEFAULT_CONFIG_PATH)
+    sub.add_argument('--allow-partial', action='store_true')
+    sub.add_argument('--overwrite', action='store_true')
     for name in ('download', 'build'):
         sub = commands.add_parser(name)
         sub.add_argument('collection', help='Configured collection ID; use catalog to list.')
@@ -41,6 +48,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             from ._config.paths import project_root
             for path in initialize_workspace(project_root()):
                 print(path)
+        elif args.command == 'export-h3-matrix':
+            from .h3_matrix import export_h3_matrix
+            try:
+                print(export_h3_matrix(args.grid, args.output, length_crs=args.length_crs,
+                                      config_path=args.config, allow_partial=args.allow_partial,
+                                      overwrite=args.overwrite))
+            except (ValueError, FileNotFoundError, FileExistsError, ImportError) as error:
+                parser.error(str(error))
         elif args.command == 'catalog':
             from .shared.catalog import validate_catalog
             print(json.dumps(validate_catalog(config_path=args.config, verify_artifacts=args.verify_artifacts), indent=2))
