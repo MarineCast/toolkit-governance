@@ -1,5 +1,7 @@
 # Governance Toolkit
 
+<img src="docs/assets/governance-toolkit-banner.png" alt="Ink coastal chart with islands, navigation markers, and boundary lines" width="100%">
+
 Species-neutral, source-backed marine governance geometry: protected areas, sanctuaries,
 jurisdictional reference boundaries and fisheries management areas. The distribution is
 **`toolkit-governance`**; the Python package and command are **`governance`**.
