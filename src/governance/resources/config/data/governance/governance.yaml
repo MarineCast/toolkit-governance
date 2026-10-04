@@ -47,6 +47,137 @@ coverage_regions:
     label: International boundary
 
 sources:
+  chs_routing_layer_2:
+    provider: Canadian Hydrographic Service, Fisheries and Oceans Canada
+    acquisition_type: arcgis
+    url: https://egisp.dfo-mpo.gc.ca/arcgis/rest/services/open_data_donnees_ouvertes/vessel_traffic_routes_en/MapServer/2
+    snapshot_path: data/raw/governance/chs_routing_layer_2/features.pages.json
+    source_as_of: dynamic_at_retrieval; catalog modification is not data effective time
+    license: Open Government Licence - Canada v2.0; https://open.canada.ca/en/open-government-licence-canada
+    attribution: Canadian Hydrographic Service, Fisheries and Oceans Canada, Vessel
+      Traffic Routes
+    legal_citation: ENC routing reference; no controlling legal applicability determination
+    redistribution: OGL-Canada attribution and license link required; label modifications,
+      no endorsement; local release only
+    authority_scope: CHS-published maritime routing reference, not legal-current certification
+      or navigation advice
+    source_status: available_after_download
+    server_filter: true
+    page_size: 50
+    source_limitation: Selected non-ferry ENC object classes; all source fields retained.
+      Distinct boundary, separation, crossing, lane-part, recommended/two-way route
+      and navigation-line roles are never pooled. Repeated chart records retain ENC_NAME/LNAM;
+      component counts deduplicate shared LNAM within type, geometry unions remove overlap
+      within source/role only. Dates/status codes remain original uninterpreted source
+      attributes; no mandatory/current inference.
+    coverage: &id001
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: partial
+      us_federal_offshore: partial
+      canadian_federal_offshore: partial
+      international_boundary: partial
+  chs_routing_layer_3:
+    provider: Canadian Hydrographic Service, Fisheries and Oceans Canada
+    acquisition_type: arcgis
+    url: https://egisp.dfo-mpo.gc.ca/arcgis/rest/services/open_data_donnees_ouvertes/vessel_traffic_routes_en/MapServer/3
+    snapshot_path: data/raw/governance/chs_routing_layer_3/features.pages.json
+    source_as_of: dynamic_at_retrieval; catalog modification is not data effective time
+    license: Open Government Licence - Canada v2.0; https://open.canada.ca/en/open-government-licence-canada
+    attribution: Canadian Hydrographic Service, Fisheries and Oceans Canada, Vessel
+      Traffic Routes
+    legal_citation: ENC routing reference; no controlling legal applicability determination
+    redistribution: OGL-Canada attribution and license link required; label modifications,
+      no endorsement; local release only
+    authority_scope: CHS-published maritime routing reference, not legal-current certification
+      or navigation advice
+    source_status: available_after_download
+    server_filter: true
+    page_size: 50
+    source_limitation: Selected non-ferry ENC object classes; all source fields retained.
+      Distinct boundary, separation, crossing, lane-part, recommended/two-way route
+      and navigation-line roles are never pooled. Repeated chart records retain ENC_NAME/LNAM;
+      component counts deduplicate shared LNAM within type, geometry unions remove overlap
+      within source/role only. Dates/status codes remain original uninterpreted source
+      attributes; no mandatory/current inference.
+    coverage: *id001
+  chs_routing_layer_4:
+    provider: Canadian Hydrographic Service, Fisheries and Oceans Canada
+    acquisition_type: arcgis
+    url: https://egisp.dfo-mpo.gc.ca/arcgis/rest/services/open_data_donnees_ouvertes/vessel_traffic_routes_en/MapServer/4
+    snapshot_path: data/raw/governance/chs_routing_layer_4/features.pages.json
+    source_as_of: dynamic_at_retrieval; catalog modification is not data effective time
+    license: Open Government Licence - Canada v2.0; https://open.canada.ca/en/open-government-licence-canada
+    attribution: Canadian Hydrographic Service, Fisheries and Oceans Canada, Vessel
+      Traffic Routes
+    legal_citation: ENC routing reference; no controlling legal applicability determination
+    redistribution: OGL-Canada attribution and license link required; label modifications,
+      no endorsement; local release only
+    authority_scope: CHS-published maritime routing reference, not legal-current certification
+      or navigation advice
+    source_status: available_after_download
+    server_filter: true
+    page_size: 50
+    source_limitation: Selected non-ferry ENC object classes; all source fields retained.
+      Distinct boundary, separation, crossing, lane-part, recommended/two-way route
+      and navigation-line roles are never pooled. Repeated chart records retain ENC_NAME/LNAM;
+      component counts deduplicate shared LNAM within type, geometry unions remove overlap
+      within source/role only. Dates/status codes remain original uninterpreted source
+      attributes; no mandatory/current inference.
+    coverage: *id001
+  chs_routing_layer_5:
+    provider: Canadian Hydrographic Service, Fisheries and Oceans Canada
+    acquisition_type: arcgis
+    url: https://egisp.dfo-mpo.gc.ca/arcgis/rest/services/open_data_donnees_ouvertes/vessel_traffic_routes_en/MapServer/5
+    snapshot_path: data/raw/governance/chs_routing_layer_5/features.pages.json
+    source_as_of: dynamic_at_retrieval; catalog modification is not data effective time
+    license: Open Government Licence - Canada v2.0; https://open.canada.ca/en/open-government-licence-canada
+    attribution: Canadian Hydrographic Service, Fisheries and Oceans Canada, Vessel
+      Traffic Routes
+    legal_citation: ENC routing reference; no controlling legal applicability determination
+    redistribution: OGL-Canada attribution and license link required; label modifications,
+      no endorsement; local release only
+    authority_scope: CHS-published maritime routing reference, not legal-current certification
+      or navigation advice
+    source_status: available_after_download
+    server_filter: true
+    page_size: 50
+    source_limitation: Selected non-ferry ENC object classes; all source fields retained.
+      Distinct boundary, separation, crossing, lane-part, recommended/two-way route
+      and navigation-line roles are never pooled. Repeated chart records retain ENC_NAME/LNAM;
+      component counts deduplicate shared LNAM within type, geometry unions remove overlap
+      within source/role only. Dates/status codes remain original uninterpreted source
+      attributes; no mandatory/current inference.
+    coverage: *id001
+  noaa_routing_2026:
+    provider: NOAA Office for Coastal Management; U.S. Coast Guard
+    acquisition_type: local_vector
+    url: https://marinecadastre.gov/downloads/data/mc/VesselRoutingMeasure.zip
+    snapshot_path: data/raw/governance/noaa_routing_2026/routing-source.parquet
+    source_as_of: 2026-03-16 publication; source period 2024-07 to 2026-03
+    license: 'Marine Cadastre disclaimer: government-hosted information public domain
+      unless specifically annotated otherwise; source-specific use constraints retained'
+    attribution: NOAA Office for Coastal Management; U.S. Coast Guard, Vessel Routing
+      Measures, 2026
+    legal_citation: Per-record CFRSection/citation retained as references, not independently
+      reconciled current law
+    redistribution: Retain attribution/disclaimer; no false ownership or endorsement;
+      modified content must not be presented as official unchanged government information;
+      local release only
+    authority_scope: Selected U.S. waters planning-reference polygons from the separately
+      pinned 2026 archive; not the older EPSG3857 live service
+    source_status: available_after_download
+    server_filter: false
+    source_limitation: NAD83 archive, publication 2026-03-16, no maintenance planned,
+      completeness untested; coastal/ocean planning only, not navigation. Exclude area-to-be-avoided,
+      precautionary and particularly-sensitive-area types from routing families. Original
+      GPKG FID and every attribute retained in derived source frame alongside unchanged
+      ZIP with SHA256 9dff1d661030e6e306b5c49cf84e07e5f566a3b027da282c3d713e74314eff37.
+      No cross-source route equivalence or legal effective date inferred.
+    coverage: *id001
+
   census_counties_2025:
     provider: U.S. Census Bureau
     acquisition_type: direct_archive
@@ -958,6 +1089,34 @@ sources:
       international_boundary: partial
 
 collections:
+  shipping_lanes:
+    category: vessel_management
+    display_name: Shipping Lanes typed reference components
+    normalization_profile: typed_chs_noaa_routing_reference
+    source_ids:
+    - chs_routing_layer_4
+    - chs_routing_layer_5
+    - noaa_routing_2026
+    artifact_path: data/processed/domain/governance/vessel_management/shipping_lanes/shipping_lanes.parquet
+    manifest_path: data/processed/domain/governance/vessel_management/shipping_lanes/manifest.json
+    color: '#FF7F00'
+    default_visible: false
+    implementation_status: implemented_partial
+  traffic_separation_schemes:
+    category: vessel_management
+    display_name: Traffic Separation Schemes typed reference components
+    normalization_profile: typed_chs_noaa_routing_reference
+    source_ids:
+    - chs_routing_layer_2
+    - chs_routing_layer_3
+    - chs_routing_layer_4
+    - noaa_routing_2026
+    artifact_path: data/processed/domain/governance/vessel_management/traffic_separation_schemes/traffic_separation_schemes.parquet
+    manifest_path: data/processed/domain/governance/vessel_management/traffic_separation_schemes/manifest.json
+    color: '#FF7F00'
+    default_visible: false
+    implementation_status: implemented_partial
+
   county_regional_boundaries:
     category: jurisdiction
     display_name: U.S. county-equivalent reference inventory

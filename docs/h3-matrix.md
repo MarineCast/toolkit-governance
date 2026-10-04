@@ -64,3 +64,11 @@ the proposed ecosystem H3 contract. It confers no model eligibility or legal
 authority. Snapshot import and rebuild dates do not establish current law or
 fresh provider acquisition. Keep raw and generated data local under source terms.
 Output writes are atomic and replacement requires `--overwrite`.
+
+
+Routing collections use declared `metric_groups` keyed by source and component role. Their
+collection-level aggregate columns are intentionally absent. Each group points to its native
+collection/source/role; all other collections retain their established columns. Empty role
+subsets retain the native schema and produce nulls. Delivery1.1.0 includes only dimensionally
+applicable routing metrics and retains source-specific coverage and overlap policy. Full native
+record relationships remain the companion authority for chart/attribute inspection.

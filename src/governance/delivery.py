@@ -16,7 +16,7 @@ import pyarrow.parquet as pq
 
 from .shared.artifacts import sha256_file
 
-METHOD_VERSION = 'native-inventory-overlay-1.0.0'
+METHOD_VERSION = 'native-inventory-overlay-1.1.0'
 METRICS = {
     'FEATURE_COUNT': ('recorded_feature_count', 'count', 'Distinct source-backed feature IDs with positive-dimensional intersections'),
     'POLYGON_COVERAGE_FRAC': ('recorded_polygon_union_area_fraction', '1', 'Unioned polygon intersection area / full H3 cell area, EPSG:6933'),
@@ -55,14 +55,20 @@ def export_delivery(matrix_path: str | Path, output_directory: str | Path, *,
         columns = {'h3_index': selected['H3_INDEX']}
         fields = {'h3_index': {'units': None, 'definition': 'H3 cell identity', 'nullable': False}}
         coverage = {}
-        for collection, native_record in metadata['native_manifests'].items():
+        groups = metadata.get('metric_groups') or {name: {'collection': name} for name in metadata['native_manifests']}
+        for collection, group in groups.items():
+            native_record = metadata['native_manifests'][group['collection']]
             native = native_record['manifest']
             completeness = native.get('source_completeness', 'unknown')
             state = 'observed' if completeness == 'complete' else 'partial' if completeness in ('partial', 'complete_current_noaa_west_coast_sanctuary_roster') else completeness
             if state not in STATES:
                 raise ValueError('Invalid completeness')
-            records = native['sources']
+            records = [s for s in native['sources'] if 'source_id' not in group or s['source_id'] == group['source_id']]
+            if not records:
+                raise ValueError(f'Metric group has no source lineage: {collection}')
             available = sum(s['runtime_status'] == 'available' for s in records)
+            if 'source_id' in group and available == 0:
+                state = 'unavailable'
             coverage[collection] = {
                 'configured_source_receipt': {'numerator': available, 'denominator': len(records),
                     'unit': 'configured source entries', 'method': 'Count available native-manifest source records / collection configured source records; equal weights',
@@ -70,10 +76,18 @@ def export_delivery(matrix_path: str | Path, output_directory: str | Path, *,
                 'geographic_inventory_coverage': {'numerator': None, 'denominator': None, 'status': 'unknown',
                     'meaning': 'No independently established exhaustive regional feature inventory; no geographic completeness fraction can be inferred'},
                 'scope': metadata['grid'], 'native_source_completeness': completeness,
+                'component_group': group,
+                'metric_support_state': state,
+                'overlap_policy': ('Union geometry within this source/role; never add component or source groups as a unique route/scheme total. CHS object LNAM identifies repeated chart records when present; no inference of cross-source identity.' if 'role' in group else 'Established collection-level union across received native geometry; source-backed feature identity counts. Overlapping areas/lines are unioned, not summed.'),
                 'gaps': [s['source_id'] for s in records if s['runtime_status'] != 'available'],
                 'effect': 'Finite values summarize received records only. Empty intersections and absent geometry types stay null under incomplete support.',
             }
             for original, (suffix, units, definition) in METRICS.items():
+                if 'geometry_family' in group:
+                    applicable = 'POLYGON_COVERAGE_FRAC' if group['geometry_family'] == 'polygon' else 'LINE_LENGTH_M'
+                    if original not in ('FEATURE_COUNT', applicable):
+                        continue
+                    definition = group['description'] + ': ' + definition + '. ' + group['identity']
                 name = f'{collection}__{suffix}'
                 values = selected[f'{collection}__{original}']
                 statuses = []
@@ -92,7 +106,7 @@ def export_delivery(matrix_path: str | Path, output_directory: str | Path, *,
         manifest = {
             'governance_delivery_schema_version': 1,
             'shared_contract_conformance': {'status': 'not_claimed_by_local_envelope', 'reason': 'v0.1 has no reference_geometry category. An optional separately validated shared manifest can declare adoption of an explicitly supplied approved extension.'},
-            'product_id': f'governance.inventory_geometry_r{resolution}', 'semantic_product_version': '1.0.0',
+            'product_id': f'governance.inventory_geometry_r{resolution}', 'semantic_product_version': '1.1.0',
             'scientific_method_version': METHOD_VERSION, 'software': {'package': 'toolkit-governance', 'version': '0.1.0', 'git_sha': software_revision},
             'data_release_id': release_id, 'created_at_utc': datetime.now(UTC).isoformat(),
             'identity': {'primary_key': ['h3_index'], 'grain': 'One row per supplied cell, static inventory snapshot'},

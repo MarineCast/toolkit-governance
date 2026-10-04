@@ -79,6 +79,16 @@ CORE_FEATURES = (
 )
 
 EXTRA_FEATURES = {
+    "shipping_lanes": (
+        ("ROUTING_ROLE", "state", "derived", "category"),
+        ("ROUTING_SOURCE_TYPE", "state", "observed", "category"),
+        ("ROUTING_IDENTITY_METHOD", "provenance", "derived", "text"),
+    ),
+    "traffic_separation_schemes": (
+        ("ROUTING_ROLE", "state", "derived", "category"),
+        ("ROUTING_SOURCE_TYPE", "state", "observed", "category"),
+        ("ROUTING_IDENTITY_METHOD", "provenance", "derived", "text"),
+    ),
     "wildlife_refuges": (
         ("REFUGE_SYSTEM_TYPE", "state", "observed", "category"),
     ),
