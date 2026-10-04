@@ -78,3 +78,8 @@ def test_direct_archive_is_checksum_pinned_and_metadata_is_archived(monkeypatch,
     path.write_bytes(b"changed")
     with pytest.raises(ValueError, match="checksum mismatch"):
         acquisition.download_direct_snapshot(source)
+
+    with pytest.raises(acquisition.SourceUnavailableError, match='byte cap'):
+        acquisition.download_direct_snapshot(source, overwrite=True, max_bytes=3)
+    assert path.read_bytes() == b'changed'
+    assert not list(tmp_path.glob('*.part'))

@@ -47,6 +47,102 @@ coverage_regions:
     label: International boundary
 
 sources:
+  census_counties_2025:
+    provider: U.S. Census Bureau
+    acquisition_type: direct_archive
+    url: https://www2.census.gov/geo/tiger/TIGER2025/COUNTY/tl_2025_us_county.zip
+    snapshot_path: data/raw/governance/census_counties_2025/tl_2025_us_county.zip
+    archive_member: tl_2025_us_county.shp
+    expected_sha256: 9c6e9d9076abce2670d1de255de3710c35ecca00a7005d88e012dec52d95f763
+    source_as_of: '2025-01-01'
+    license: U.S. Census Bureau public data; retain source metadata and attribution
+    attribution: U.S. Census Bureau, 2025 TIGER/Line Shapefiles, counties and equivalents
+    legal_citation: Statistical/cartographic reference, not controlling legal boundary
+      descriptions
+    redistribution: Retain Census attribution, original archive metadata, vintage and
+      reference-only limitations
+    authority_scope: Census-published county-equivalent mapping; no independent legal
+      boundary determination
+    source_status: available_after_download
+    server_filter: false
+    source_limitation: United States only; Canadian regional districts unavailable.
+      2025 TIGER/Line boundary/name reference date 2025-01-01 is not a legal effective
+      date. NAD83 source is transformed to WGS84 by the reader; original archive, identifiers
+      and all attributes retained.
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: unavailable
+      us_federal_offshore: partial
+      canadian_federal_offshore: unavailable
+      international_boundary: not_applicable
+  fws_national_wildlife_refuges:
+    provider: U.S. Fish and Wildlife Service, National Wildlife Refuge System, Division
+      of Realty
+    acquisition_type: arcgis
+    url: https://services.arcgis.com/QVENGdaPbd4LUkLV/arcgis/rest/services/National_Wildlife_Refuge_System_Boundaries/FeatureServer/0
+    snapshot_path: data/raw/governance/fws_national_wildlife_refuges/features.pages.json
+    source_as_of: dynamic_at_retrieval
+    license: FWS public GIS with source disclaimer; no warranty of accuracy/completeness
+    attribution: U.S. Fish and Wildlife Service, National Wildlife Refuge System, Division
+      of Realty
+    legal_citation: Source inventory classification only; legal text not independently
+      reconciled
+    redistribution: Retain attribution, original metadata, source disclaimer/license
+      and reference-only limitations
+    authority_scope: Official selected refuge-system reference inventory; no legal compliance
+      or exhaustive geographic authority
+    source_status: available_after_download
+    server_filter: true
+    page_size: 10
+    source_limitation: "Only RSL_TYPE=NWR; not acquisition-approved boundaries, all\
+      \ FWS facilities, state refuges or private reserves. FWS dissolved resource-grade\
+      \ mapping; selected features generalized by source 1\u201330 m, repaired/densified\
+      \ and projected for service. Contact FWS Realty for legal descriptions. No public\
+      \ access or current legal applicability inferred."
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: not_applicable
+      us_federal_offshore: partial
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+  eccc_wildlife_areas_sanctuaries:
+    provider: Environment and Climate Change Canada, CPCAD reporting partners
+    acquisition_type: arcgis
+    url: https://maps-cartes.ec.gc.ca/arcgis/rest/services/CWS_SCF/CPCAD/MapServer/0
+    snapshot_path: data/raw/governance/eccc_wildlife_areas_sanctuaries/features.pages.json
+    source_as_of: dynamic_at_retrieval
+    license: Open Government Licence - Canada; https://open.canada.ca/en/open-government-licence-canada
+    attribution: Environment and Climate Change Canada, CPCAD reporting partners
+    legal_citation: Source inventory classification only; legal text not independently
+      reconciled
+    redistribution: Retain attribution, original metadata, source disclaimer/license
+      and reference-only limitations
+    authority_scope: Official selected refuge-system reference inventory; no legal compliance
+      or exhaustive geographic authority
+    source_status: available_after_download
+    server_filter: true
+    page_size: 10
+    source_limitation: Only TYPE_E National Wildlife Area, Marine National Wildlife
+      Area, Migratory Bird Sanctuary. Excludes other provincial/private/Indigenous protected-area
+      types; retains source reporting status, identifiers, management attributes and
+      establishment/qualification years without inferring legal effective dates. CPCAD
+      is a compiled official inventory, not controlling regulatory text.
+    coverage:
+      california: not_applicable
+      oregon: not_applicable
+      washington: not_applicable
+      alaska: not_applicable
+      british_columbia_canada: partial
+      us_federal_offshore: not_applicable
+      canadian_federal_offshore: partial
+      international_boundary: not_applicable
+
   international_boundary_commission_v1_3:
     provider: International Boundary Commission
     acquisition_type: direct_archive
@@ -862,6 +958,30 @@ sources:
       international_boundary: partial
 
 collections:
+  county_regional_boundaries:
+    category: jurisdiction
+    display_name: U.S. county-equivalent reference inventory
+    normalization_profile: census_county_reference_2025
+    source_ids:
+    - census_counties_2025
+    artifact_path: data/processed/domain/governance/jurisdiction/county_regional_boundaries/county_regional_boundaries.parquet
+    manifest_path: data/processed/domain/governance/jurisdiction/county_regional_boundaries/manifest.json
+    color: '#8856A7'
+    default_visible: false
+    implementation_status: implemented_partial
+  wildlife_refuges:
+    category: protected_areas
+    display_name: Selected U.S. and Canadian wildlife refuge reference inventory
+    normalization_profile: fws_eccc_selected_refuge_reference
+    source_ids:
+    - fws_national_wildlife_refuges
+    - eccc_wildlife_areas_sanctuaries
+    artifact_path: data/processed/domain/governance/protected_areas/wildlife_refuges/wildlife_refuges.parquet
+    manifest_path: data/processed/domain/governance/protected_areas/wildlife_refuges/manifest.json
+    color: '#8856A7'
+    default_visible: false
+    implementation_status: implemented_partial
+
   marine_protected_areas:
     category: protected_areas
     display_name: Marine protected areas

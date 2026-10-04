@@ -22,6 +22,8 @@ def test_governance_config_uses_shared_full_area_without_h3_products() -> None:
         "management_areas",
         "ports",
         "critical_habitat",
+        "county_regional_boundaries",
+        "wildlife_refuges",
     }
     for collection in config.collections.values():
         assert "H3" not in str(collection.artifact_path).upper()
@@ -101,7 +103,7 @@ def test_governance_catalog_is_generated_and_model_safe() -> None:
     )
     assert catalog == generated
     assert len(catalog["collections"]) == 24
-    assert sum(value["map_layer"] for value in catalog["collections"].values()) == 8
+    assert sum(value["map_layer"] for value in catalog["collections"].values()) == 10
     assert catalog["canonical_storage"] == "native_geometry"
     assert catalog["h3_products"] is False
     for collection in catalog["collections"].values():

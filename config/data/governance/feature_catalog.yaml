@@ -768,13 +768,158 @@ collections:
       unit: text
   wildlife_refuges:
     category: protected_areas
-    display_name: Wildlife Refuges
-    implementation_status: planned
-    artifact: null
-    manifest: null
-    map_layer: false
-    model_policy: ineligible_not_implemented
-    features: []
+    display_name: Selected U.S. and Canadian wildlife refuge reference inventory
+    implementation_status: implemented_partial
+    artifact: data/processed/domain/governance/protected_areas/wildlife_refuges/wildlife_refuges.parquet
+    manifest: data/processed/domain/governance/protected_areas/wildlife_refuges/manifest.json
+    map_layer: true
+    model_policy: ineligible_pending_temporal_leakage_review
+    features:
+    - name: GOVERNANCE_FEATURE_ID
+      role: support
+      measurement_status: derived
+      model_eligible: false
+      unit: identifier
+    - name: SOURCE_DATASET_ID
+      role: provenance
+      measurement_status: observed
+      model_eligible: false
+      unit: identifier
+    - name: SOURCE_FEATURE_ID
+      role: provenance
+      measurement_status: observed
+      model_eligible: false
+      unit: identifier
+    - name: GEOMETRY_PART_ID
+      role: support
+      measurement_status: derived
+      model_eligible: false
+      unit: identifier
+    - name: FEATURE_NAME
+      role: state
+      measurement_status: observed
+      model_eligible: false
+      unit: text
+    - name: FEATURE_TYPE
+      role: state
+      measurement_status: observed
+      model_eligible: false
+      unit: category
+    - name: AUTHORITY
+      role: provenance
+      measurement_status: observed
+      model_eligible: false
+      unit: text
+    - name: JURISDICTION
+      role: state
+      measurement_status: observed
+      model_eligible: false
+      unit: category
+    - name: LEGAL_BINDING_STATUS
+      role: evidence
+      measurement_status: derived
+      model_eligible: false
+      unit: category
+    - name: LEGAL_AUTHORITY
+      role: evidence
+      measurement_status: observed
+      model_eligible: false
+      unit: citation
+    - name: LEGAL_SOURCE_URL
+      role: provenance
+      measurement_status: observed
+      model_eligible: false
+      unit: url
+    - name: EFFECTIVE_START
+      role: support
+      measurement_status: observed
+      model_eligible: false
+      unit: date
+    - name: EFFECTIVE_END
+      role: support
+      measurement_status: observed
+      model_eligible: false
+      unit: date
+    - name: SYSTEM_LEARNED_AT
+      role: provenance
+      measurement_status: derived
+      model_eligible: false
+      unit: datetime
+    - name: SOURCE_VINTAGE
+      role: provenance
+      measurement_status: observed
+      model_eligible: false
+      unit: date_or_unknown
+    - name: SOURCE_COVERAGE_STATUS
+      role: coverage
+      measurement_status: derived
+      model_eligible: false
+      unit: category
+    - name: MEASUREMENT_STATUS
+      role: provenance
+      measurement_status: derived
+      model_eligible: false
+      unit: category
+    - name: MODEL_ELIGIBLE
+      role: qc
+      measurement_status: derived
+      model_eligible: false
+      unit: boolean
+    - name: QC_STATUS
+      role: qc
+      measurement_status: derived
+      model_eligible: false
+      unit: category
+    - name: QC_REASON
+      role: qc
+      measurement_status: derived
+      model_eligible: false
+      unit: text
+    - name: CLIPPED_TO_FULL_AREA
+      role: qc
+      measurement_status: derived
+      model_eligible: false
+      unit: boolean
+    - name: SOURCE_MIN_LON
+      role: provenance
+      measurement_status: derived
+      model_eligible: false
+      unit: degrees_east
+    - name: SOURCE_MIN_LAT
+      role: provenance
+      measurement_status: derived
+      model_eligible: false
+      unit: degrees_north
+    - name: SOURCE_MAX_LON
+      role: provenance
+      measurement_status: derived
+      model_eligible: false
+      unit: degrees_east
+    - name: SOURCE_MAX_LAT
+      role: provenance
+      measurement_status: derived
+      model_eligible: false
+      unit: degrees_north
+    - name: RETAINED_GEOMETRY_TYPE
+      role: qc
+      measurement_status: derived
+      model_eligible: false
+      unit: category
+    - name: RETAINED_MEASURE_FRACTION
+      role: qc
+      measurement_status: derived
+      model_eligible: false
+      unit: fraction
+    - name: geometry
+      role: support
+      measurement_status: observed
+      model_eligible: false
+      unit: native_geometry
+    - name: REFUGE_SYSTEM_TYPE
+      role: state
+      measurement_status: observed
+      model_eligible: false
+      unit: category
   conservation_designations:
     category: protected_areas
     display_name: Conservation Designations
@@ -1428,13 +1573,153 @@ collections:
       unit: category
   county_regional_boundaries:
     category: jurisdiction
-    display_name: County Regional Boundaries
-    implementation_status: planned
-    artifact: null
-    manifest: null
-    map_layer: false
-    model_policy: ineligible_not_implemented
-    features: []
+    display_name: U.S. county-equivalent reference inventory
+    implementation_status: implemented_partial
+    artifact: data/processed/domain/governance/jurisdiction/county_regional_boundaries/county_regional_boundaries.parquet
+    manifest: data/processed/domain/governance/jurisdiction/county_regional_boundaries/manifest.json
+    map_layer: true
+    model_policy: ineligible_pending_temporal_leakage_review
+    features:
+    - name: GOVERNANCE_FEATURE_ID
+      role: support
+      measurement_status: derived
+      model_eligible: false
+      unit: identifier
+    - name: SOURCE_DATASET_ID
+      role: provenance
+      measurement_status: observed
+      model_eligible: false
+      unit: identifier
+    - name: SOURCE_FEATURE_ID
+      role: provenance
+      measurement_status: observed
+      model_eligible: false
+      unit: identifier
+    - name: GEOMETRY_PART_ID
+      role: support
+      measurement_status: derived
+      model_eligible: false
+      unit: identifier
+    - name: FEATURE_NAME
+      role: state
+      measurement_status: observed
+      model_eligible: false
+      unit: text
+    - name: FEATURE_TYPE
+      role: state
+      measurement_status: observed
+      model_eligible: false
+      unit: category
+    - name: AUTHORITY
+      role: provenance
+      measurement_status: observed
+      model_eligible: false
+      unit: text
+    - name: JURISDICTION
+      role: state
+      measurement_status: observed
+      model_eligible: false
+      unit: category
+    - name: LEGAL_BINDING_STATUS
+      role: evidence
+      measurement_status: derived
+      model_eligible: false
+      unit: category
+    - name: LEGAL_AUTHORITY
+      role: evidence
+      measurement_status: observed
+      model_eligible: false
+      unit: citation
+    - name: LEGAL_SOURCE_URL
+      role: provenance
+      measurement_status: observed
+      model_eligible: false
+      unit: url
+    - name: EFFECTIVE_START
+      role: support
+      measurement_status: observed
+      model_eligible: false
+      unit: date
+    - name: EFFECTIVE_END
+      role: support
+      measurement_status: observed
+      model_eligible: false
+      unit: date
+    - name: SYSTEM_LEARNED_AT
+      role: provenance
+      measurement_status: derived
+      model_eligible: false
+      unit: datetime
+    - name: SOURCE_VINTAGE
+      role: provenance
+      measurement_status: observed
+      model_eligible: false
+      unit: date_or_unknown
+    - name: SOURCE_COVERAGE_STATUS
+      role: coverage
+      measurement_status: derived
+      model_eligible: false
+      unit: category
+    - name: MEASUREMENT_STATUS
+      role: provenance
+      measurement_status: derived
+      model_eligible: false
+      unit: category
+    - name: MODEL_ELIGIBLE
+      role: qc
+      measurement_status: derived
+      model_eligible: false
+      unit: boolean
+    - name: QC_STATUS
+      role: qc
+      measurement_status: derived
+      model_eligible: false
+      unit: category
+    - name: QC_REASON
+      role: qc
+      measurement_status: derived
+      model_eligible: false
+      unit: text
+    - name: CLIPPED_TO_FULL_AREA
+      role: qc
+      measurement_status: derived
+      model_eligible: false
+      unit: boolean
+    - name: SOURCE_MIN_LON
+      role: provenance
+      measurement_status: derived
+      model_eligible: false
+      unit: degrees_east
+    - name: SOURCE_MIN_LAT
+      role: provenance
+      measurement_status: derived
+      model_eligible: false
+      unit: degrees_north
+    - name: SOURCE_MAX_LON
+      role: provenance
+      measurement_status: derived
+      model_eligible: false
+      unit: degrees_east
+    - name: SOURCE_MAX_LAT
+      role: provenance
+      measurement_status: derived
+      model_eligible: false
+      unit: degrees_north
+    - name: RETAINED_GEOMETRY_TYPE
+      role: qc
+      measurement_status: derived
+      model_eligible: false
+      unit: category
+    - name: RETAINED_MEASURE_FRACTION
+      role: qc
+      measurement_status: derived
+      model_eligible: false
+      unit: fraction
+    - name: geometry
+      role: support
+      measurement_status: observed
+      model_eligible: false
+      unit: native_geometry
   tribal_first_nations_areas:
     category: jurisdiction
     display_name: Tribal First Nations Areas
