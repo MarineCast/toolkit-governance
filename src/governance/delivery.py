@@ -16,7 +16,7 @@ import pyarrow.parquet as pq
 
 from .shared.artifacts import sha256_file
 
-METHOD_VERSION = 'native-inventory-overlay-1.1.0'
+METHOD_VERSION = 'native-inventory-overlay-1.2.0'
 METRICS = {
     'FEATURE_COUNT': ('recorded_feature_count', 'count', 'Distinct source-backed feature IDs with positive-dimensional intersections'),
     'POLYGON_COVERAGE_FRAC': ('recorded_polygon_union_area_fraction', '1', 'Unioned polygon intersection area / full H3 cell area, EPSG:6933'),
@@ -78,7 +78,7 @@ def export_delivery(matrix_path: str | Path, output_directory: str | Path, *,
                 'scope': metadata['grid'], 'native_source_completeness': completeness,
                 'component_group': group,
                 'metric_support_state': state,
-                'overlap_policy': ('Union geometry within this source/role; never add component or source groups as a unique route/scheme total. CHS object LNAM identifies repeated chart records when present; no inference of cross-source identity.' if 'role' in group else 'Established collection-level union across received native geometry; source-backed feature identity counts. Overlapping areas/lines are unioned, not summed.'),
+                'overlap_policy': group.get('overlap_policy', ('Union geometry within this source/role; never add component or source groups as a unique route/scheme total. CHS object LNAM identifies repeated chart records when present; no inference of cross-source identity.' if 'role' in group else 'Established collection-level union across received native geometry; source-backed feature identity counts. Overlapping areas/lines are unioned, not summed.')),
                 'gaps': [s['source_id'] for s in records if s['runtime_status'] != 'available'],
                 'effect': 'Finite values summarize received records only. Empty intersections and absent geometry types stay null under incomplete support.',
             }
@@ -106,7 +106,7 @@ def export_delivery(matrix_path: str | Path, output_directory: str | Path, *,
         manifest = {
             'governance_delivery_schema_version': 1,
             'shared_contract_conformance': {'status': 'not_claimed_by_local_envelope', 'reason': 'v0.1 has no reference_geometry category. An optional separately validated shared manifest can declare adoption of an explicitly supplied approved extension.'},
-            'product_id': f'governance.inventory_geometry_r{resolution}', 'semantic_product_version': '1.1.0',
+            'product_id': f'governance.inventory_geometry_r{resolution}', 'semantic_product_version': '1.2.0',
             'scientific_method_version': METHOD_VERSION, 'software': {'package': 'toolkit-governance', 'version': '0.1.0', 'git_sha': software_revision},
             'data_release_id': release_id, 'created_at_utc': datetime.now(UTC).isoformat(),
             'identity': {'primary_key': ['h3_index'], 'grain': 'One row per supplied cell, static inventory snapshot'},

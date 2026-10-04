@@ -90,6 +90,13 @@ def source_record(source: GovernanceSource, path: Path | None) -> dict[str, Any]
                 "service_layer_name": snapshot.get("metadata_response", {}).get("name"),
                 "service_version": snapshot.get("metadata_response", {}).get("currentVersion"),
             }
+            if snapshot.get("receipt_times_by_page"):
+                runtime_snapshot.update(
+                    receipt_times_by_page=True,
+                    temporal_note=snapshot.get("temporal_note"),
+                    page_receipts=[{k: v for k, v in page.items() if k != "response"}
+                                   for page in snapshot.get("pages", [])],
+                )
     elif available and path is not None:
         metadata_path = path.with_suffix(f"{path.suffix}.metadata.json")
         if metadata_path.is_file():
