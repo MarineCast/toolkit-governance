@@ -16,7 +16,7 @@ row is exactly one provided cell, retaining both resolutions when supplied. The
 overlay uses full H3 polygons, not water-clipped footprints or cell centres.
 It supports a bounded grid that does not cross the antimeridian. Native products
 are validated without modification; their feature IDs and part IDs remain intact.
-All six configured collection products and manifests are required. Missing or
+All configured collection products and manifests are required. Missing or
 corrupt products fail the export rather than yielding a misleading partial file.
 Raw source checksums are verified against native manifests. Missing raw sources
 are allowed only when the native manifest already records them as unavailable.

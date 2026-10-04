@@ -1,6 +1,7 @@
 # Governance production readiness
 
-The pipeline supports six native inventory collections. Eighteen catalog families remain
+The baseline supported six native inventory collections. This work adds NGA physical port points
+and NOAA critical-habitat reference inventories. Sixteen catalog families remain
 unimplemented, not completed products. No collection establishes legal applicability, current
 regulatory compliance, historical effective dates or model eligibility. Retained acquisition dates
 are not a freshness guarantee. The configured native extent is [-180, 32, -109, 72] EPSG:4326.
@@ -17,7 +18,7 @@ relations and all source attributes. Static snapshots have no fabricated daily o
 1. Initialize an isolated workspace and explicitly provision source snapshots and support inputs.
 2. Run `governance --workspace WORKSPACE preflight`. It inventories all catalog entries and every
    configured source, including unused alternatives. Missing products are unavailable, not passed.
-3. Build all six collections into this isolated workspace with `--allow-partial`. Never rebuild
+3. Build all configured collections into this isolated workspace with `--allow-partial`. Never rebuild
    into a published generation. Legacy per-family commands remain per-file atomic only.
 4. Export the explicit H3 overlay; supply the grid and suitable metre-based length CRS.
 5. Use `export-delivery --matrix MATRIX --output-directory NEW_DIR --release-id ID
@@ -124,3 +125,49 @@ Only local data retention is in scope; no data publication is authorized.
 | boem_submerged_lands_boundary | available | unknown | U.S. Government work; BOEM source terms apply; GIS line is approximate and is not the controlling official boundary record. |
 | wdfw_recreational_marine_areas | available | unknown | Washington State public data terms apply; One Washington recreational area system; not complete fisheries-management coverage. |
 | dfo_pacific_fishery_management_areas | unavailable | unknown | Open Government Licence - Canada where applicable; Official maps and legal descriptions are known, but no approved machine-readable geometry snapshot is configured. |
+
+## Explicit shared-schema mapping
+
+Install `.[contract]` and use `export-shared-manifest --artifact TABLE --local-manifest COMPANION
+--schema PINNED_SCHEMA --schema-reference IMMUTABLE_REFERENCE` for an approved schema that admits
+`reference_geometry`. The adapter validates the entire manifest with JSON Schema and date-time
+format checking, writes a separate `.shared-manifest.json`, and refuses v0.1. Native-local
+companions remain required for metric coverage and transitive rights/authority lineage. Immediate
+provenance sources are the rebuilt native artifacts read locally; read time is explicitly
+not external provider retrieval. Unknown original acquisition dates remain unknown. The schema
+reference/hash, native manifest hashes, scientific method and immutable release identity remain
+recoverable in the shared manifest processing description. No model or legal qualification follows
+from schema validity.
+
+## Newly implemented static reference families
+
+**Ports:** the official NGA public World Port Index JSON was acquired instead of the OSM fallback.
+The original response contains 2,951 port records; 322 points fall in the native Northeast Pacific
+extent. Numeric positions use literal DMS arithmetic. Provider strings with exactly 60 minutes
+and zero seconds carry one degree; original coordinate strings remain in NGA-prefixed attributes.
+This is a physical point inventory, not port polygons, jurisdiction, current navigation advice
+or an exhaustive harbor roster. NGA original attributes are retained without interpreting
+regulatory codes. Redistribution rights require separate review; this release remains local.
+The source is https://msi.nga.mil/Publications/WPI and its public JSON endpoint.
+
+**Critical habitat:** NOAA's published merged polygon/line service was discovered from its
+[critical-habitat page](https://www.fisheries.noaa.gov/national/endangered-species-conservation/critical-habitat).
+The 1,791 polygon-source features cover the configured Northeast Pacific query. A bounded full-AOI
+line request hit its 150 MB combined-acquisition cap and did not publish a partial line snapshot.
+A separately recorded application-footprint line request returned 9,679 features in approximately
+16 MB. Thus line support is only [-125.89,46.79,-122.09,50.06]; it is not native-AOI-wide line
+coverage. Source query metadata and original attributes preserve this distinction. The generic
+`download critical_habitat` command refuses unbudgeted network acquisition; provision the
+explicitly bounded ArcGIS snapshots documented in the release evidence.
+
+NOAA describes the GIS as reference geometry; proposed/final rules and 50 CFR 226 control.
+Proposed versus final status, listed entity, species, source publication/effective dates, units,
+notes and links are retained individually. No source end dates are invented. Canadian and USFWS
+critical habitat remain outside this source scope. Merged layer names/vintage are retained; this
+is not a certification that every latest individual species layer has been merged.
+
+The original 18-family planning table above is the assessment baseline; ports and critical_habitat
+now have the bounded implementations described here. The other 16 remain pending. OSM port
+requests returned HTTP 406 and 429; no OSM data was accepted. NGA eliminated the need for a port
+fallback. OSM's [ODbL attribution terms](https://www.openstreetmap.org/copyright) would apply to
+any later OSM-derived reference product, separately from authoritative sources.

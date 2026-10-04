@@ -17,6 +17,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--workspace', type=Path, help='Data workspace (default: GOVERNANCE_WORKSPACE or cwd).')
     commands = parser.add_subparsers(dest='command', required=True)
+    sub = commands.add_parser('export-shared-manifest', help='Validate an explicit approved shared-schema mapping.')
+    sub.add_argument('--artifact', required=True, type=Path)
+    sub.add_argument('--local-manifest', required=True, type=Path)
+    sub.add_argument('--schema', required=True, type=Path)
+    sub.add_argument('--schema-reference', required=True)
     commands.add_parser('preflight', help='Read-only source and full catalog readiness inventory.')
     sub = commands.add_parser('export-delivery', help='Project a verified overlay into single-resolution wide tables.')
     sub.add_argument('--matrix', required=True, type=Path)
@@ -61,7 +66,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.workspace is not None:
         os.environ['GOVERNANCE_WORKSPACE'] = str(args.workspace.expanduser().resolve())
     try:
-        if args.command == 'preflight':
+        if args.command == 'export-shared-manifest':
+            from .shared_contract import export_shared_manifest
+            print(export_shared_manifest(args.artifact, args.local_manifest, args.schema, schema_reference=args.schema_reference))
+        elif args.command == 'preflight':
             from .preflight import preflight
             print(json.dumps(preflight(), indent=2))
         elif args.command == 'export-delivery':

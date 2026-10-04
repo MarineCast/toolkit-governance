@@ -226,7 +226,7 @@ def test_delivery_splits_resolutions_and_preserves_partial_nulls(workspace, grid
     assert table['management_areas__recorded_feature_count'].to_pylist() == [1,None]
     info=json.loads(manifest.read_text())
     assert info['coverage']['management_areas']['geographic_inventory_coverage']['denominator'] is None
-    assert info['shared_contract_conformance']['status']=='blocked'
+    assert info['shared_contract_conformance']['status']=='not_claimed_by_local_envelope'
     with pytest.raises(FileExistsError):
         export_delivery(matrix,tmp_path/'delivery',release_id='test-release',software_revision='a'*40)
 
@@ -240,3 +240,25 @@ def test_delivery_mixed_input_creates_separate_tables(workspace, grid_path, tmp_
     assert len(paths)==4
     results=[validate_delivery(paths[i],paths[i+1]) for i in (0,2)]
     assert [(r['resolution'],r['rows']) for r in results]==[(6,1),(8,1)]
+
+
+def test_shared_reference_geometry_adopter(workspace, grid_path, tmp_path):
+    from pathlib import Path
+    from governance.delivery import export_delivery
+    from governance.shared_contract import export_shared_manifest
+    matrix=export_h3_matrix(grid_path,tmp_path/'matrix.parquet',length_crs='EPSG:32610',allow_partial=True)
+    artifact,local=export_delivery(matrix,tmp_path/'delivery',release_id='shared-test',software_revision='c'*40)
+    schema=Path(__file__).parent/'fixtures/reference-geometry-v0.2.schema.json'
+    shared=export_shared_manifest(artifact,local,schema,schema_reference='test-pinned-schema')
+    manifest=json.loads(shared.read_text())
+    assert manifest['contract_version']=='0.2'
+    assert manifest['product']['quantity_kind']=='reference_geometry'
+    assert 'not' in manifest['product']['description'].lower() or 'no legal' in manifest['product']['description'].lower()
+    assert 'no new provider acquisition' in manifest['provenance']['sources'][0]['temporal_coverage']
+    with pytest.raises(FileExistsError):
+        export_shared_manifest(artifact,local,schema,schema_reference='test-pinned-schema')
+    old=json.loads(schema.read_text())
+    old['properties']['product']['properties']['quantity_kind']['enum'].remove('reference_geometry')
+    invalid=tmp_path/'invalid.json';invalid.write_text(json.dumps(old))
+    with pytest.raises(ValueError,match='does not admit'):
+        export_shared_manifest(artifact,local,invalid,schema_reference='old-schema')

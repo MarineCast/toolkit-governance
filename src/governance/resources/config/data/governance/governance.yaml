@@ -774,6 +774,93 @@ sources:
       canadian_federal_offshore: unavailable
       international_boundary: not_applicable
 
+  noaa_critical_habitat_polygon:
+    provider: NOAA National Marine Fisheries Service
+    acquisition_type: arcgis
+    url: https://maps.fisheries.noaa.gov/server/rest/services/All_NMFS_Critical_Habitat/MapServer/226
+    snapshot_path: data/raw/governance/noaa_critical_habitat_polygon/features.pages.json
+    source_as_of: dynamic_at_retrieval
+    license: NOAA public GIS reference; source metadata and NOAA disclaimers apply
+    attribution: NOAA National Marine Fisheries Service
+    legal_citation: 50 CFR 226; feature-specific ECFR and FR references retained
+    redistribution: Retain NOAA attribution, source metadata and reference-only limitations
+    authority_scope: NOAA-published NMFS proposed/designated critical-habitat spatial
+      inventory; not controlling legal text
+    source_status: available_after_download
+    server_filter: true
+    page_size: 500
+    source_limitation: NMFS only; excludes USFWS and Canadian coverage. Proposed/designated
+      status and species/entity retained. Regulatory text and exclusions may alter depicted
+      boundaries. Polygon acquisition spans configured native AOI; line snapshot may
+      have narrower explicitly recorded query footprint. Source dates do not independently
+      prove present legal applicability.
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: not_applicable
+      us_federal_offshore: partial
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+  noaa_critical_habitat_line:
+    provider: NOAA National Marine Fisheries Service
+    acquisition_type: arcgis
+    url: https://maps.fisheries.noaa.gov/server/rest/services/All_NMFS_Critical_Habitat/MapServer/2
+    snapshot_path: data/raw/governance/noaa_critical_habitat_line/features.pages.json
+    source_as_of: dynamic_at_retrieval
+    license: NOAA public GIS reference; source metadata and NOAA disclaimers apply
+    attribution: NOAA National Marine Fisheries Service
+    legal_citation: 50 CFR 226; feature-specific ECFR and FR references retained
+    redistribution: Retain NOAA attribution, source metadata and reference-only limitations
+    authority_scope: NOAA-published NMFS proposed/designated critical-habitat spatial
+      inventory; not controlling legal text
+    source_status: available_after_download
+    server_filter: true
+    page_size: 500
+    source_limitation: NMFS only; excludes USFWS and Canadian coverage. Proposed/designated
+      status and species/entity retained. Regulatory text and exclusions may alter depicted
+      boundaries. Polygon acquisition spans configured native AOI; line snapshot may
+      have narrower explicitly recorded query footprint. Source dates do not independently
+      prove present legal applicability.
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: not_applicable
+      us_federal_offshore: partial
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+  nga_world_port_index:
+    provider: National Geospatial-Intelligence Agency
+    acquisition_type: local_vector
+    url: https://msi.nga.mil/api/publications/world-port-index?output=json
+    snapshot_path: data/raw/governance/nga_world_port_index/ports.parquet
+    source_as_of: dynamic_at_retrieval
+    license: NGA MSI legal disclaimer and commercial-use warning apply; source-specific
+      redistribution rights not independently cleared
+    attribution: National Geospatial-Intelligence Agency, World Port Index
+    legal_citation: Not a legal boundary or jurisdiction source
+    redistribution: Local reference use only for this release; review https://msi.nga.mil/legal-sec
+      and /commercial-use before redistribution
+    authority_scope: NGA-published physical port point reference; no inferred authority
+      or jurisdiction
+    source_status: available_after_download
+    server_filter: false
+    source_limitation: Published port point locations, not port footprints, exhaustive
+      harbor inventory, current navigation advice, legal jurisdiction or regulatory
+      status. All original NGA attributes retained as source values without interpretation.
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: partial
+      us_federal_offshore: partial
+      canadian_federal_offshore: partial
+      international_boundary: partial
+
 collections:
   marine_protected_areas:
     category: protected_areas
@@ -860,5 +947,29 @@ collections:
     artifact_path: data/processed/domain/governance/fisheries_management/management_areas/management_areas.parquet
     manifest_path: data/processed/domain/governance/fisheries_management/management_areas/manifest.json
     color: '#E31A1C'
+    default_visible: false
+    implementation_status: implemented_partial
+
+  critical_habitat:
+    category: protected_areas
+    display_name: Critical Habitat reference inventory
+    normalization_profile: noaa_nmfs_critical_habitat_reference
+    source_ids:
+    - noaa_critical_habitat_polygon
+    - noaa_critical_habitat_line
+    artifact_path: data/processed/domain/governance/protected_areas/critical_habitat/critical_habitat.parquet
+    manifest_path: data/processed/domain/governance/protected_areas/critical_habitat/manifest.json
+    color: '#8856A7'
+    default_visible: false
+    implementation_status: implemented_partial
+  ports:
+    category: administrative_context
+    display_name: Ports reference inventory
+    normalization_profile: nga_world_port_index_points
+    source_ids:
+    - nga_world_port_index
+    artifact_path: data/processed/domain/governance/administrative_context/ports/ports.parquet
+    manifest_path: data/processed/domain/governance/administrative_context/ports/manifest.json
+    color: '#8856A7'
     default_visible: false
     implementation_status: implemented_partial

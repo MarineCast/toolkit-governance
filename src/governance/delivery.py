@@ -91,7 +91,7 @@ def export_delivery(matrix_path: str | Path, output_directory: str | Path, *,
         pq.write_table(pa.table(columns), artifact, compression='zstd')
         manifest = {
             'governance_delivery_schema_version': 1,
-            'shared_contract_conformance': {'status': 'blocked', 'reason': 'Governance/reference geometry is absent from shared v0.1 quantity_kind enum; no substitute quantity used'},
+            'shared_contract_conformance': {'status': 'not_claimed_by_local_envelope', 'reason': 'v0.1 has no reference_geometry category. An optional separately validated shared manifest can declare adoption of an explicitly supplied approved extension.'},
             'product_id': f'governance.inventory_geometry_r{resolution}', 'semantic_product_version': '1.0.0',
             'scientific_method_version': METHOD_VERSION, 'software': {'package': 'toolkit-governance', 'version': '0.1.0', 'git_sha': software_revision},
             'data_release_id': release_id, 'created_at_utc': datetime.now(UTC).isoformat(),
