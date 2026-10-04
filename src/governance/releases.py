@@ -66,7 +66,7 @@ def verify_generation(path: str | Path) -> dict:
     for member in root.rglob('*'):
         if member.is_symlink():
             raise ValueError('Release symlinks are forbidden')
-        if member.is_file() and member.name != 'generation.json':
+        if member.is_file() and member != root / 'generation.json':
             actual.add(member.relative_to(root).as_posix())
     if actual != set(files):
         raise ValueError('Generation membership mismatch')

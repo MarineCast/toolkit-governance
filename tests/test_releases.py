@@ -58,3 +58,30 @@ def test_lock_and_exact_membership(tmp_path):
     with pytest.raises(FileExistsError): publish(source,root,'two')
     (first/'unexpected').write_text('x')
     with pytest.raises(ValueError): resolve_current(root)
+
+
+@pytest.mark.parametrize('operation', ['verify', 'resolve', 'activate'])
+def test_nested_untracked_generation_manifest_is_rejected(tmp_path, operation):
+    source = tmp_path / 'source'
+    source.mkdir()
+    (source / 'data').write_text('data')
+    root = tmp_path / 'releases'
+    first = publish(source, root, 'one')
+    second = publish(source, root, 'two')
+    target = second if operation == 'resolve' else first
+    (target / 'unexpected').mkdir()
+    (target / 'unexpected' / 'generation.json').write_text('untracked bytes')
+    pointer_before = (root / 'current.json').read_bytes()
+
+    with pytest.raises(ValueError, match='Generation membership mismatch'):
+        if operation == 'verify':
+            verify_generation(target)
+        elif operation == 'resolve':
+            resolve_current(root)
+        else:
+            activate_generation(root, target.name)
+
+    assert (root / 'current.json').read_bytes() == pointer_before
+    assert not (root / '.publish.lock').exists()
+    if operation == 'activate':
+        assert resolve_current(root) == second
