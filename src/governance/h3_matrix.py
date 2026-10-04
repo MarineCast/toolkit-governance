@@ -301,14 +301,23 @@ def export_h3_matrix(
         if name in {'shipping_lanes', 'traffic_separation_schemes'}:
             from .vessel_management.routing import metric_groups
             groups = metric_groups(name)
-            allowed_pairs = {(g['role'], g['source_id']) for g in groups.values()}
-            if 'ROUTING_ROLE' not in native or not set(zip(native.ROUTING_ROLE, native.SOURCE_DATASET_ID)).issubset(allowed_pairs):
-                raise ValueError(f'Unrecognized or missing routing roles: {name}')
+        elif name == 'coast_guard_sectors':
+            from .administrative_context.coast_guard_sectors.normalize import metric_groups
+            groups = metric_groups(name)
+        elif name == 'conservation_designations':
+            from .protected_areas.conservation_designations.normalize import metric_groups
+            groups = metric_groups(name)
         else:
             groups = {name: {'collection': name}}
+        typed = [g for g in groups.values() if 'role' in g]
+        if typed:
+            role_field = typed[0].get('role_field', 'ROUTING_ROLE')
+            allowed_pairs = {(g['role'], g['source_id']) for g in typed}
+            if role_field not in native or not set(zip(native[role_field], native.SOURCE_DATASET_ID)).issubset(allowed_pairs):
+                raise ValueError(f'Unrecognized or missing source roles: {name}')
         for prefix, group in groups.items():
             groups_metadata[prefix] = group
-            subset = native.loc[(native.ROUTING_ROLE == group['role']) & (native.SOURCE_DATASET_ID == group['source_id'])] if 'role' in group else native
+            subset = native.loc[(native[group.get('role_field', 'ROUTING_ROLE')] == group['role']) & (native.SOURCE_DATASET_ID == group['source_id'])] if 'role' in group else native
             group_completeness = completeness
             if 'source_id' in group and not any(r['source_id'] == group['source_id'] and r['runtime_status'] == 'available' for r in records):
                 group_completeness = 'unavailable'

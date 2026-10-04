@@ -1,8 +1,9 @@
 # Governance production readiness
 
-The baseline supported six native inventory collections. This work adds NGA physical port points
-and NOAA critical-habitat reference inventories. Sixteen catalog families remain
-unimplemented, not completed products. No collection establishes legal applicability, current
+Fourteen native reference collection pipelines are implemented, with ten catalog families still
+planned and unavailable. The latest bounded batch adds distinct Coast Guard administrative
+references and ECCC-reported marine classifications. Every current collection is research-only.
+No collection establishes legal applicability, current
 regulatory compliance, historical effective dates or model eligibility. Retained acquisition dates
 are not a freshness guarantee. The configured native extent is [-180, 32, -109, 72] EPSG:4326.
 
@@ -29,7 +30,7 @@ relations and all source attributes. Static snapshots have no fabricated daily o
 6. Assemble native products, all secondary artifacts, snapshots, effective configs, grid,
    metric dictionary, source rights/lineage and validation evidence in one prepared directory.
 7. Run `publish-generation --source PREPARED --release-root LOCAL_ROOT --release-id ID
-   --scientific-method-version native-inventory-overlay-1.0.0 --software-revision FULL_SHA`.
+   --scientific-method-version native-inventory-overlay-1.2.0 --software-revision FULL_SHA`.
    It copies and hashes every member, checks exact membership, synchronizes writes and atomically
    switches `current.json` under an exclusive publisher lock. IDs cannot be overwritten. Readers
    call `resolve_current` once and retain that path for the operation; this prevents mixed reads.
@@ -43,7 +44,7 @@ The local generation envelope is distinct from the shared application manifest s
 shape alone is not shared-schema conformance. Governance does not fit v0.1's quantity_kind enum;
 any shared-profile adopter needs the reviewed reference-geometry extension and validation.
 
-## Remaining catalog families
+## Original planning inventory (historical; current status below)
 
 Each row needs a pinned dataset/version, verified rights, native normalizer and fixtures,
 coverage qualification, real overlay comparison and release acceptance before implementation is
@@ -253,3 +254,48 @@ The bounded real native build produced 256 shipping-reference parts/source recor
 object IDs. All new output geometries validate without repair. Four declared roles have no
 source geometry in the native AOI and remain null in delivery, not observed absence. The archive
 and raw chart responses retain source records outside the native AOI and excluded object types.
+
+## Coast Guard and ECCC classification batch
+
+The fourth batch implements two narrow families, bringing the current count to 14 research-only
+collections and 10 planned/unavailable families. Method `native-inventory-overlay-1.2.0` adds six
+source/role groups; existing metric definitions and values remain unchanged. The R6/R8 grids,
+area/length projections, native extent and schema 0.2 mapping remain the established configuration.
+
+- Coast Guard: two USCG sectors (Columbia River and Puget Sound) selected by the exact application
+  grid, plus the CCG Western administrative region. These are distinct organizational units,
+  never pooled as unique jurisdiction or equivalent sectors. CCG is a 2021 cartographic snapshot
+  intended for 1:250000 or smaller scales; operating areas may extend beyond mapped boundaries.
+- ECCC: 72 CPCAD December 2025 marine source records, retaining 70 parent and 72 zone IDs:
+  51 reported PA/designated, 17 OECM/designated, one interim PA/interim and three provider
+  Not applicable/designated. These are provider-qualified classification views, not a new
+  cross-country designation taxonomy or incremental protected coverage. Not applicable here
+  is a provider label, distinct from a metric missingness state. All classes remain partial.
+  Original codes, dates, mechanism strings and IPCA fields remain source attributes without
+  legal-current, effective-date or Indigenous territorial inference.
+- Four CPCAD records reuse exact cached refuge source evidence with their original per-page
+  retrieval receipts. Parent/zone evidence keys and a release crosswalk disclose this overlap.
+  No aggregate conservation metric is produced; do not sum MPA, refuge and classification metrics.
+- PAD-US contributes only an evidence crosswalk: all 60 grid-selected Marine/MPA Source_PAID
+  values match the existing NOAA inventory identifiers. Its NOAA 2021 source vintage is retained
+  separately from NOAA 2023; no new geometry, coverage or replacement inventory is inferred.
+
+New source geometry acquisition used 4,587,359 bytes (CCG 1,486,345; CPCAD 3,101,014), below the
+8 MB per-source caps. Total authorized public acquisition consumed 387,275,523 of 400,000,000
+bytes including earlier attempts/preflight. Estimated final release is 0.80–0.82 GB and transient
+staging/assembly/publication requires approximately 2.6 GB. No paid API or cloud resource is used.
+
+USCG original metadata is retained unchanged, including its malformed redistribution clause.
+The derivative has a distinct title and accompanying FGDC-format processing/lineage/citation
+metadata. Schema conformance and redistribution clearance are not asserted; the release remains
+local-only pending rights review. CCG and CPCAD retain Open Government Licence - Canada
+attribution, links and modified-data labels. Other inherited source rights restrictions persist.
+
+The remaining 10 planned families are tribal_first_nations_areas, seasonal_closures,
+gear_restrictions, harvest_regulations, salmon_management_zones, exclusion_zones,
+speed_restriction_zones, whale_approach_regulation_zones, management_regions and reporting_areas.
+Tribal administrative/reserve versus traditional-territory scope and management/reporting systems
+require explicit selection. Dynamic legal products require authoritative activity/gear/species
+keys, instruments and effective/knowledge-time history; static inventory geometry cannot fill
+those gaps. The estimates in the original table apply only after those decisions and source
+qualification. OSM cannot resolve these legal or territorial gaps.

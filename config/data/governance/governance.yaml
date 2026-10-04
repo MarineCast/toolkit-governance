@@ -47,6 +47,103 @@ coverage_regions:
     label: International boundary
 
 sources:
+  uscg_app_sectors:
+    provider: United States Coast Guard
+    acquisition_type: arcgis
+    url: https://services9.arcgis.com/Fr5UUTVwNRJlXAkf/arcgis/rest/services/USCG_Sectors_view/FeatureServer/0
+    snapshot_path: data/raw/governance/uscg_app_sectors/features.pages.json
+    source_as_of: Service inventory acquired 2026-10-04; item revision 2024-10-25 and
+      edit 2026-01-30 are not legal effective times
+    license: USCG source metadata use limitations; original-source-metadata.xml retained
+    attribution: USCG - OSC Enterprise GIS Inventory Dataset 'Coast Guard Sectors source
+      data, Geographic NAD83, USCG - OSC Enterprise GIS
+    legal_citation: Provider inventory reference only; no controlling legal determination
+    redistribution: Local reference only; retain original metadata, distinct derivative
+      title, processing lineage and FGDC metadata. Source malformed redistribution clause
+      retained verbatim; no redistribution clearance asserted.
+    authority_scope: Two app-grid selected USCG sector polygons; administrative reference,
+      not operational jurisdiction or navigation. Source receipt times qualified in
+      snapshot pages.
+    source_status: available_after_download
+    server_filter: true
+    page_size: 4
+    source_limitation: Two app-grid selected USCG sector polygons; administrative reference,
+      not operational jurisdiction or navigation. Source receipt times qualified in
+      snapshot pages.
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: partial
+      us_federal_offshore: partial
+      canadian_federal_offshore: partial
+      international_boundary: partial
+  ccg_western_region:
+    provider: Canadian Coast Guard, Fisheries and Oceans Canada
+    acquisition_type: arcgis
+    url: https://egisp.dfo-mpo.gc.ca/arcgis/rest/services/open_data_donnees_ouvertes/ccg_gcc_regions/MapServer/0
+    snapshot_path: data/raw/governance/ccg_western_region/features.pages.json
+    source_as_of: 2021-03-31 inventory; published 2021-07-30; catalog modification is
+      not source revision
+    license: Open Government Licence - Canada v2.0; https://open.canada.ca/en/open-government-licence-canada
+    attribution: Canadian Coast Guard administrative regions
+    legal_citation: Provider inventory reference only; no controlling legal determination
+    redistribution: OGL-Canada attribution and license link required; label modifications,
+      no endorsement; local release only
+    authority_scope: Western administrative region; not a Canadian sector or precise
+      operational boundary. Cartographic scale 1:250000 or smaller; operations may extend
+      beyond boundaries.
+    source_status: available_after_download
+    server_filter: true
+    page_size: 4
+    source_limitation: Western administrative region; not a Canadian sector or precise
+      operational boundary. Cartographic scale 1:250000 or smaller; operations may extend
+      beyond boundaries.
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: partial
+      us_federal_offshore: partial
+      canadian_federal_offshore: partial
+      international_boundary: partial
+  eccc_marine_classification:
+    provider: Environment and Climate Change Canada
+    acquisition_type: arcgis
+    url: https://maps-cartes.ec.gc.ca/arcgis/rest/services/CWS_SCF/CPCAD/MapServer/0
+    snapshot_path: data/raw/governance/eccc_marine_classification/features.pages.json
+    source_as_of: CPCAD December 2025 release; mixed per-page acquisition receipts preserved
+    license: Open Government Licence - Canada v2.0; https://open.canada.ca/en/open-government-licence-canada
+    attribution: Environment and Climate Change Canada, Canadian Protected and Conserved
+      Areas Database, December 2025
+    legal_citation: Provider inventory reference only; no controlling legal determination
+    redistribution: OGL-Canada attribution and license link required; label modifications,
+      no endorsement; local release only
+    authority_scope: 72 exact-app-grid candidates with provider BIOME=M; four provider-qualified
+      class/status combinations. Classification view of existing source evidence, not
+      incremental protected coverage. Parent/zone IDs retained; never sum with MPA/refuge
+      coverage. Provider Not applicable class is not metric missingness. No effective-date,
+      legal-current or territorial inference.
+    source_status: available_after_download
+    server_filter: true
+    page_size: 4
+    source_limitation: 72 exact-app-grid candidates with provider BIOME=M; four provider-qualified
+      class/status combinations. Classification view of existing source evidence, not
+      incremental protected coverage. Parent/zone IDs retained; never sum with MPA/refuge
+      coverage. Provider Not applicable class is not metric missingness. No effective-date,
+      legal-current or territorial inference.
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: partial
+      us_federal_offshore: partial
+      canadian_federal_offshore: partial
+      international_boundary: partial
+
   chs_routing_layer_2:
     provider: Canadian Hydrographic Service, Fisheries and Oceans Canada
     acquisition_type: arcgis
@@ -1250,5 +1347,29 @@ collections:
     artifact_path: data/processed/domain/governance/administrative_context/ports/ports.parquet
     manifest_path: data/processed/domain/governance/administrative_context/ports/manifest.json
     color: '#8856A7'
+    default_visible: false
+    implementation_status: implemented_partial
+
+  coast_guard_sectors:
+    category: administrative_context
+    display_name: Distinct USCG sector and CCG region references
+    normalization_profile: distinct_coast_guard_administrative_reference
+    source_ids:
+    - uscg_app_sectors
+    - ccg_western_region
+    artifact_path: data/processed/domain/governance/administrative_context/coast_guard_sectors/coast_guard_sectors.parquet
+    manifest_path: data/processed/domain/governance/administrative_context/coast_guard_sectors/manifest.json
+    color: '#6A3D9A'
+    default_visible: false
+    implementation_status: implemented_partial
+  conservation_designations:
+    category: protected_areas
+    display_name: ECCC reported marine classifications
+    normalization_profile: eccc_reported_marine_classification
+    source_ids:
+    - eccc_marine_classification
+    artifact_path: data/processed/domain/governance/protected_areas/conservation_designations/conservation_designations.parquet
+    manifest_path: data/processed/domain/governance/protected_areas/conservation_designations/manifest.json
+    color: '#6A3D9A'
     default_visible: false
     implementation_status: implemented_partial

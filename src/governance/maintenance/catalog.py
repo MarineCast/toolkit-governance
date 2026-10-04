@@ -79,6 +79,8 @@ CORE_FEATURES = (
 )
 
 EXTRA_FEATURES = {
+    "coast_guard_sectors": (("ADMIN_UNIT_ROLE", "state", "derived", "category"), ("ADMIN_UNIT_DESCRIPTION", "provenance", "derived", "text")),
+    "conservation_designations": tuple((field, "provenance", "derived", "text") for field in ("CLASSIFICATION_ROLE", "PROVIDER_CLASS_LABEL", "PROVIDER_STATUS_LABEL", "PROVIDER_EVIDENCE_KEY", "EVIDENCE_OVERLAP_POLICY")),
     "shipping_lanes": (
         ("ROUTING_ROLE", "state", "derived", "category"),
         ("ROUTING_SOURCE_TYPE", "state", "observed", "category"),
