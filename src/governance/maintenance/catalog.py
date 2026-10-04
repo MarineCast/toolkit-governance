@@ -79,6 +79,9 @@ CORE_FEATURES = (
 )
 
 EXTRA_FEATURES = {
+    "wildlife_refuges": (
+        ("REFUGE_SYSTEM_TYPE", "state", "observed", "category"),
+    ),
     "marine_protected_areas": (
         ("SOURCE_RECORD_ID", "provenance", "observed", "identifier"),
         ("DESIGNATION_ID", "support", "derived", "identifier"),

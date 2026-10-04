@@ -167,7 +167,44 @@ critical habitat remain outside this source scope. Merged layer names/vintage ar
 is not a certification that every latest individual species layer has been merged.
 
 The original 18-family planning table above is the assessment baseline; ports and critical_habitat
-now have the bounded implementations described here. The other 16 remain pending. OSM port
+now have the bounded implementations described here. That first release left 16 pending; the next batch below implements two more as partial reference inventories. OSM port
 requests returned HTTP 406 and 429; no OSM data was accepted. NGA eliminated the need for a port
 fallback. OSM's [ODbL attribution terms](https://www.openstreetmap.org/copyright) would apply to
 any later OSM-derived reference product, separately from authoritative sources.
+
+
+## County and selected-refuge batch
+
+The second batch raises the implemented count to ten, leaving fourteen planned families. All
+remain model-ineligible reference inventories. It adds no legal applicability or effective-date
+reconstruction. See the family [county source notes](../src/governance/jurisdiction/county_regional_boundaries/DATA_SOURCES.md)
+and [refuge source notes](../src/governance/protected_areas/wildlife_refuges/DATA_SOURCES.md).
+
+The 2025 Census county archive is 83,989,800 bytes, pinned to SHA-256
+`9c6e9d9076abce2670d1de255de3710c35ecca00a7005d88e012dec52d95f763`.
+The source is nationwide U.S. data, transformed from NAD83 to WGS84 and clipped through the
+existing antimeridian-safe native pipeline. It provides no Canadian regional districts. The
+2025-01-01 reference date describes the Census vintage, not a legal effective date.
+
+Filtered official refuge acquisition returned 132 FWS National Wildlife Refuge records and 68
+ECCC National Wildlife Area / Marine National Wildlife Area / Migratory Bird Sanctuary records
+returned by the server query for [-180,32,-109,72]. Exact native clipping retained 132 FWS
+and 40 ECCC features; 28 ECCC query candidates were outside the precise AOI. Complete object-ID
+rosters and every response page are archived;
+IDs are snapshot-scoped, not assumed stable across future source updates. FWS source geometry
+is resource-grade, dissolved and partly generalized (source documentation reports 1–30 m for
+selected features). ECCC source status, establishment year, parent/zone IDs and management fields
+are retained individually. Neither an establishment year nor an inventory receipt becomes an
+exact legal effective date. Other protected-area categories are explicitly excluded.
+
+The two refuge requests used 92,367,404 response bytes under a 120 MB cap. Including Census and
+the preceding approximately 175 MB acquisition, the running estimate remains below the approved
+400 MB public-source budget. Staging is capped at 2 GB. No paid services, source-data commits or
+external data publication are involved. Every subsequent release uses a new immutable identity;
+previous releases and caches remain intact.
+
+
+The native outputs contain 372 county geometry parts (325 county-equivalent features) and
+29,193 refuge parts (172 source features). All output geometries validate. The shared native
+pipeline repaired 64 invalid FWS source geometries using its existing documented `make_valid`
+method; source snapshots remain unchanged. Clipping diagnostics retain repaired/excluded counts.

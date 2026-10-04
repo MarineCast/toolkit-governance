@@ -131,6 +131,7 @@ def download_direct_snapshot(
     source: GovernanceSource,
     *,
     overwrite: bool = False,
+    max_bytes: int | None = None,
 ) -> Path:
     """Archive an exact versioned file download plus request metadata."""
 
@@ -147,9 +148,13 @@ def download_direct_snapshot(
     try:
         with requests.get(source.url, headers=HEADERS, stream=True, timeout=180) as response:
             response.raise_for_status()
+            received = 0
             with temporary.open("wb") as handle:
                 for chunk in response.iter_content(chunk_size=1024 * 1024):
                     if chunk:
+                        received += len(chunk)
+                        if max_bytes is not None and received > max_bytes:
+                            raise SourceUnavailableError(f'Download exceeds {max_bytes} byte cap: {source.source_id}')
                         handle.write(chunk)
         _validate_expected_checksum(source, temporary)
         os.replace(temporary, destination)
