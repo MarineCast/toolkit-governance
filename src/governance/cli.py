@@ -17,6 +17,23 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--workspace', type=Path, help='Data workspace (default: GOVERNANCE_WORKSPACE or cwd).')
     commands = parser.add_subparsers(dest='command', required=True)
+    commands.add_parser('preflight', help='Read-only source and full catalog readiness inventory.')
+    sub = commands.add_parser('export-delivery', help='Project a verified overlay into single-resolution wide tables.')
+    sub.add_argument('--matrix', required=True, type=Path)
+    sub.add_argument('--output-directory', required=True, type=Path)
+    sub.add_argument('--release-id', required=True)
+    sub.add_argument('--software-revision', required=True)
+    sub = commands.add_parser('publish-generation', help='Verify and atomically publish a prepared local generation.')
+    sub.add_argument('--source', required=True, type=Path)
+    sub.add_argument('--release-root', required=True, type=Path)
+    sub.add_argument('--release-id', required=True)
+    sub.add_argument('--scientific-method-version', required=True)
+    sub.add_argument('--software-revision', required=True)
+    sub = commands.add_parser('activate-generation', help='Select a verified prior local generation for rollback.')
+    sub.add_argument('--release-root', required=True, type=Path)
+    sub.add_argument('--release-id', required=True)
+    sub = commands.add_parser('verify-generation', help='Verify exact immutable generation membership and checksums.')
+    sub.add_argument('path', type=Path)
     commands.add_parser('init', help='Copy missing configuration defaults; no downloads.')
     sub = commands.add_parser('export-h3-matrix', help='Derive an explicit H3 context overlay from verified native products.')
     sub.add_argument('--grid', required=True, type=Path)
@@ -44,7 +61,23 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.workspace is not None:
         os.environ['GOVERNANCE_WORKSPACE'] = str(args.workspace.expanduser().resolve())
     try:
-        if args.command == 'init':
+        if args.command == 'preflight':
+            from .preflight import preflight
+            print(json.dumps(preflight(), indent=2))
+        elif args.command == 'export-delivery':
+            from .delivery import export_delivery
+            for path in export_delivery(args.matrix, args.output_directory, release_id=args.release_id, software_revision=args.software_revision):
+                print(path)
+        elif args.command == 'publish-generation':
+            from .releases import publish_generation
+            print(publish_generation(args.source, args.release_root, args.release_id, scientific_method_version=args.scientific_method_version, software_revision=args.software_revision))
+        elif args.command == 'activate-generation':
+            from .releases import activate_generation
+            print(activate_generation(args.release_root, args.release_id))
+        elif args.command == 'verify-generation':
+            from .releases import verify_generation
+            print(json.dumps(verify_generation(args.path), indent=2))
+        elif args.command == 'init':
             from ._config.paths import project_root
             for path in initialize_workspace(project_root()):
                 print(path)

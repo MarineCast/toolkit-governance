@@ -213,3 +213,30 @@ def test_export_detects_effective_config_drift(workspace, grid_path):
             length_crs="EPSG:32610",
             allow_partial=True,
         )
+
+
+def test_delivery_splits_resolutions_and_preserves_partial_nulls(workspace, grid_path, tmp_path):
+    from governance.delivery import export_delivery, validate_delivery
+    matrix = export_h3_matrix(grid_path, tmp_path/'matrix.parquet', length_crs='EPSG:32610', allow_partial=True)
+    outputs = export_delivery(matrix, tmp_path/'delivery', release_id='test-release', software_revision='a'*40)
+    parquet, manifest = outputs
+    assert validate_delivery(parquet, manifest)['rows'] == 2
+    table = pq.read_table(parquet)
+    assert table['management_areas__recorded_feature_count_status'].to_pylist() == ['partial','partial']
+    assert table['management_areas__recorded_feature_count'].to_pylist() == [1,None]
+    info=json.loads(manifest.read_text())
+    assert info['coverage']['management_areas']['geographic_inventory_coverage']['denominator'] is None
+    assert info['shared_contract_conformance']['status']=='blocked'
+    with pytest.raises(FileExistsError):
+        export_delivery(matrix,tmp_path/'delivery',release_id='test-release',software_revision='a'*40)
+
+
+def test_delivery_mixed_input_creates_separate_tables(workspace, grid_path, tmp_path):
+    from governance.delivery import export_delivery, validate_delivery
+    mixed=tmp_path/'mixed.parquet'
+    pq.write_table(pa.table({'H3_INDEX':[h3.latlng_to_cell(48.5,-123,6),h3.latlng_to_cell(48.5,-123,8)],'H3_RESOLUTION':[6,8]}),mixed)
+    matrix=export_h3_matrix(mixed,tmp_path/'matrix.parquet',length_crs='EPSG:32610',allow_partial=True)
+    paths=export_delivery(matrix,tmp_path/'delivery',release_id='split',software_revision='b'*40)
+    assert len(paths)==4
+    results=[validate_delivery(paths[i],paths[i+1]) for i in (0,2)]
+    assert [(r['resolution'],r['rows']) for r in results]==[(6,1),(8,1)]

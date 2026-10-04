@@ -50,3 +50,7 @@ runtime dynamic-import relationships. Source/tests are authoritative.
 `graphify-out/` is a disposable local-only cache. Never commit or publish it, install agent hooks
 implicitly or build a MarineCast-wide graph. This repository owns its graph independently of
 other toolkits. See [migration validation](MIGRATION.md) for the observed run.
+
+`preflight` inventories every source and catalog family; `delivery` projects single-resolution
+wide snapshot tables; `releases` provides immutable local multi-artifact generations and verified
+activation/rollback. See [production readiness](production-readiness.md) for operational boundaries.

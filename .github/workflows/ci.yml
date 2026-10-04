@@ -32,7 +32,16 @@ jobs:
           "$wheel_env/bin/python" - <<'PY'
           from importlib.resources import files
 
+          import sys
+          class BlockApplication:
+              def find_spec(self, fullname, path=None, target=None):
+                  if fullname.split(".")[0] in {"orcacast", "domains"}:
+                      raise ImportError("Application imports forbidden in installed smoke")
+          sys.meta_path.insert(0, BlockApplication())
           import governance
+          import governance.delivery
+          import governance.preflight
+          import governance.releases
           import governance.fisheries_management.management_areas.build
           import governance.jurisdiction.federal_waters.build
           import governance.jurisdiction.international_boundaries.build
@@ -52,4 +61,5 @@ jobs:
           "$wheel_env/bin/governance" --help
           "$wheel_env/bin/governance" --workspace "$workspace" init
           "$wheel_env/bin/governance" --workspace "$workspace" catalog
+          "$wheel_env/bin/governance" --workspace "$workspace" preflight
       - run: git diff --check
