@@ -9,7 +9,7 @@ It installs independently of OrcaCast and sibling toolkits.
 
 ## Implemented scope
 
-Fourteen collections have normalization, build and inspection modules; acquisition is explicit and bounded:
+Fifteen collections have normalization, build and inspection modules; acquisition is explicit and bounded:
 
 - Marine protected areas (NOAA inventory and DFO designations/areas of interest).
 - National marine sanctuaries (six NOAA ONMS boundary sources).
@@ -24,8 +24,9 @@ Fourteen collections have normalization, build and inspection modules; acquisiti
 - Shipping-lane and TSS reference components (CHS and NOAA2026; distinct per-source/role metrics).
 - Coast Guard administrative references (USCG sectors and CCG Western region, kept distinct).
 - ECCC-reported marine classifications (source-qualified, non-additive views of CPCAD evidence).
+- BIA land-area and NRCan Indian Reserve administrative references (source systems remain distinct; no traditional territories).
 
-The catalog includes 24 collections; 10 remain planned. Collection names do not establish
+The catalog includes 24 collections; 9 remain planned. Collection names do not establish
 complete U.S./Canadian coverage. Read [contracts](docs/CONTRACTS.md) and the per-family
 `DATA_SOURCES.md` files before interpreting outputs. Canonical products use **native geometry**,
 not H3; all fields remain **model-ineligible by default**. Reference maps, legal authority,

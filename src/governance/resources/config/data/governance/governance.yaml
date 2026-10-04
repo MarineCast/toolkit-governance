@@ -47,6 +47,78 @@ coverage_regions:
     label: International boundary
 
 sources:
+  bia_administrative_lar:
+    provider: Bureau of Indian Affairs
+    acquisition_type: arcgis
+    url: https://biamaps.geoplatform.gov/server/rest/services/DivLTR/BIA_AIAN_National_LAR/FeatureServer/0
+    snapshot_path: data/raw/governance/bia_administrative_lar/features.pages.json
+    source_as_of: Current service inventory at page receipt; geometry vintage and legal
+      effective dates unavailable. Historical 2019 LAR references do not establish this
+      service vintage.
+    license: Public information subject to BIA source use limitations; complete provider
+      metadata retained
+    attribution: Bureau of Indian Affairs, Office of Trust Services, Division of Land
+      Titles and Records, Branch of Geospatial Support
+    legal_citation: Provider administrative reference only; no controlling legal determination
+    redistribution: Illustrative/reference/statistical purposes only; not legal, survey,
+      engineering or navigation use. Acquire directly from BIA and preserve metadata;
+      no jurisdiction or ownership inference; local release only.
+    authority_scope: Exact application-grid selected land-area inventory. CLASSIFICATION
+      source codes retained without unsupported decoding. Includes source-specific reservation/trust/restricted/mixed
+      concepts; no claim to represent all tribal interests, traditional territory, sovereignty
+      or fishing entitlement.
+    source_status: available_after_download
+    server_filter: true
+    page_size: 5
+    source_limitation: Exact application-grid selected land-area inventory. CLASSIFICATION
+      source codes retained without unsupported decoding. Includes source-specific reservation/trust/restricted/mixed
+      concepts; no claim to represent all tribal interests, traditional territory, sovereignty
+      or fishing entitlement.
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: partial
+      us_federal_offshore: partial
+      canadian_federal_offshore: partial
+      international_boundary: partial
+  nrcan_indian_reserves:
+    provider: Natural Resources Canada, Canada Lands Survey System
+    acquisition_type: arcgis
+    url: https://proxyinternet.nrcan-rncan.gc.ca/arcgis/rest/services/CLSS-SATC/CLSS_Administrative_Boundaries/MapServer/0
+    snapshot_path: data/raw/governance/nrcan_indian_reserves/features.pages.json
+    source_as_of: Current provider snapshot at page receipts; no inferred legal establishment/effective
+      dates
+    license: Open Government Licence - Canada; https://open.canada.ca/en/open-government-licence-canada
+    attribution: Natural Resources Canada, Aboriginal Lands of Canada Legislative Boundaries,
+      Indian Reserve records in British Columbia
+    legal_citation: Provider administrative reference only; no controlling legal determination
+    redistribution: OGL-Canada attribution and licence link required; label modifications,
+      no endorsement; local release only
+    authority_scope: Exact application-grid selected British Columbia Indian Reserve
+      records only. Administrative boundaries compiled from cadastral sources; provider
+      representationPurpose retained as an attribute, not legal-title certification.
+      Sechelt Land and other classes excluded; no traditional-territory or sovereign-jurisdiction
+      inference.
+    source_status: available_after_download
+    server_filter: true
+    page_size: 5
+    source_limitation: Exact application-grid selected British Columbia Indian Reserve
+      records only. Administrative boundaries compiled from cadastral sources; provider
+      representationPurpose retained as an attribute, not legal-title certification.
+      Sechelt Land and other classes excluded; no traditional-territory or sovereign-jurisdiction
+      inference.
+    coverage:
+      california: partial
+      oregon: partial
+      washington: partial
+      alaska: partial
+      british_columbia_canada: partial
+      us_federal_offshore: partial
+      canadian_federal_offshore: partial
+      international_boundary: partial
+
   uscg_app_sectors:
     provider: United States Coast Guard
     acquisition_type: arcgis
@@ -1370,6 +1442,19 @@ collections:
     - eccc_marine_classification
     artifact_path: data/processed/domain/governance/protected_areas/conservation_designations/conservation_designations.parquet
     manifest_path: data/processed/domain/governance/protected_areas/conservation_designations/manifest.json
+    color: '#6A3D9A'
+    default_visible: false
+    implementation_status: implemented_partial
+
+  tribal_first_nations_areas:
+    category: jurisdiction
+    display_name: BIA and NRCan administrative references; not traditional territories
+    normalization_profile: bia_nrcan_administrative_references
+    source_ids:
+    - bia_administrative_lar
+    - nrcan_indian_reserves
+    artifact_path: data/processed/domain/governance/jurisdiction/tribal_first_nations_areas/tribal_first_nations_areas.parquet
+    manifest_path: data/processed/domain/governance/jurisdiction/tribal_first_nations_areas/manifest.json
     color: '#6A3D9A'
     default_visible: false
     implementation_status: implemented_partial

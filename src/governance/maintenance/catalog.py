@@ -79,6 +79,7 @@ CORE_FEATURES = (
 )
 
 EXTRA_FEATURES = {
+    "tribal_first_nations_areas": tuple((field, "provenance", "derived", "text") for field in ("ADMIN_REFERENCE_ROLE", "ADMIN_REFERENCE_DESCRIPTION", "PROVIDER_AREA_ID")),
     "coast_guard_sectors": (("ADMIN_UNIT_ROLE", "state", "derived", "category"), ("ADMIN_UNIT_DESCRIPTION", "provenance", "derived", "text")),
     "conservation_designations": tuple((field, "provenance", "derived", "text") for field in ("CLASSIFICATION_ROLE", "PROVIDER_CLASS_LABEL", "PROVIDER_STATUS_LABEL", "PROVIDER_EVIDENCE_KEY", "EVIDENCE_OVERLAP_POLICY")),
     "shipping_lanes": (

@@ -304,6 +304,9 @@ def export_h3_matrix(
         elif name == 'coast_guard_sectors':
             from .administrative_context.coast_guard_sectors.normalize import metric_groups
             groups = metric_groups(name)
+        elif name == 'tribal_first_nations_areas':
+            from .jurisdiction.tribal_first_nations_areas.normalize import metric_groups
+            groups = metric_groups(name)
         elif name == 'conservation_designations':
             from .protected_areas.conservation_designations.normalize import metric_groups
             groups = metric_groups(name)
