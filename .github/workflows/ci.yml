@@ -45,6 +45,8 @@ jobs:
           import governance.protected_areas.critical_habitat.build
           import governance.jurisdiction.county_regional_boundaries.build
           import governance.protected_areas.wildlife_refuges.build
+          import governance.vessel_management.shipping_lanes.build
+          import governance.vessel_management.traffic_separation_schemes.build
           import governance.preflight
           import governance.releases
           import governance.fisheries_management.management_areas.build

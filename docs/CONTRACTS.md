@@ -30,7 +30,7 @@ rejects H3/model-eligible manifests. Atomic writes are per file; the multi-file 
 has no global rollback or combined atomic generation pointer. Consumers must verify manifests
 and treat missing or inconsistent outputs as incomplete.
 
-The catalog has 24 entries and ten implemented map families. `catalog --verify-artifacts` verifies
+The catalog has 24 entries and twelve implemented map families. `catalog --verify-artifacts` verifies
 present configured primary artifacts; missing artifacts are skipped, not certified as complete.
 Secondary products and legal/source completeness require their own checks. The inspector reports
 unavailable/planned layers separately. Native manifests are not the proposed MarineCast H3

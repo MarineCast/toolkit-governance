@@ -21,7 +21,7 @@ from shapely.ops import transform
 
 from .shared.artifacts import load_manifest, sha256_dataset, sha256_file
 from .shared.config import DEFAULT_CONFIG_PATH, load_governance_config
-from .shared.schema import validate_governance_geometry
+from .shared.schema import CANONICAL_FIELDS, validate_governance_geometry
 
 
 def _grid(path: Path) -> gpd.GeoDataFrame:
@@ -75,7 +75,11 @@ def overlay_collection(
     length_crs: str,
 ) -> dict[str, pa.Array]:
     """Overlay one validated native collection; preserve empty-intersection missingness."""
-    validate_governance_geometry(native)
+    if native.empty:
+        if not set(CANONICAL_FIELDS).issubset(native.columns) or native.crs is None:
+            raise ValueError('Empty overlay subset must retain its verified native schema/CRS')
+    else:
+        validate_governance_geometry(native)
     projected_grid = grid.to_crs(6933)
     extent = box(*grid.total_bounds)
     indexes = native.sindex.query(extent, predicate="intersects")
@@ -249,6 +253,7 @@ def export_h3_matrix(
     arrays["MODEL_ELIGIBLE"] = pa.array([False] * len(grid))
     manifests = {}
     field_definitions = {}
+    groups_metadata = {}
     for name, collection in config.collections.items():
         manifest = load_manifest(collection.manifest_path)
         if (
@@ -292,35 +297,50 @@ def export_h3_matrix(
             f"Overlay {name}: {len(native):,} native parts on {len(grid):,} cells",
             flush=True,
         )
-        columns = overlay_collection(
-            grid, native, completeness=completeness, length_crs=length_crs
-        )
-        for column, values in columns.items():
-            key = f"{name}__{column}"
-            arrays[key] = values
-            unit = (
-                "proportion_of_full_cell"
-                if column == "POLYGON_COVERAGE_FRAC"
-                else (
-                    "m"
-                    if column == "LINE_LENGTH_M"
+        validate_governance_geometry(native)
+        if name in {'shipping_lanes', 'traffic_separation_schemes'}:
+            from .vessel_management.routing import metric_groups
+            groups = metric_groups(name)
+            allowed_pairs = {(g['role'], g['source_id']) for g in groups.values()}
+            if 'ROUTING_ROLE' not in native or not set(zip(native.ROUTING_ROLE, native.SOURCE_DATASET_ID)).issubset(allowed_pairs):
+                raise ValueError(f'Unrecognized or missing routing roles: {name}')
+        else:
+            groups = {name: {'collection': name}}
+        for prefix, group in groups.items():
+            groups_metadata[prefix] = group
+            subset = native.loc[(native.ROUTING_ROLE == group['role']) & (native.SOURCE_DATASET_ID == group['source_id'])] if 'role' in group else native
+            group_completeness = completeness
+            if 'source_id' in group and not any(r['source_id'] == group['source_id'] and r['runtime_status'] == 'available' for r in records):
+                group_completeness = 'unavailable'
+            columns = overlay_collection(
+                grid, subset, completeness=group_completeness, length_crs=length_crs
+            )
+            for column, values in columns.items():
+                key = f"{prefix}__{column}"
+                arrays[key] = values
+                unit = (
+                    "proportion_of_full_cell"
+                    if column == "POLYGON_COVERAGE_FRAC"
                     else (
-                        "count"
-                        if column in ("FEATURE_COUNT", "POINT_COUNT")
+                        "m"
+                        if column == "LINE_LENGTH_M"
                         else (
-                            "native_attribute_set_as_strings"
-                            if column.startswith("NATIVE_")
-                            else "category"
+                            "count"
+                            if column in ("FEATURE_COUNT", "POINT_COUNT")
+                            else (
+                                "native_attribute_set_as_strings"
+                                if column.startswith("NATIVE_")
+                                else "category"
+                            )
                         )
                     )
                 )
-            )
-            field_definitions[key] = {
-                "collection": name,
-                "variable": column,
-                "unit": unit,
-                "model_eligible": False,
-            }
+                field_definitions[key] = {
+                    "collection": name,
+                    "variable": column,
+                    "unit": unit,
+                    "model_eligible": False,
+                }
         manifests[name] = {
             "manifest_sha256": sha256_file(collection.manifest_path),
             "manifest": manifest,
@@ -344,6 +364,7 @@ def export_h3_matrix(
         "catalog": catalog,
         "catalog_sha256": sha256_file(config.catalog_path),
         "fields": field_definitions,
+        "metric_groups": groups_metadata,
         "area_crs": "EPSG:6933",
         "length_crs": crs.to_string(),
         "support": "full H3 polygon, positive-area/positive-length or point intersections",

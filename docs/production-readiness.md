@@ -208,3 +208,48 @@ The native outputs contain 372 county geometry parts (325 county-equivalent feat
 29,193 refuge parts (172 source features). All output geometries validate. The shared native
 pipeline repaired 64 invalid FWS source geometries using its existing documented `make_valid`
 method; source snapshots remain unchanged. Clipping diagnostics retain repaired/excluded counts.
+
+
+## Typed routing-reference batch
+
+The third batch implements `shipping_lanes` and `traffic_separation_schemes` as explicit component
+inventories, bringing the catalog to twelve implemented reference collections and twelve planned.
+The method is `native-inventory-overlay-1.1.0`; delivery semantic version is 1.1.0. Existing ten
+family calculations are unchanged. Routing has fifteen separately declared source/role groups,
+with no pooled routing count, area or line total. Polygon roles expose component-object count and
+unioned area fraction; line roles expose component-object count and unioned length. An absent
+source is unavailable; empty roles/intersections under incomplete regional coverage remain null.
+
+CHS AOI queries for layers 2–5 returned 26/14/55/234 candidates. Ferry layer 1 is excluded. Every
+source field, chart identifier and object LNAM is retained. Where LNAM is present, logical object
+counts deduplicate that identifier within its source object type; native source-record/part IDs
+remain unique. Geometry union prevents additive overlap inside each source/role. Overlap with
+other roles or NOAA is not summed or interpreted as a unique route or whole scheme. Conflicting
+chart geometries are retained and unioned, not silently resolved to a preferred chart scale.
+
+The NOAA March 16, 2026 archive is distinct from its older live EPSG:3857 service and contains
+327 NAD83 source records. Original GPKG FID is preserved in the provisioned GeoParquet and the ZIP
+is retained unchanged, SHA-256 `9dff1d661030e6e306b5c49cf84e07e5f566a3b027da282c3d713e74314eff37`.
+Traffic Lane/Separation Zone roles belong to TSS; Fairway/Two-Way Route/Recommended Route roles
+belong to shipping references. Area To Be Avoided, Precautionary Area and Particularly Sensitive
+Sea Area are excluded from these families, not repurposed into unqualified regulatory products.
+
+The official Marine Cadastre disclaimer was retrieved through its linked page. It permits use
+of government-hosted public-domain information unless specifically annotated otherwise, with
+attribution/no-false-ownership, no-endorsement and no-presentation-of-modified-content-as-official
+constraints. Dataset metadata limits use to coastal/ocean planning, not navigation, reports no
+maintenance planned and untested completeness. CHS uses OGL-Canada v2 with attribution/license
+link and no endorsement. Dates/status codes remain original attributes; publication, catalog
+modification, retrieval and legal applicability are distinct.
+
+Acquisition used 27,936,991 response bytes (40 MB cap), including a size-preflighted 27,668,464-byte
+NOAA ZIP. The cumulative estimate is 379,294,195 bytes under the existing 400 MB acquisition
+budget. No paid access or external source-data publication. Exact source metadata, dictionary,
+rights, request rosters, pages, checksums and receipts accompany the immutable local release.
+
+
+The bounded real native build produced 256 shipping-reference parts/source records representing
+199 logical object IDs after CHS LNAM deduplication, and 195 TSS parts representing 187 source
+object IDs. All new output geometries validate without repair. Four declared roles have no
+source geometry in the native AOI and remain null in delivery, not observed absence. The archive
+and raw chart responses retain source records outside the native AOI and excluded object types.
