@@ -49,7 +49,7 @@ git diff --check
 ```
 
 Verify a regular wheel installation from outside the checkout, initialize a fresh external
-workspace, validate its catalog and import all six families without application imports. Keep
+workspace, validate its catalog and import all eight families without application imports. Keep
 `config/` and `src/governance/resources/config/` byte-identical. Regenerate the editable catalog
 with `python -m governance.maintenance.catalog`, then synchronize its packaged resource.
 
@@ -57,3 +57,9 @@ Moved local historical products retain their original bytes, manifests and absol
 paths. They are evidence of the prior build, not freshly validated toolkit releases. Use a new
 workspace for rebuilds; do not reuse an old manifest as proof that new configuration was run.
 See [migration](MIGRATION.md) for the local transfer/cleanup boundary and unrun checks.
+
+## Coherent local releases
+
+Use the separate [production release workflow](production-readiness.md) to stage all native
+products, companions and evidence before an atomic generation-pointer switch. Per-family build
+commands still write per-file and must not target an already published generation.

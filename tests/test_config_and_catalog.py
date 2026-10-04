@@ -20,6 +20,8 @@ def test_governance_config_uses_shared_full_area_without_h3_products() -> None:
         "federal_waters",
         "state_provincial_waters",
         "management_areas",
+        "ports",
+        "critical_habitat",
     }
     for collection in config.collections.values():
         assert "H3" not in str(collection.artifact_path).upper()
@@ -72,6 +74,10 @@ def test_governance_root_is_public_surface_and_shared_code_is_packaged() -> None
         "cli.py",
         "workspace.py",
         "h3_matrix.py",
+        "delivery.py",
+        "shared_contract.py",
+        "preflight.py",
+        "releases.py",
     }
     assert {
         "acquisition.py",
@@ -95,7 +101,7 @@ def test_governance_catalog_is_generated_and_model_safe() -> None:
     )
     assert catalog == generated
     assert len(catalog["collections"]) == 24
-    assert sum(value["map_layer"] for value in catalog["collections"].values()) == 6
+    assert sum(value["map_layer"] for value in catalog["collections"].values()) == 8
     assert catalog["canonical_storage"] == "native_geometry"
     assert catalog["h3_products"] is False
     for collection in catalog["collections"].values():
