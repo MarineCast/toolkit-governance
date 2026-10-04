@@ -76,4 +76,4 @@ def test_role_delivery_never_pools_components_sources_or_absent_roles(tmp_path,m
     assert 'traffic_separation_schemes__chs_lane_part__recorded_line_union_length_m' not in table.column_names
     assert d['coverage']['traffic_separation_schemes__noaa_traffic_lane']['configured_source_receipt']['numerator']==0
     assert d['coverage']['traffic_separation_schemes__chs_lane_part']['configured_source_receipt']['denominator']==1
-    assert d['scientific_method_version']=='native-inventory-overlay-1.2.0'
+    assert d['scientific_method_version']=='native-inventory-overlay-1.3.0'

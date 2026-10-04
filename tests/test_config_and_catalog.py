@@ -24,6 +24,7 @@ def test_governance_config_uses_shared_full_area_without_h3_products() -> None:
         "critical_habitat",
         "county_regional_boundaries",
         "wildlife_refuges",
+        "tribal_first_nations_areas",
         "coast_guard_sectors",
         "conservation_designations",
         "shipping_lanes",
@@ -107,7 +108,7 @@ def test_governance_catalog_is_generated_and_model_safe() -> None:
     )
     assert catalog == generated
     assert len(catalog["collections"]) == 24
-    assert sum(value["map_layer"] for value in catalog["collections"].values()) == 14
+    assert sum(value["map_layer"] for value in catalog["collections"].values()) == 15
     assert catalog["canonical_storage"] == "native_geometry"
     assert catalog["h3_products"] is False
     for collection in catalog["collections"].values():

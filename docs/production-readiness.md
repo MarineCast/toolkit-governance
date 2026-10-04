@@ -1,8 +1,8 @@
 # Governance production readiness
 
-Fourteen native reference collection pipelines are implemented, with ten catalog families still
-planned and unavailable. The latest bounded batch adds distinct Coast Guard administrative
-references and ECCC-reported marine classifications. Every current collection is research-only.
+Fifteen native reference collection pipelines are implemented, with nine catalog families still
+planned and unavailable. The latest bounded batch adds source-specific BIA land-area and NRCan Indian Reserve
+administrative references. Every current collection is research-only.
 No collection establishes legal applicability, current
 regulatory compliance, historical effective dates or model eligibility. Retained acquisition dates
 are not a freshness guarantee. The configured native extent is [-180, 32, -109, 72] EPSG:4326.
@@ -30,7 +30,7 @@ relations and all source attributes. Static snapshots have no fabricated daily o
 6. Assemble native products, all secondary artifacts, snapshots, effective configs, grid,
    metric dictionary, source rights/lineage and validation evidence in one prepared directory.
 7. Run `publish-generation --source PREPARED --release-root LOCAL_ROOT --release-id ID
-   --scientific-method-version native-inventory-overlay-1.2.0 --software-revision FULL_SHA`.
+   --scientific-method-version native-inventory-overlay-1.3.0 --software-revision FULL_SHA`.
    It copies and hashes every member, checks exact membership, synchronizes writes and atomically
    switches `current.json` under an exclusive publisher lock. IDs cannot be overwritten. Readers
    call `resolve_current` once and retain that path for the operation; this prevents mixed reads.
@@ -299,3 +299,59 @@ require explicit selection. Dynamic legal products require authoritative activit
 keys, instruments and effective/knowledge-time history; static inventory geometry cannot fill
 those gaps. The estimates in the original table apply only after those decisions and source
 qualification. OSM cannot resolve these legal or territorial gaps.
+
+## BIA and NRCan administrative-reference batch
+
+The fifth batch raises the implemented count to 15 research-only collections and leaves nine
+planned families. The `tribal_first_nations_areas` catalog family implements only the approved
+administrative/reserve reference scope. It contains no traditional territories, treaty fishing
+areas, sovereign-jurisdiction inference or legal-title determination. Its two source/role groups
+remain separate in H3 metrics and map inspection. Provider area identifiers count source units,
+not Tribes, Nations, people or rights holders. Separate source records and geometry parts remain
+recoverable; geometry overlaps are unioned within a source group rather than summed.
+
+Direct BIA AIAN National LAR acquisition returned 14 full source polygons selected by the existing
+exact application-grid mask. All observed CLASSIFICATION codes are `1`; the service supplied no
+code domain, so no decoded land-type claim is introduced. BIA explicitly limits the geometry to
+illustrative/reference/statistical use, disclaims legal/jurisdiction/ownership inference, and
+warns that all co-interested tribes may not be represented. Its current service describes ongoing
+improvements; an older BIA consultation described 2019 LAR spatial definitions. Neither statement
+is silently converted to this snapshot's geometry vintage or legal effective date.
+
+Direct NRCan CLSS acquisition returned 111 source records selected by the same mask and explicitly
+filtered to provider `Indian Reserve` records in British Columbia. Provider administrative IDs,
+original distribution/jurisdiction/representation-purpose fields and every received attribute are
+retained. A provider purpose value of `Legal` is not promoted to canonical legal authority.
+Sechelt Land and other administrative classes remain outside this first qualified subset.
+Open Government Licence - Canada terms, attribution and modification labels remain attached.
+
+This is partial application-grid-selected WA/BC reference coverage, not a full provincial/state,
+Northeast Pacific or Indigenous-interest inventory. The original native AOI and supplied R6/R8
+memberships remain unchanged; selected whole source features are clipped only by the established
+native pipeline. Empty intersections stay null under partial support, and all fields remain
+model-ineligible. Original source OBJECTIDs and stable provider area IDs serve different roles.
+No source establishment or effective date is inferred from retrieval, edit or catalog dates.
+
+Acquisition used 2,682,213 additional response bytes: BIA geometry 461,775 bytes, NRCan geometry
+2,194,612 bytes, and 25,826 bytes of fresh metadata/ID rosters. Including the earlier 410,508-byte
+scope preflight, this is 3,092,721 bytes against the approved 11 MB additional batch cap.
+Cumulative counted public acquisition is 390,368,244 / 400,000,000 bytes. Peak task-owned staging,
+assembly and local publication remains estimated at 2.7 GB, with 29 GiB free before work began.
+The additive scientific method/product version is `native-inventory-overlay-1.3.0`; existing
+metric meanings and values are unchanged. Native and shared schema 0.2 companions remain required.
+
+The remaining nine families are seasonal_closures, gear_restrictions, harvest_regulations,
+salmon_management_zones, exclusion_zones, speed_restriction_zones,
+whale_approach_regulation_zones, management_regions and reporting_areas. WA/BC WDFW/DFO systems
+and dated whale/fisheries snapshot scopes are approved; source qualification remains necessary.
+DataBC PFMA metadata says Access Only while a third-party copy claims OGL-BC, and a discovered
+Washington commercial salmon reporting layer explicitly says non-authoritative. Neither was
+accepted as authoritative geometry. DFO's legacy geoportal endpoint returned 404. Existing WDFW
+recreational geometry is reusable evidence, not automatically a new commercial reporting system.
+
+Primary WA/BC regulatory texts must retain jurisdiction, issuer/system, species, vessel/activity/
+gear and rights-holder applicability, exceptions, and independent effective/expiry, publication,
+knowledge and receipt times. Moving-whale approach rules do not yield fixed exclusion polygons.
+Coastline/border-defined segments require qualified geometry support. Contradictory dates in a
+Tribe-issued fishery instrument require human review, not silent correction. No regulatory
+snapshot, UTC time expansion or legal-history product is added in this batch.

@@ -41,6 +41,7 @@ jobs:
           import governance
           import governance.delivery
           import governance.shared_contract
+          import governance.jurisdiction.tribal_first_nations_areas.build
           import governance.administrative_context.coast_guard_sectors.build
           import governance.protected_areas.conservation_designations.build
           import governance.administrative_context.ports.build
