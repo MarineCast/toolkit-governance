@@ -69,6 +69,9 @@ provisioned seascape support; no sibling checkout is implicitly searched.
 
 ## Python API and documentation
 
+The [documentation site guide](docs/documentation-site.md) explains local preview,
+PR build artifacts and manual publication after merge.
+
 ```python
 from governance import initialize_workspace, load_governance_config
 from governance.protected_areas.marine_protected_areas.build import build

@@ -1,0 +1,53 @@
+site_name: Governance Toolkit
+site_description: Source-backed native-geometry marine governance reference products
+site_url: https://marinecast.github.io/toolkit-governance/
+repo_url: https://github.com/MarineCast/toolkit-governance
+repo_name: MarineCast/toolkit-governance
+edit_uri: edit/main/docs/
+copyright: MarineCast contributors · Apache-2.0 software license
+theme:
+  name: material
+  font: false
+  icon:
+    logo: material/map-marker-radius
+  palette:
+    - scheme: default
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - scheme: slate
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - content.code.copy
+plugins:
+  - search
+markdown_extensions:
+  - tables
+  - pymdownx.superfences
+nav:
+  - Home: index.md
+  - Reference:
+      - Scientific contracts: CONTRACTS.md
+      - Workflows: WORKFLOWS.md
+      - Explicit H3 matrix: h3-matrix.md
+      - Production readiness and limitations: production-readiness.md
+  - Development:
+      - Architecture: ARCHITECTURE.md
+      - Migration and validation: MIGRATION.md
+      - Documentation site: documentation-site.md
+validation:
+  nav:
+    omitted_files: warn
+  links:
+    not_found: warn
+    unrecognized_links: warn
+    anchors: warn

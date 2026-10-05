@@ -178,8 +178,8 @@ any later OSM-derived reference product, separately from authoritative sources.
 
 The second batch raises the implemented count to ten, leaving fourteen planned families. All
 remain model-ineligible reference inventories. It adds no legal applicability or effective-date
-reconstruction. See the family [county source notes](../src/governance/jurisdiction/county_regional_boundaries/DATA_SOURCES.md)
-and [refuge source notes](../src/governance/protected_areas/wildlife_refuges/DATA_SOURCES.md).
+reconstruction. See the family [county source notes](https://github.com/MarineCast/toolkit-governance/blob/main/src/governance/jurisdiction/county_regional_boundaries/DATA_SOURCES.md)
+and [refuge source notes](https://github.com/MarineCast/toolkit-governance/blob/main/src/governance/protected_areas/wildlife_refuges/DATA_SOURCES.md).
 
 The 2025 Census county archive is 83,989,800 bytes, pinned to SHA-256
 `9c6e9d9076abce2670d1de255de3710c35ecca00a7005d88e012dec52d95f763`.
