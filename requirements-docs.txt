@@ -1,0 +1,3 @@
+# Documentation builds do not install the geospatial runtime or execute producers.
+mkdocs==1.6.1
+mkdocs-material==9.6.23
