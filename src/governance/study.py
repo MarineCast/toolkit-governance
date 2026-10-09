@@ -84,7 +84,8 @@ def study_preflight(study, grids, mask, *, mask_layer, mask_manifest, cache_work
     if water.empty or water.crs is None or water.crs.to_epsg() != 4326 or not water.geometry.is_valid.all():
         raise ValueError('Mask must be nonempty valid EPSG:4326 geometry')
     mask_provenance = json.loads(Path(mask_manifest).read_text())
-    if mask_provenance['source_mapped_geometry']['raw_sha256'] != sha256_file(mask):
+    mask_sha256 = sha256_file(mask)
+    if mask_provenance['source_mapped_geometry']['raw_sha256'] != mask_sha256:
         raise ValueError('Mask provenance checksum mismatch')
     cache_generation = Path(cache_workspace).resolve().parent / 'generation.json'
     if cache_generation.is_file():
@@ -95,8 +96,12 @@ def study_preflight(study, grids, mask, *, mask_layer, mask_manifest, cache_work
     envelope = config['domain']['bbox_wgs84']
     for source in inventory['sources'].values():
         bbox = source.get('requested_bbox_wgs84')
+        selection_mask = source.get('requested_grid_mask_sha256')
         source['study_cache_support'] = (
             'unavailable' if source['runtime_status'] != 'available' else
+            'source_selected_against_different_mask_requires_requalification' if selection_mask and
+            selection_mask != mask_sha256 else
+            'source_selection_mask_matches_requires_roster_review' if selection_mask else
             'query_envelope_covers_study_planning_envelope_only' if bbox and
             bbox[0] <= envelope[0] and bbox[1] <= envelope[1] and bbox[2] >= envelope[2] and bbox[3] >= envelope[3] else
             'query_envelope_does_not_cover_expanded_study' if bbox else

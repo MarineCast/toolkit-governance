@@ -49,6 +49,28 @@ def test_mask_requires_positive_area_not_touch_or_point(inputs):
         _positive_mask_support(grid,point)
 
 
+def test_preflight_does_not_promote_old_mask_selection_to_expanded_coverage(inputs, monkeypatch):
+    from governance.shared.artifacts import sha256_file
+    import governance.study as module
+    # A broad query envelope cannot override a narrower mask-selected ID roster.
+    broad = dict(runtime_status='available', requested_bbox_wgs84=[-180,32,-109,72])
+    sources = {
+        'old': broad | {'requested_grid_mask_sha256': 'a'*64},
+        'same': broad | {'requested_grid_mask_sha256': sha256_file(inputs['mask'])},
+        'bbox': broad,
+        'narrow': dict(runtime_status='available',requested_bbox_wgs84=[-123.5,48.5,-123,49]),
+        'missing': broad | {'runtime_status': 'unavailable','requested_grid_mask_sha256': 'a'*64},
+    }
+    monkeypatch.setattr(module,'preflight',lambda: {'sources': sources})
+    result=study_preflight(**inputs)['inventory']['sources']
+    assert result['old']['study_cache_support']=='source_selected_against_different_mask_requires_requalification'
+    assert result['same']['study_cache_support']=='source_selection_mask_matches_requires_roster_review'
+    assert result['bbox']['study_cache_support']=='query_envelope_covers_study_planning_envelope_only'
+    assert result['narrow']['study_cache_support']=='query_envelope_does_not_cover_expanded_study'
+    assert result['missing']['study_cache_support']=='unavailable'
+    assert all(s['study_geographic_completeness']=='unknown' for s in result.values())
+
+
 def test_budget_fails_before_output_or_cache_mutation(inputs, tmp_path):
     output=tmp_path/'new';before=sorted(str(p) for p in inputs['cache_workspace'].rglob('*'))
     with pytest.raises(ValueError,match='staging estimate'):
