@@ -139,3 +139,24 @@ def test_offline_study_bundle_relocates_and_validates_from_permanent_path(inputs
     result=json.loads((final/'validation.json').read_text())
     assert result['native_collections']==1
     assert len(result['independent_samples'])==1
+    pointer=(root/'current.json').read_bytes()
+    envelope=final/'generation.json';original=envelope.read_bytes()
+    for field,value in [('scientific_method_version','incorrect-method'),('software_revision','b'*40)]:
+        altered=json.loads(original);altered[field]=value
+        envelope.write_text(json.dumps(altered))
+        try:
+            with pytest.raises(ValueError,match='generation method/software mismatch'):
+                activate_generation(root,identity)
+            assert (root/'current.json').read_bytes()==pointer
+        finally:
+            envelope.write_bytes(original)
+    # A schema-valid shared producer revision must still match its local companion.
+    contract=json.loads((output/'study-contract.json').read_text())
+    shared=Path(contract['tables'][0]['shared_manifest'].replace(str(permanent),str(output)))
+    original=shared.read_bytes();altered=json.loads(original)
+    altered['producer']['git_sha']='b'*40;shared.write_text(json.dumps(altered))
+    try:
+        with pytest.raises(ValueError,match='Shared/local software identity mismatch'):
+            study_module.validate_study_release(output,independent=False)
+    finally:
+        shared.write_bytes(original)

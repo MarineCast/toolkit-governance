@@ -198,6 +198,11 @@ def validate_study_release(root, *, independent=True):
     if contract.get('schema_version') != 1:
         raise ValueError('Unsupported study release contract')
     permanent = contract['permanent_release_path']
+    generation_path = root / 'generation.json'
+    generation = json.loads(generation_path.read_text()) if generation_path.is_file() else None
+    if generation is not None and (root != Path(permanent).resolve() or
+                                   generation.get('release_id') != Path(permanent).name):
+        raise ValueError('Study permanent generation identity mismatch')
     def map_path(path):
         replaced = _replace(str(path), permanent, str(root))
         result = Path(replaced).resolve()
@@ -250,8 +255,12 @@ def validate_study_release(root, *, independent=True):
         artifact, companion = map_path(item['artifact']), map_path(item['manifest'])
         result = validate_delivery(artifact, companion)
         local = json.loads(companion.read_text())
-        if local['scientific_method_version'] != METHOD_VERSION or local['data_release_id'] != root.name and local['data_release_id'] != Path(permanent).name:
+        if local['scientific_method_version'] != METHOD_VERSION or local['data_release_id'] != Path(permanent).name:
             raise ValueError('Delivery identity/method mismatch')
+        if generation is not None and (
+                generation.get('scientific_method_version') != local['scientific_method_version'] or
+                generation.get('software_revision') != local['software']['git_sha']):
+            raise ValueError('Study generation method/software mismatch')
         if local['model_eligible'] is not False or local['temporal']['type'] != 'static':
             raise ValueError('Study snapshot interpretation mismatch')
         if (local['native_manifests'] != meta['native_manifests'] or
@@ -276,6 +285,8 @@ def validate_study_release(root, *, independent=True):
         Draft202012Validator(schema, format_checker=FormatChecker()).validate(shared)
         if shared['artifact']['sha256'] != sha256_file(artifact):
             raise ValueError('Shared artifact mismatch')
+        if shared['producer']['git_sha'] != local['software']['git_sha']:
+            raise ValueError('Shared/local software identity mismatch')
         results.append(result)
     if matrix['MODEL_ELIGIBLE'].to_pylist() != [False] * matrix.num_rows:
         raise ValueError('Overlay model eligibility mismatch')

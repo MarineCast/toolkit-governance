@@ -68,6 +68,10 @@ all positive-area mask intersections and sampled independent overlay calculation
 The independent calculation still shares GEOS/projection libraries and is not legal
 certification. PR7 repeats semantic validation before a study-contract generation
 can be activated or selected for rollback; baseline byte verification alone is insufficient.
+At the permanent path, the generation release identity, scientific method and
+software revision must agree with every delivery companion; shared and local
+producer revisions must also agree. Mismatches block activation and preserve the
+previous pointer.
 
 After an interrupted overlay, `run-study` with the same arguments plus
 `--resume-native` can reuse complete verified native staging. It checks input and
