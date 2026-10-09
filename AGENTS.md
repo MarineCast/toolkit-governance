@@ -4,10 +4,9 @@
 
 This repository owns the standalone `governance` package for species-neutral native-geometry
 marine protected areas, jurisdictional reference boundaries and fisheries management products.
-Fifteen collection build pipelines are implemented; the 24-entry catalog also includes 9 planned families. Critical-habitat acquisition remains explicitly budgeted/provisioned; read docs/production-readiness.md.
-Read [architecture](docs/ARCHITECTURE.md) for ownership/import changes, [contracts](docs/CONTRACTS.md)
-for scientific changes, and [workflows](docs/WORKFLOWS.md) before producer execution. Read the
-[README](README.md) and [migration report](docs/MIGRATION.md) for setup and extraction evidence.
+Fifteen collection build pipelines are implemented; the 24-entry catalog includes 9 planned
+families. Critical-habitat acquisition remains explicitly budgeted/provisioned; read
+[production readiness](docs/production-readiness.md) before operational execution.
 Preserve unrelated changes and read deeper instructions before editing a subdirectory.
 
 ## Shared MarineCast context
@@ -51,42 +50,37 @@ requires provisioned external spatial-support inputs; do not silently search an 
 Historical migrated local artifacts retain original provenance and need separate rebuild validation.
 Keep downloads, local migration evidence, build outputs and credentials out of tracked source.
 
-## Validation and completion
+## Task routing and validation
 
-Run `git status --short` before edits and inspect the diff afterward. Behavior changes require
-focused tests, then `python -m pytest -q`; package/resource changes also require a regular wheel
-installation outside the checkout with a new external workspace. Block application imports in
-that smoke test. Documentation-only work needs references and `git diff --check`.
-State acquisition, regional rebuild, map visual QA, platform and integration boundaries accurately.
-No network or regional science run was established by the extraction's offline tests.
+Run `git status --short` before edits, preserve unrelated work and read deeper instructions.
+Load only the matching guidance; combine applicable gates and run the full suite once after
+focused checks.
 
-For the optional explicit H3 overlay, read `docs/h3-matrix.md`, install `.[test,h3]`,
-and run `python -m pytest -q tests/test_h3_matrix.py` followed by the full suite.
-It derives a separate model-ineligible consumer-grid product; canonical native
-schemas and manifests retain their no-H3 contract. A regional overlay requires
-verified native products, an explicit grid and an explicit metre-based length CRS.
+| Task | Guidance / checks |
+| --- | --- |
+| Setup / extraction history | [README](README.md) / [migration report](docs/MIGRATION.md), respectively |
+| Ownership or imports | [Architecture](docs/ARCHITECTURE.md); focused tests, then full suite |
+| Scientific / schema change | [Contracts](docs/CONTRACTS.md); focused tests, then full suite |
+| Behavior change | `python -m pytest -q tests/<relevant_test>.py`, then `python -m pytest -q` |
+| Documentation-only | Verify references/names, inspect diff and `git diff --check`; no package suite |
+| Package / resources | Focused/full tests plus [installed-wheel acceptance](docs/agent-checks.md#installed-wheel-acceptance) outside the checkout in a new external workspace; block application imports |
+| Explicit H3 overlay | [H3 matrix](docs/h3-matrix.md), `.[test,h3]`, `python -m pytest -q tests/test_h3_matrix.py`, then full suite |
+| Acquisition / rebuild / inspection | [Workflows](docs/WORKFLOWS.md) and [production readiness](docs/production-readiness.md); review source pins, rights, paths and effects before execution |
+| Preflight / delivery / immutable publication or rollback behavior | [Operational/release gates](docs/agent-checks.md#regional-and-release-boundaries), production readiness; focused config/workspace/release tests, then full suite |
 
-## Codebase navigation
+The H3 overlay is a separate model-ineligible consumer-grid product; canonical native schemas and
+manifests retain their no-H3 contract. Regional overlays require verified native products, an
+explicit grid and an explicit metre-based length CRS. `catalog --verify-artifacts` skips missing
+artifacts and is not whole-release acceptance; inspection HTML does not promote a release.
+Historical products and offline tests are not new rebuild evidence. State acquisition, regional,
+map visual QA, platform and integration boundaries accurately; inspect the diff and run
+`git diff --check` before handoff.
 
-Use `graphify-out/graph.json` for structural questions, then read authoritative source/tests.
-Skip graph work for obvious targeted edits. Use `rg` for literals/configuration/prose and ast-grep
-for syntax patterns. Graphify is optional isolated developer tooling (`graphifyy==0.9.62`), not a
-runtime dependency. On the extraction machine it is installed in `~/.local/share/graphify-venv`.
+## Navigation
 
-From this checkout only:
-
-```sh
-graphify extract . --code-only
-graphify cluster-only .
-graphify export html
-graphify explain "build_collection"
-graphify affected "build_collection" --relation calls --depth 1
-```
-
-Use `extract . --code-only --no-cluster` for a quick structural graph. Refresh after structural
-edits; do not rebuild for each question. `.gitignore` and `.graphifyignore` exclude generated data,
-builds and local migration archives. Code-only extraction skips prose semantics and does not prove
-dynamic imports; inspect source when coverage is incomplete. The graph/report/HTML are disposable
-local-only caches: never commit or publish them or enable hooks implicitly. Do not run Graphify at
-MarineCast root, grouping directories or `.github`. Source/tests outrank schemas, architecture and
-this navigation cache. See the migration report for the observed graph run and its limitations.
+Use scoped source search for known paths/literals. Existing graphs are optional for relationships;
+check relevant source/manifest freshness and coverage first, then verify source/tests. Fall back
+for stale/missing/incomplete indexes; no-match does not prove no use. Source/tests outrank
+schemas/contracts, architecture and caches. [Navigation details](docs/agent-checks.md#codebase-navigation)
+retain commands, exclusions and the local-only sharing policy. Do not install, rebuild, export,
+overwrite instructions or enable hooks merely for a question; maintenance requires explicit scope.
