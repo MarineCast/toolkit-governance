@@ -85,6 +85,7 @@ def test_governance_root_is_public_surface_and_shared_code_is_packaged() -> None
         "shared_contract.py",
         "preflight.py",
         "releases.py",
+        "study.py",
     }
     assert {
         "acquisition.py",

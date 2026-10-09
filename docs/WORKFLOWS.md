@@ -63,3 +63,7 @@ See [migration](MIGRATION.md) for the local transfer/cleanup boundary and unrun 
 Use the separate [production release workflow](production-readiness.md) to stage all native
 products, companions and evidence before an atomic generation-pointer switch. Per-family build
 commands still write per-file and must not target an already published generation.
+
+For a cache-only regional build on explicit frozen shared-study grids, use `study-preflight`,
+`run-study` and `validate-study-release`; see [production readiness](production-readiness.md#explicit-shared-study-build).
+The study generation guard repeats scientific checks before activation or rollback.

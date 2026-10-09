@@ -81,6 +81,9 @@ def verify_generation(path: str | Path) -> dict:
 
 def _activate(root: Path, generation: Path) -> None:
     verify_generation(generation)
+    if (generation / 'study-contract.json').exists():
+        from .study import validate_study_release
+        validate_study_release(generation)
     pointer = {'schema_version': 1, 'release_id': generation.name,
                'generation_sha256': sha256_file(generation / 'generation.json')}
     temporary = root / f'.current-{os.getpid()}.json'
@@ -112,7 +115,8 @@ def activate_generation(root: str | Path, release_id: str) -> Path:
 
 
 def publish_generation(source: str | Path, root: str | Path, release_id: str, *,
-                       scientific_method_version: str, software_revision: str) -> Path:
+                       scientific_method_version: str, software_revision: str,
+                       activate: bool = True) -> Path:
     """Copy, hash, verify and atomically expose a prepared local release.
 
     A failed pointer switch can leave a verified unreferenced generation; the previous
@@ -164,7 +168,9 @@ def publish_generation(source: str | Path, root: str | Path, release_id: str, *,
             _sync_directory(temporary)
             os.rename(temporary, destination)
             _sync_directory(root)
-            _activate(root, destination)
+            verify_generation(destination)
+            if activate:
+                _activate(root, destination)
             return destination
         finally:
             if temporary.exists():
