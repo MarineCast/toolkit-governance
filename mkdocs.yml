@@ -35,7 +35,13 @@ markdown_extensions:
   - pymdownx.superfences
 nav:
   - Home: index.md
+  - Using the toolkit:
+      - Install and configure: getting-started.md
+      - CLI reference: cli.md
+      - Frozen study: study-guide.md
+      - Troubleshooting: troubleshooting.md
   - Reference:
+      - Source and quality index: sources.md
       - Scientific contracts: CONTRACTS.md
       - Workflows: WORKFLOWS.md
       - Explicit H3 matrix: h3-matrix.md

@@ -7,12 +7,30 @@ No collection establishes legal applicability, current
 regulatory compliance, historical effective dates or model eligibility. Retained acquisition dates
 are not a freshness guarantee. The configured native extent is [-180, 32, -109, 72] EPSG:4326.
 
-The existing application grid contains 1,263 R6 cells and 43,393 R8 cells across approximately
-[-125.887, 46.793, -122.097, 50.056]. These are separate delivery variants, preserving supplied
+The historical application delivery grid contained 1,263 R6 cells and 43,393 R8 cells across approximately
+[-125.887, 46.793, -122.097, 50.056]. These historical products were separate delivery variants, preserving supplied
 membership; neither is an exhaustive grid over the native Northeast Pacific extent. The grid
 falls within UTM zone 10N, so EPSG:32610 is retained for line lengths; EPSG:6933 measures areas.
 Antimeridian H3 cells remain explicitly unsupported. Native companions preserve feature/part
 relations and all source attributes. Static snapshots have no fabricated daily or effective date.
+
+## Current frozen study checkpoint (2026-10-09)
+
+The local `governance-shared-study-20261009-v1` release records **2,621 R6 cells,
+88,243 R8 cells and 173 delivery fields**, with 15 research-only collections and
+nine unavailable catalog families. This is a verified local checkpoint, not full
+regional coverage or a public dataset. It supersedes the historical grid counts
+above for the frozen study; it does not enlarge the scope of cached source queries.
+The retained critical-habitat line footprint and unknown inventory completeness
+remain limitations. The study window is retained without fabricated daily rows
+or legal-history inference.
+
+The frozen-study CLI and semantic publication gate are introduced by
+[PR7](https://github.com/MarineCast/toolkit-governance/pull/7), inspected at
+`fe1dcc0e9e244b111a0b80d33acd0ab6fe9feaaf`. They are not commands available in the
+current main installation. See the [study guide](study-guide.md) for explicit input
+bindings, validation and dependency boundaries, and the [source index](sources.md)
+for family qualification evidence. Data remains local under source-specific rights.
 
 ## Operational workflow
 

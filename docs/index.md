@@ -32,8 +32,17 @@ acquisition or builds. Follow the [workflows](WORKFLOWS.md) for explicit downloa
 partial-build acceptance and overwrite boundaries. The [repository README](https://github.com/MarineCast/toolkit-governance/blob/main/README.md)
 contains installation and API examples.
 
+The current local frozen-study checkpoint contains 2,621 R6 cells and 88,243 R8
+cells with 173 delivery fields. It is a bounded research release; cached query
+footprints and unknown completeness remain explicit. See [current readiness](production-readiness.md#current-frozen-study-checkpoint-2026-10-09).
+
 ## Documentation guide
 
+- [Install and configure](getting-started.md): practical installation and workspace setup.
+- [CLI reference](cli.md): command effects and required arguments.
+- [Frozen study](study-guide.md): PR7 workflow, inputs, recovery and validation.
+- [Source and quality index](sources.md): pinned family notes and acceptance evidence.
+- [Troubleshooting](troubleshooting.md): configuration, staging, locks and publication.
 - [Scientific contracts](CONTRACTS.md): geometry, grain, provenance, time and missingness.
 - [Workflows](WORKFLOWS.md): acquisition, build, inspection and external inputs.
 - [Explicit H3 matrix](h3-matrix.md): optional consumer-grid overlays retaining native authority.

@@ -17,7 +17,9 @@ python -m venv .venv
 
 Open the address printed by MkDocs. Navigation coverage, missing Markdown links
 and anchors are warnings that fail the strict build. Repository source notes are
-linked to GitHub because they live outside the site. `site/` is ignored build output.
+linked to a pinned GitHub revision in the [source index](sources.md) because they
+live outside the site. External source availability requires a separate check;
+MkDocs validates local navigation/links/anchors, not remote provider uptime. `site/` is ignored build output.
 
 ## Pull requests and main
 
@@ -42,8 +44,23 @@ an in-progress publication. Only the deploy job has `pages: write` and `id-token
 It uses the `github-pages` environment and the official GitHub Pages Actions.
 
 The intended canonical URL is <https://marinecast.github.io/toolkit-governance/>.
-Successful publication is confirmed by the deploy job's environment URL, not by
-completion of a build. Repository **Settings → Pages → Source** must be **GitHub
+Confirm publication using the deploy job's environment URL and an HTTP 200
+readback of the rendered homepage and linked pages. A successful build only
+confirms a preview artifact. Repository **Settings → Pages → Source** must be **GitHub
 Actions**, and the `github-pages` environment must allow deployments from `main`.
 If those settings need changing, a repository administrator must review the change.
 No workflow automatically enables Pages or changes environment protection rules.
+
+
+## Verified publication checkpoint
+
+On 2026-10-09 the canonical URL returned HTTP **404**. Read-only API checks
+reported Pages `build_type: workflow`, HTTPS enabled, and an existing
+`github-pages` environment with a custom branch policy allowing `main`.
+These settings were inspected, not changed. PR6 remains a draft; publication is
+blocked on user review/merge followed by the authorized manual main dispatch.
+Recheck settings and environment protections at dispatch time. If administrator
+settings or permissions must change, obtain that approval explicitly.
+
+Do not describe this site as live until deployment and HTTP/content readback pass.
+A local preview and downloadable CI artifact support review before merge.

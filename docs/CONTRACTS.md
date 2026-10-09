@@ -27,11 +27,17 @@ response, temporal leakage and ecological interpretation require downstream revi
 Native manifests record configuration and common-extent hashes, sources, exact artifact SHA-256,
 clipping metadata, schema and known limitations. `load_manifest` verifies the artifact hash and
 rejects H3/model-eligible manifests. Atomic writes are per file; the multi-file family pipeline
-has no global rollback or combined atomic generation pointer. Consumers must verify manifests
-and treat missing or inconsistent outputs as incomplete.
+has no global rollback or combined atomic generation pointer of its own. Consumers must verify
+manifests and treat missing or inconsistent outputs as incomplete. The separate `releases`
+envelope verifies exact membership and checksums and atomically switches `current.json` for a
+prepared immutable multi-artifact generation. Readers resolve that pointer once per operation;
+per-family writes must never target a published generation. See [workflows](WORKFLOWS.md).
 
 The catalog has 24 entries and fifteen implemented map families. `catalog --verify-artifacts` verifies
 present configured primary artifacts; missing artifacts are skipped, not certified as complete.
 Secondary products and legal/source completeness require their own checks. The inspector reports
 unavailable/planned layers separately. Native manifests are not the proposed MarineCast H3
-manifest v0.1; no shared-contract adoption is claimed.
+manifest v0.1. The optional `export-shared-manifest` command validates a delivery artifact
+against a caller-supplied, pinned schema admitting `reference_geometry`; it requires the
+`contract` extra. This explicit adopter mapping does not change native manifests, establish
+organization-wide adoption or supply a schema automatically. See [CLI reference](cli.md).
