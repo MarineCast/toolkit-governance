@@ -34,6 +34,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             sub.add_argument('--schema-reference', required=True)
             sub.add_argument('--staging-cap-bytes', type=int, default=2700000000)
             sub.add_argument('--length-crs', default='EPSG:32610')
+            sub.add_argument('--resume-native', action='store_true', help='Reuse verified native staging after an interrupted overlay; refuse assembled output.')
     sub = commands.add_parser('validate-study-release', help='Read-only semantic and independent study validation.')
     sub.add_argument('path', type=Path)
     sub = commands.add_parser('export-shared-manifest', help='Validate an explicit approved shared-schema mapping.')
@@ -92,7 +93,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 kwargs.update(output=args.output, permanent_release_path=args.permanent_release_path,
                               release_id=args.release_id, software_revision=args.software_revision,
                               schema=args.schema, schema_reference=args.schema_reference,
-                              staging_cap_bytes=args.staging_cap_bytes, length_crs=args.length_crs)
+                              staging_cap_bytes=args.staging_cap_bytes, length_crs=args.length_crs,
+                              resume_native=args.resume_native)
                 print(run_study(args.study, args.grid, args.mask, **kwargs))
             else:
                 print(json.dumps(study_preflight(args.study, args.grid, args.mask, **kwargs), indent=2))

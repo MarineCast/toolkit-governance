@@ -419,3 +419,8 @@ permanent generation path before switching `current.json`**. Byte verification a
 activate a failed study generation. Failure leaves the prior pointer unchanged and may retain an
 unreferenced immutable candidate. The Python publication API also supports `activate=False` for
 explicit deferred review; generic byte verification does not imply scientific acceptance.
+
+After a confirmed stopped process, `run-study --resume-native` reuses complete native staging
+only when all original input bindings and retained grids/mask/schema match. Native products and
+source checksums are reverified; assembled delivery directories are refused. It does not resume
+partial native builds or replace published data. Inspect processes first to avoid concurrent runs.

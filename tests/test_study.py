@@ -84,7 +84,7 @@ def test_deferred_generation_does_not_change_pointer(tmp_path):
     assert resolve_current(root)==good
 
 
-def test_offline_study_bundle_relocates_and_validates_from_permanent_path(inputs,tmp_path):
+def test_offline_study_bundle_relocates_and_validates_from_permanent_path(inputs,tmp_path,monkeypatch):
     import yaml
     cache=inputs['cache_workspace'];config_path=cache/'config/data/governance/governance.yaml'
     config=yaml.safe_load(config_path.read_text())
@@ -97,8 +97,19 @@ def test_offline_study_bundle_relocates_and_validates_from_permanent_path(inputs
     root=tmp_path/'releases';identity='regional';permanent=root/identity
     output=tmp_path/'prepared'
     schema=Path(__file__).parent/'fixtures/reference-geometry-v0.2.schema.json'
-    run_study(**inputs,output=output,permanent_release_path=permanent,release_id=identity,
-              software_revision='a'*40,schema=schema,schema_reference='pinned-fixture')
+    import governance.study as study_module
+    original_export = study_module.export_h3_matrix
+    def interrupted(*args, **kwargs):
+        raise RuntimeError('interrupted overlay')
+    monkeypatch.setattr(study_module, 'export_h3_matrix', interrupted)
+    kwargs = dict(output=output,permanent_release_path=permanent,release_id=identity,
+                  software_revision='a'*40,schema=schema,schema_reference='pinned-fixture')
+    with pytest.raises(RuntimeError,match='interrupted overlay'):
+        run_study(**inputs,**kwargs)
+    native_files = {str(p): (p.stat().st_mtime_ns,p.read_bytes()) for p in (output/'workspace/data/processed').rglob('*.parquet')}
+    monkeypatch.setattr(study_module, 'export_h3_matrix', original_export)
+    run_study(**inputs,**kwargs,resume_native=True)
+    assert native_files == {str(p): (p.stat().st_mtime_ns,p.read_bytes()) for p in (output/'workspace/data/processed').rglob('*.parquet')}
     assert (cache/'data/raw/test.geojson').read_bytes()==raw
     assert (output/'workspace/data/raw/test.geojson').read_bytes()==raw
     final=publish_generation(output,root,identity,scientific_method_version='native-inventory-overlay-1.3.0',software_revision='a'*40)

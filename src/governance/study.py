@@ -281,7 +281,8 @@ def validate_study_release(root, *, independent=True):
 
 def run_study(study, grids, mask, *, mask_layer, mask_manifest, cache_workspace, output,
               permanent_release_path, release_id, software_revision, schema,
-              schema_reference, staging_cap_bytes=2700000000, length_crs='EPSG:32610'):
+              schema_reference, staging_cap_bytes=2700000000, length_crs='EPSG:32610',
+              resume_native=False):
     """Rebuild cached native products and prepare an immutable, validated study bundle.
 
     Output must be new. The caller explicitly publishes it; no network is accessed.
@@ -296,27 +297,55 @@ def run_study(study, grids, mask, *, mask_layer, mask_manifest, cache_workspace,
         raise ValueError('Study staging estimate exceeds cap or free disk')
     report['resource_estimate'] = {'estimated_peak_staging_bytes': estimated_peak,
                                   'staging_cap_bytes': staging_cap_bytes, 'one_worker': True, 'new_acquisition_bytes': 0}
-    output.mkdir(exist_ok=False)
-    _write(output / 'preflight.json', report)
     workspace = output / 'workspace'
-    shutil.copytree(cache_workspace / 'config', workspace / 'config')
-    shutil.copytree(cache_workspace / 'data/raw', workspace / 'data/raw')
-    support = output / 'study-support'; support.mkdir()
-    shutil.copyfile(study, support / 'study.v1.json')
-    shutil.copyfile(mask, support / 'land-water.gpkg')
-    shutil.copyfile(mask_manifest, support / 'mask-source-manifest.json')
-    shutil.copyfile(schema, support / 'shared-schema.json')
-    merged = []
-    for record in report['grids']:
-        grid = pq.read_table(record['path'], columns=['H3_INDEX', 'H3_RESOLUTION'])
-        pq.write_table(grid, support / f"grid-r{record['resolution']}.parquet", compression='zstd')
-        merged.append(grid)
-    pq.write_table(pa.concat_tables(merged), support / 'grid.parquet', compression='zstd')
+    support = output / 'study-support'
+    if resume_native:
+        if (output / 'delivery').exists() or (output / 'study-contract.json').exists():
+            raise ValueError('Resume requires unassembled native staging')
+        prior = json.loads((output / 'preflight.json').read_text())
+        for name in ('study', 'grids', 'mask', 'mask_manifest', 'cache_generation'):
+            if prior[name] != report[name]:
+                raise ValueError('Resume input binding mismatch: ' + name)
+        for original, retained in ((study, support / 'study.v1.json'),
+                                   (mask, support / 'land-water.gpkg'),
+                                   (mask_manifest, support / 'mask-source-manifest.json'),
+                                   (schema, support / 'shared-schema.json')):
+            if sha256_file(original) != sha256_file(retained):
+                raise ValueError('Resume retained input mismatch')
+        for record in report['grids']:
+            expected = pq.read_table(record['path'], columns=['H3_INDEX', 'H3_RESOLUTION'])
+            retained = pq.read_table(support / f"grid-r{record['resolution']}.parquet")
+            if not expected.equals(retained, check_metadata=False):
+                raise ValueError('Resume retained grid mismatch')
+    else:
+        output.mkdir(exist_ok=False)
+        _write(output / 'preflight.json', report)
+        shutil.copytree(cache_workspace / 'config', workspace / 'config')
+        shutil.copytree(cache_workspace / 'data/raw', workspace / 'data/raw')
+        support.mkdir()
+        shutil.copyfile(study, support / 'study.v1.json')
+        shutil.copyfile(mask, support / 'land-water.gpkg')
+        shutil.copyfile(mask_manifest, support / 'mask-source-manifest.json')
+        shutil.copyfile(schema, support / 'shared-schema.json')
+        merged = []
+        for record in report['grids']:
+            grid = pq.read_table(record['path'], columns=['H3_INDEX', 'H3_RESOLUTION'])
+            pq.write_table(grid, support / f"grid-r{record['resolution']}.parquet", compression='zstd')
+            merged.append(grid)
+        pq.write_table(pa.concat_tables(merged), support / 'grid.parquet', compression='zstd')
     with _workspace(workspace):
         config = load_governance_config()
-        for name, collection in config.collections.items():
-            print('BUILD ' + name, flush=True)
-            importlib.import_module(f'governance.{collection.category}.{name}.build').build(config.path, allow_partial=True)
+        if not resume_native:
+            for name, collection in config.collections.items():
+                print('BUILD ' + name, flush=True)
+                importlib.import_module(f'governance.{collection.category}.{name}.build').build(config.path, allow_partial=True)
+        else:
+            from .shared.artifacts import load_manifest
+            for name, collection in config.collections.items():
+                native = load_manifest(collection.manifest_path)
+                if Path(native['artifact']['path']).resolve() != collection.artifact_path.resolve():
+                    raise ValueError('Resume native path mismatch: ' + name)
+            print('RESUME verified native collections: ' + str(len(config.collections)), flush=True)
         matrix = export_h3_matrix(support / 'grid.parquet', workspace / 'governance-h3-matrix.parquet', length_crs=length_crs, allow_partial=True)
         _write(output / 'postbuild-inventory.json', preflight())
     permanent = str(Path(permanent_release_path).resolve())
