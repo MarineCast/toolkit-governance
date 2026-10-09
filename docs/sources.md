@@ -6,10 +6,11 @@ workspace source configuration and retained source receipts. Notes describe sour
 roles and rights; they do not certify complete geographic coverage, source freshness,
 current law or model eligibility. All 15 implemented collections remain research-only.
 
-The [production-readiness inventory](production-readiness.md) records configured
-source rights and limitations. The science owner maintains the family qualification
-and acceptance evidence separately; follow that evidence when supplied rather than
-inferring acceptance from a successful site build. Local study bundles retain
+The [source acceptance inventory](source-acceptance.md) records all 24 families,
+all 45 configured sources, expanded-scope qualification gaps and bounded resource
+estimates. The [production-readiness inventory](production-readiness.md) records
+configured source rights and limitations. Follow the scientific acceptance evidence;
+a successful site build does not qualify source coverage. Local study bundles retain
 `source-evidence-index.json`, `preflight.json`, metric/native/delivery companions,
 `validation.json` and study contracts. They are not publicly hosted by this site.
 

@@ -57,8 +57,12 @@ No workflow automatically enables Pages or changes environment protection rules.
 On 2026-10-09 the canonical URL returned HTTP **404**. Read-only API checks
 reported Pages `build_type: workflow`, HTTPS enabled, and an existing
 `github-pages` environment with a custom branch policy allowing `main`.
-These settings were inspected, not changed. PR6 remains a draft; publication is
-blocked on user review/merge followed by the authorized manual main dispatch.
+These settings were inspected, not changed. Documentation/site setup and agent
+guidance are consolidated with the study implementation in
+[PR7](https://github.com/MarineCast/toolkit-governance/pull/7); it incorporates the
+earlier PR6 documentation change, so PR6 is not a separate merge dependency.
+Publication is blocked on user review/merge of the combined change followed by
+the authorized manual main dispatch.
 Recheck settings and environment protections at dispatch time. If administrator
 settings or permissions must change, obtain that approval explicitly.
 

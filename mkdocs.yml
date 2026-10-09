@@ -42,6 +42,7 @@ nav:
       - Troubleshooting: troubleshooting.md
   - Reference:
       - Source and quality index: sources.md
+      - Source acceptance inventory: source-acceptance.md
       - Scientific contracts: CONTRACTS.md
       - Workflows: WORKFLOWS.md
       - Explicit H3 matrix: h3-matrix.md
@@ -49,6 +50,7 @@ nav:
   - Development:
       - Architecture: ARCHITECTURE.md
       - Migration and validation: MIGRATION.md
+      - Conditional agent checks: agent-checks.md
       - Documentation site: documentation-site.md
 validation:
   nav:
