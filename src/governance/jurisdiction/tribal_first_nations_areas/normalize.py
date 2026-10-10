@@ -28,7 +28,7 @@ def normalize(frame, source):
             governance_feature_id=f'{source.source_id}:area:{area}',
             feature_name=clean(row.get(name_field)), feature_type='provider_administrative_reference',
             authority=source.provider, jurisdiction=None, legal_authority=None, legal_source_url=None,
-            source_coverage_status='partial_app_grid_selected_administrative_inventory')
+            source_coverage_status='partial_source_selected_administrative_inventory')
         record.update(LEGAL_AUTHORITY=None, LEGAL_SOURCE_URL=None, ADMIN_REFERENCE_ROLE=role,
             ADMIN_REFERENCE_DESCRIPTION=description, PROVIDER_AREA_ID=area, geometry=row.geometry)
         for name, value in row.items():

@@ -11,3 +11,5 @@ dist/
 /migration-local/
 /graphify-out/
 .DS_Store
+
+/site/

@@ -44,7 +44,7 @@ def normalize(frame, source):
             governance_feature_id=key, feature_name=clean(row.get('NAME_E')),
             feature_type='provider_reported_marine_classification_zone', authority=source.provider,
             jurisdiction='Canadian provider inventory; no legal applicability inference',
-            legal_authority=None, legal_source_url=None, source_coverage_status='partial_app_grid_selected_marine_inventory')
+            legal_authority=None, legal_source_url=None, source_coverage_status='partial_source_selected_marine_inventory')
         record.update(LEGAL_AUTHORITY=None, LEGAL_SOURCE_URL=None, CLASSIFICATION_ROLE=role,
                       PROVIDER_CLASS_LABEL=class_label, PROVIDER_STATUS_LABEL=status_label,
                       PROVIDER_EVIDENCE_KEY=key,

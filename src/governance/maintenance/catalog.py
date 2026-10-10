@@ -230,6 +230,10 @@ EXTRA_FEATURES = {
         ("PROVINCE_WATER_EQUIVALENT", "coverage", "unavailable", "category"),
     ),
     "management_areas": (
+        ("AREA_SYSTEM_ID", "support", "observed", "identifier"),
+        ("AREA_HIERARCHY_LEVEL", "support", "observed", "category"),
+        ("PARENT_AREA_CODE", "support", "unavailable", "identifier"),
+        ("FISHERY_SECTOR", "evidence", "observed", "category"),
         ("MANAGEMENT_SYSTEM", "state", "observed", "category"),
         ("AREA_CODE", "support", "observed", "identifier"),
         ("AREA_TITLE", "state", "observed", "text"),

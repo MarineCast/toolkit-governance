@@ -17,6 +17,26 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--workspace', type=Path, help='Data workspace (default: GOVERNANCE_WORKSPACE or cwd).')
     commands = parser.add_subparsers(dest='command', required=True)
+    for name in ('study-preflight', 'run-study'):
+        sub = commands.add_parser(name, help='Explicit offline frozen study workflow.')
+        sub.add_argument('--study', required=True, type=Path)
+        sub.add_argument('--grid', required=True, type=Path, action='append')
+        sub.add_argument('--mask', required=True, type=Path)
+        sub.add_argument('--mask-layer', required=True)
+        sub.add_argument('--mask-manifest', required=True, type=Path)
+        sub.add_argument('--cache-workspace', required=True, type=Path)
+        if name == 'run-study':
+            sub.add_argument('--output', required=True, type=Path)
+            sub.add_argument('--permanent-release-path', required=True, type=Path)
+            sub.add_argument('--release-id', required=True)
+            sub.add_argument('--software-revision', required=True)
+            sub.add_argument('--schema', required=True, type=Path)
+            sub.add_argument('--schema-reference', required=True)
+            sub.add_argument('--staging-cap-bytes', type=int, default=2700000000)
+            sub.add_argument('--length-crs', default='EPSG:32610')
+            sub.add_argument('--resume-native', action='store_true', help='Reuse verified native staging after an interrupted overlay; refuse assembled output.')
+    sub = commands.add_parser('validate-study-release', help='Read-only semantic and independent study validation.')
+    sub.add_argument('path', type=Path)
     sub = commands.add_parser('export-shared-manifest', help='Validate an explicit approved shared-schema mapping.')
     sub.add_argument('--artifact', required=True, type=Path)
     sub.add_argument('--local-manifest', required=True, type=Path)
@@ -66,7 +86,22 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.workspace is not None:
         os.environ['GOVERNANCE_WORKSPACE'] = str(args.workspace.expanduser().resolve())
     try:
-        if args.command == 'export-shared-manifest':
+        if args.command in ('study-preflight', 'run-study'):
+            from .study import study_preflight, run_study
+            kwargs = dict(mask_layer=args.mask_layer, mask_manifest=args.mask_manifest, cache_workspace=args.cache_workspace)
+            if args.command == 'run-study':
+                kwargs.update(output=args.output, permanent_release_path=args.permanent_release_path,
+                              release_id=args.release_id, software_revision=args.software_revision,
+                              schema=args.schema, schema_reference=args.schema_reference,
+                              staging_cap_bytes=args.staging_cap_bytes, length_crs=args.length_crs,
+                              resume_native=args.resume_native)
+                print(run_study(args.study, args.grid, args.mask, **kwargs))
+            else:
+                print(json.dumps(study_preflight(args.study, args.grid, args.mask, **kwargs), indent=2))
+        elif args.command == 'validate-study-release':
+            from .study import validate_study_release
+            print(json.dumps(validate_study_release(args.path), indent=2))
+        elif args.command == 'export-shared-manifest':
             from .shared_contract import export_shared_manifest
             print(export_shared_manifest(args.artifact, args.local_manifest, args.schema, schema_reference=args.schema_reference))
         elif args.command == 'preflight':

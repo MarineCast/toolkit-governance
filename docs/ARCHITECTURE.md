@@ -12,7 +12,12 @@ application runtime dependency, sibling-path import, shared core package or impl
 | `governance.__init__` | Public configuration and workspace initializer |
 | `governance.cli` / `python -m governance` | CLI routing and explicit workspace selection |
 | `governance.h3_matrix` | Optional explicit H3 overlay export; see [contract](h3-matrix.md) |
-| `protected_areas/*`, `jurisdiction/*`, `fisheries_management/*` | Fifteen family-owned source, build and inspection workflows |
+| `protected_areas/*`, `jurisdiction/*`, `fisheries_management/*`, `administrative_context/*`, `vessel_management/*` | Fifteen family-owned source, build and inspection workflows |
+| `preflight` | Read-only source and catalog readiness inventory |
+| `delivery` | Verified overlay projection into one wide table per supplied resolution |
+| `releases` | Immutable local generation envelope, verified activation and rollback |
+| `shared_contract` | Explicit delivery mapping to a caller-supplied pinned `reference_geometry` schema |
+| `study` (PR7) | Frozen input bindings, offline rebuild and semantic validation; see [study guide](study-guide.md) |
 | `shared/` | Native schema, acquisition, clipping, coverage, manifests, catalog and map descriptors |
 | `_config/` | Private composed YAML, redaction, path and presentation support |
 | `maintenance/catalog.py` | Explicit 24-collection registry and deterministic catalog generator |

@@ -87,6 +87,15 @@ def source_record(source: GovernanceSource, path: Path | None) -> dict[str, Any]
                 "retrieved_at_utc": snapshot.get("retrieved_at_utc"),
                 "server_filtered_runtime": snapshot.get("server_filtered"),
                 "requested_bbox_wgs84": snapshot.get("requested_bbox_wgs84"),
+                "requested_grid_mask_sha256": snapshot.get("requested_grid_mask_sha256"),
+                "selection_where": snapshot.get("selection_where"),
+                "geometry_roster_complete": snapshot.get("geometry_roster_complete"),
+                "expected_object_id_count": snapshot.get("expected_object_id_count"),
+                "unreceived_object_ids": snapshot.get("unreceived_object_ids"),
+                "selected_object_id_count": (
+                    len(snapshot["selected_object_ids"])
+                    if isinstance(snapshot.get("selected_object_ids"), list) else None
+                ),
                 "service_layer_name": snapshot.get("metadata_response", {}).get("name"),
                 "service_version": snapshot.get("metadata_response", {}).get("currentVersion"),
             }

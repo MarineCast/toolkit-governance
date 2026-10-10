@@ -7,12 +7,30 @@ No collection establishes legal applicability, current
 regulatory compliance, historical effective dates or model eligibility. Retained acquisition dates
 are not a freshness guarantee. The configured native extent is [-180, 32, -109, 72] EPSG:4326.
 
-The existing application grid contains 1,263 R6 cells and 43,393 R8 cells across approximately
-[-125.887, 46.793, -122.097, 50.056]. These are separate delivery variants, preserving supplied
+The historical application delivery grid contained 1,263 R6 cells and 43,393 R8 cells across approximately
+[-125.887, 46.793, -122.097, 50.056]. These historical products were separate delivery variants, preserving supplied
 membership; neither is an exhaustive grid over the native Northeast Pacific extent. The grid
 falls within UTM zone 10N, so EPSG:32610 is retained for line lengths; EPSG:6933 measures areas.
 Antimeridian H3 cells remain explicitly unsupported. Native companions preserve feature/part
 relations and all source attributes. Static snapshots have no fabricated daily or effective date.
+
+## Current frozen study checkpoint (2026-10-09)
+
+The local `governance-shared-study-20261009-v1` release records **2,621 R6 cells,
+88,243 R8 cells and 173 delivery fields**, with 15 research-only collections and
+nine unavailable catalog families. This is a verified local checkpoint, not full
+regional coverage or a public dataset. It supersedes the historical grid counts
+above for the frozen study; it does not enlarge the scope of cached source queries.
+The retained critical-habitat line footprint and unknown inventory completeness
+remain limitations. The study window is retained without fabricated daily rows
+or legal-history inference.
+
+The frozen-study CLI and semantic publication gate are introduced by
+[PR7](https://github.com/MarineCast/toolkit-governance/pull/7), inspected at
+`fe1dcc0e9e244b111a0b80d33acd0ab6fe9feaaf`. They are not commands available in the
+current main installation. See the [study guide](study-guide.md) for explicit input
+bindings, validation and dependency boundaries, and the [source index](sources.md)
+for family qualification evidence. Data remains local under source-specific rights.
 
 ## Operational workflow
 
@@ -178,8 +196,8 @@ any later OSM-derived reference product, separately from authoritative sources.
 
 The second batch raises the implemented count to ten, leaving fourteen planned families. All
 remain model-ineligible reference inventories. It adds no legal applicability or effective-date
-reconstruction. See the family [county source notes](../src/governance/jurisdiction/county_regional_boundaries/DATA_SOURCES.md)
-and [refuge source notes](../src/governance/protected_areas/wildlife_refuges/DATA_SOURCES.md).
+reconstruction. See the family [county source notes](https://github.com/MarineCast/toolkit-governance/blob/main/src/governance/jurisdiction/county_regional_boundaries/DATA_SOURCES.md)
+and [refuge source notes](https://github.com/MarineCast/toolkit-governance/blob/main/src/governance/protected_areas/wildlife_refuges/DATA_SOURCES.md).
 
 The 2025 Census county archive is 83,989,800 bytes, pinned to SHA-256
 `9c6e9d9076abce2670d1de255de3710c35ecca00a7005d88e012dec52d95f763`.
@@ -355,3 +373,72 @@ knowledge and receipt times. Moving-whale approach rules do not yield fixed excl
 Coastline/border-defined segments require qualified geometry support. Contradictory dates in a
 Tribe-issued fishery instrument require human review, not silent correction. No regulatory
 snapshot, UTC time expansion or legal-history product is added in this batch.
+
+## Explicit shared study build
+
+`study-preflight` inventories the complete catalog, cached sources and query envelopes against
+an explicitly supplied study configuration, frozen single-resolution grids and materialized
+mask. A broad query envelope is evidence of request scope only, never feature recall or legal
+coverage. The pending central grid registry remains pending; supplied frozen grid bindings do
+not silently approve or rewrite it. R6 is required as the default. An explicitly supplied R8
+companion uses native R8 geometry directly; no incomplete child rollup is performed.
+
+Install `[h3,contract]`, then run the installed CLI outside the checkout:
+
+```sh
+governance study-preflight --study /inputs/study.v1.json \
+  --grid /inputs/frozen-r6.parquet --grid /inputs/frozen-r8.parquet \
+  --mask /inputs/land-water.gpkg --mask-layer reporting_water \
+  --mask-manifest /inputs/mask-source-manifest.json \
+  --cache-workspace /inputs/verified-native-workspace
+
+governance run-study --study /inputs/study.v1.json \
+  --grid /inputs/frozen-r6.parquet --grid /inputs/frozen-r8.parquet \
+  --mask /inputs/land-water.gpkg --mask-layer reporting_water \
+  --mask-manifest /inputs/mask-source-manifest.json \
+  --cache-workspace /inputs/verified-native-workspace \
+  --output /staging/new-bundle --permanent-release-path /Data/governance/releases/ID \
+  --release-id ID --software-revision FULL_GIT_SHA \
+  --schema /inputs/approved-reference-geometry-v0.2.schema.json \
+  --schema-reference PINNED_SCHEMA_REFERENCE
+```
+
+This operation accesses no network, uses one worker and copies cached raw/config inputs into
+a new directory. It rebuilds each configured native collection using the installed producer,
+retains all native parts/attributes and secondary products, then computes the explicit overlay
+and single-resolution deliveries. Native scope remains the configured full-area extent;
+regional table membership comes only from the supplied grids. Missing spatial query support
+remains partial/unknown. Source acquisition dates are preserved. The requested 2009–2026 study
+window does not produce daily duplicates or legal effective-time coverage.
+
+The mask selects reporting cells; metric denominators remain **full H3 cells**. This distinction
+retains established method `native-inventory-overlay-1.3.0`. The adapter checks every supplied
+cell has positive-area intersection with native mask pieces, and delivery membership/order
+matches the exact frozen source keys. This does not certify the mask's positional accuracy,
+coastal-policy entrance qualification or exhaustive regulatory inventory. Carry the upstream
+mask's provenance and scientific qualifications into release evidence.
+
+The default conservative transient cap is 2,700,000,000 bytes, including preparation plus the
+publication copy. Preparation estimates and actual size checks fail before publication; callers
+must separately bound execution time and shared-machine memory. Disk estimation is not a quota
+or guarantee against unexpected producer expansion. A failed run retains its own new staging
+files for investigation, without deleting any cache or prior release.
+
+`validate-study-release PATH` checks source/native/configuration bindings, exact grid membership,
+per-metric values/statuses/ranges, shared-schema conformance, all mask intersections and sampled
+scalar overlay calculations in every source-role group and resolution. The scalar check uses a
+separate join/union implementation but the same GEOS/projection libraries. It is not an
+independent computational engine or legal review. Every table has a metric dictionary, companion
+manifest, retained source lineage/rights and a study binding.
+
+Publish the prepared bundle with `publish-generation`. If `study-contract.json` is present,
+publication and subsequent rollback/activation **always repeat semantic validation from the
+permanent generation path before switching `current.json`**. Byte verification alone cannot
+activate a failed study generation. Failure leaves the prior pointer unchanged and may retain an
+unreferenced immutable candidate. The Python publication API also supports `activate=False` for
+explicit deferred review; generic byte verification does not imply scientific acceptance.
+
+After a confirmed stopped process, `run-study --resume-native` reuses complete native staging
+only when all original input bindings and retained grids/mask/schema match. Native products and
+source checksums are reverified; assembled delivery directories are refused. It does not resume
+partial native builds or replace published data. Inspect processes first to avoid concurrent runs.

@@ -26,9 +26,16 @@ Modified local geometry must retain attribution/licence and no-endorsement quali
 
 ## Provisioning and delivery
 
-Provision explicitly bounded complete source snapshots with fresh exact-grid ID rosters and
+Provision explicitly bounded complete source snapshots with fresh explicit selector ID rosters and
 page receipts. The download wrapper refuses implicit nationwide acquisition. The selected
-application-grid features preserve full native source geometry before established AOI clipping;
+query features preserve full native source geometry before established AOI clipping;
 partial support never establishes absence outside received features. Distinct source groups have
 no pooled territory metric. Published local generations must retain raw snapshots, metadata and
 rights evidence, native feature/part relations, metric dictionary and independent overlay checks.
+
+The bounded 2026-10-10 rebuild expands selectors to the configured study planning envelope,
+retaining all 23 returned BIA IDs and all 936 returned BC Indian Reserve IDs. Before/after
+rosters match; geometry receipts include preserved older pages. These are complete query
+receipts, not complete geography, all land classes, current source vintage or legal history.
+Invalid raw geometry is preserved and separately diagnosed; established native repair/clipping
+and downstream geometric validation do not certify cadastral accuracy.

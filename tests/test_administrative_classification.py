@@ -47,12 +47,15 @@ def test_classification_view_has_typed_metrics_and_not_applicable_is_observed(tm
     p=tmp_path/'config/data/governance/governance.yaml';cfg=yaml.safe_load(p.read_text())
     cfg['collections']={'conservation_designations':cfg['collections']['conservation_designations']};p.write_text(yaml.safe_dump(cfg))
     source=load_governance_config().sources['eccc_marine_classification'];source.snapshot_path.parent.mkdir(parents=True)
-    snapshot={'snapshot_schema_version':1,'retrieved_at_utc':None,'receipt_times_by_page':True,'temporal_note':'mixed receipts','pages':[{'retrieved_at_utc':'2026-10-04T15:11:49Z','cached_source':{'path':'original.json','sha256':'a'*64},'response':json.loads(classification().to_json())}]}
+    snapshot={'snapshot_schema_version':1,'retrieved_at_utc':None,'receipt_times_by_page':True,'temporal_note':'mixed receipts','requested_grid_mask_sha256':'b'*64,'selection_where':"BIOME='M'",'selected_object_ids':[1],'pages':[{'retrieved_at_utc':'2026-10-04T15:11:49Z','cached_source':{'path':'original.json','sha256':'a'*64},'response':json.loads(classification().to_json())}]}
     source.snapshot_path.write_text(json.dumps(snapshot))
     receipt=source_record(source,source.snapshot_path)
     assert receipt['retrieved_at_utc'] is None
     assert receipt['page_receipts'][0]['retrieved_at_utc']=='2026-10-04T15:11:49Z'
     assert 'response' not in receipt['page_receipts'][0]
+    assert receipt['requested_grid_mask_sha256']=='b'*64
+    assert receipt['selection_where']=="BIOME='M'"
+    assert receipt['selected_object_id_count']==1
     from governance.protected_areas.conservation_designations.build import build
     build(allow_partial=True)
     grid=tmp_path/'grid.parquet';pq.write_table(pa.table({'H3_INDEX':[h3.latlng_to_cell(48.5,-123,6)],'H3_RESOLUTION':[6]}),grid)

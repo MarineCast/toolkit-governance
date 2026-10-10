@@ -19,10 +19,14 @@ workspace. Never use the original application as a runtime root.
    a map manifest, replacing these inspection outputs. It does not promote a scientific release.
    Basemap assets require a browser/network when viewing the HTML.
 
-All stage commands accept `--config`; collection-specific defaults also remain available through
+The download, build, inspect, catalog and H3-overlay commands accept `--config`; collection-specific defaults also remain available through
 `python -m governance.<category>.<collection>.build` and `.download`. Set `GOVERNANCE_WORKSPACE`
 for direct Python/module usage. A CLI `--output` path is interpreted relative to the process cwd;
 configured output paths resolve relative to the workspace.
+
+See [installation/configuration](getting-started.md) and [CLI reference](cli.md) for
+required arguments and path rules. `preflight`, delivery and generation commands
+do not accept `--config`; they use default workspace configuration where needed.
 
 ## External local inputs
 
@@ -63,3 +67,21 @@ See [migration](MIGRATION.md) for the local transfer/cleanup boundary and unrun 
 Use the separate [production release workflow](production-readiness.md) to stage all native
 products, companions and evidence before an atomic generation-pointer switch. Per-family build
 commands still write per-file and must not target an already published generation.
+
+For a cache-only regional build on explicit frozen shared-study grids, use `study-preflight`,
+`run-study` and `validate-study-release`; see [production readiness](production-readiness.md#explicit-shared-study-build).
+The study generation guard repeats scientific checks before activation or rollback.
+
+Resolve the immutable generation once for each reader operation:
+
+```python
+from governance.releases import resolve_current
+
+generation = resolve_current('/path/to/releases')
+# Read every required companion/table beneath this retained generation path.
+```
+
+Byte and membership verification does not certify scientific completeness. The
+[study workflow](study-guide.md) supplies additional semantic gates for
+study-contract bundles, including validation from the permanent generation path.
+For interrupted staging, stale locks and validation failures see [troubleshooting](troubleshooting.md).
