@@ -79,3 +79,9 @@ retained-file bindings and refuses an assembled `delivery/` or `study-contract.j
 Do not delete those markers to force a resume. Preserve the failed candidate for
 inspection and use a new output path if assembly has begun. See
 [troubleshooting](troubleshooting.md) for lock and pointer recovery.
+
+## Fishing-area relations
+
+The study workflow also writes one `fishing-area-crosswalk-r<resolution>.parquet` table per supplied grid resolution with its own companion manifest. Each row is a positive-area relation between a retained native provider record and one H3 cell. Agency, system ID, provider area code, hierarchy, sector, geometry-part IDs and source snapshot checksum remain explicit. Parent, geometry version and effective dates remain null where unknown. Native geometry and original attributes remain available.
+
+Intersection area uses EPSG:6933. Fractions use the full retained native area and full H3 cell, including geometry outside reporting water or the supplied grid. They are geometric support measures, not catch/effort allocation weights; overlapping systems, sectors and source records are non-additive. Never copy an area quantity into every cell. The current real adapter is WDFW recreational marine reporting only; commercial, BC and Oregon systems need their own qualified sources and crosswalks. Agency administrative regions are a separate system. No quantity acquisition or allocation is performed.

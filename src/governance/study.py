@@ -99,6 +99,7 @@ def study_preflight(study, grids, mask, *, mask_layer, mask_manifest, cache_work
         selection_mask = source.get('requested_grid_mask_sha256')
         source['study_cache_support'] = (
             'unavailable' if source['runtime_status'] != 'available' else
+            'partial_source_geometry_roster' if source.get('geometry_roster_complete') is False else
             'source_selected_against_different_mask_requires_requalification' if selection_mask and
             selection_mask != mask_sha256 else
             'source_selection_mask_matches_requires_roster_review' if selection_mask else
@@ -290,7 +291,17 @@ def validate_study_release(root, *, independent=True):
         results.append(result)
     if matrix['MODEL_ELIGIBLE'].to_pylist() != [False] * matrix.num_rows:
         raise ValueError('Overlay model eligibility mismatch')
+    from .fishing_crosswalk import validate_fishing_crosswalk
+    crosswalk_checks = []
+    for item in contract.get('fishing_crosswalks', []):
+        companion = map_path(item['manifest'])
+        crosswalk_meta = json.loads(companion.read_text())
+        if (crosswalk_meta['data_release_id'] != Path(permanent).name or
+                generation is not None and crosswalk_meta['software_revision'] != generation['software_revision']):
+            raise ValueError('Fishing crosswalk release/software mismatch')
+        crosswalk_checks.append(validate_fishing_crosswalk(map_path(item['artifact']), companion, map_path=map_path))
     return {'status': 'passed', 'tables': results, 'native_collections': len(native_manifests),
+            'fishing_crosswalks': crosswalk_checks,
             'independent_samples': _sample_overlay(matrix_path, native_manifests, map_path) if independent else [],
             'independent_limit': 'Scalar separate join/union implementation, shared GEOS and projection libraries; no legal certification.'}
 
@@ -404,6 +415,17 @@ def run_study(study, grids, mask, *, mask_layer, mask_manifest, cache_workspace,
                        'external_grid': record['path']})
     for binding in [report['study'], report['mask'], report['mask_manifest'], _binding(schema), *report['grids']]:
         _check_binding(binding)
+    crosswalks = []
+    if 'management_areas' in config.collections:
+        from .fishing_crosswalk import export_fishing_crosswalk
+        collection = config.collections['management_areas']
+        crosswalks = export_fishing_crosswalk(collection.artifact_path, collection.manifest_path,
+            [support / f"grid-r{r['resolution']}.parquet" for r in report['grids']],
+            output / 'fishing-area-crosswalk', release_id=release_id, software_revision=software_revision)
+        for item in crosswalks:
+            path = Path(item['manifest'])
+            path.write_text(json.dumps(_replace(json.loads(path.read_text()), str(output), permanent), indent=2) + '\n')
+        crosswalks = _replace(crosswalks, str(output), permanent)
     _write(output / 'metric-dictionary.json', {p.name: json.loads(p.read_text())['fields'] for p in written if p.name.endswith('.manifest.json')})
     _write(output / 'study-contract.json', {'schema_version': 1, 'permanent_release_path': permanent,
             'study_path': permanent + '/study-support/study.v1.json',
@@ -412,6 +434,7 @@ def run_study(study, grids, mask, *, mask_layer, mask_manifest, cache_workspace,
             'shared_schema_path': permanent + '/study-support/shared-schema.json',
             'matrix_path': permanent + '/workspace/governance-h3-matrix.parquet',
             'native_manifest_paths': native_manifest_paths, 'tables': tables,
+            'fishing_crosswalks': crosswalks,
             'external_bindings': [report['study'], report['mask'], report['mask_manifest'], _binding(schema), *report['grids']],
             'retained_bindings': [_binding(p) | {'path': _replace(str(p), str(output), permanent)}
                                   for p in support.iterdir() if p.is_file()]})

@@ -2198,6 +2198,26 @@ collections:
       measurement_status: observed
       model_eligible: false
       unit: native_geometry
+    - name: AREA_SYSTEM_ID
+      role: support
+      measurement_status: observed
+      model_eligible: false
+      unit: identifier
+    - name: AREA_HIERARCHY_LEVEL
+      role: support
+      measurement_status: observed
+      model_eligible: false
+      unit: category
+    - name: PARENT_AREA_CODE
+      role: support
+      measurement_status: unavailable
+      model_eligible: false
+      unit: identifier
+    - name: FISHERY_SECTOR
+      role: evidence
+      measurement_status: observed
+      model_eligible: false
+      unit: category
     - name: MANAGEMENT_SYSTEM
       role: state
       measurement_status: observed

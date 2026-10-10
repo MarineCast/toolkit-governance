@@ -18,8 +18,10 @@ def normalize(
 
     records = []
     for index, row in frame.iterrows():
-        area_name = clean(row.get("AreaName")) or str(index)
-        object_id = clean(row.get("OBJECTID")) or area_name
+        area_name = clean(row.get("AreaName"))
+        object_id = clean(row.get("OBJECTID"))
+        if area_name is None or object_id is None:
+            raise ValueError("Original WDFW area and source record identifiers required")
         source_feature_id = f"{source.source_id}:{object_id}"
         title = clean(row.get("AreaTitle"))
         record = base_record(
@@ -36,11 +38,18 @@ def normalize(
         )
         record.update(
             MANAGEMENT_SYSTEM="WDFW recreational marine area",
+            AREA_SYSTEM_ID="wdfw.recreational_marine_catch_reporting",
+            AREA_HIERARCHY_LEVEL="marine_area",
+            PARENT_AREA_CODE=None,
+            FISHERY_SECTOR="recreational",
             AREA_CODE=area_name,
             AREA_TITLE=title,
             SECTOR_APPLICABILITY="recreational finfish and shellfish catch reporting",
             GEOMETRY_VERSION=source.source_as_of,
             geometry=row.geometry,
         )
+        for name, value in row.items():
+            if name != frame.geometry.name:
+                record['WDFW_' + name] = clean(value)
         records.append(record)
     return records_frame(records, frame.crs)
