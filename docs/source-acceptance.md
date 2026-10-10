@@ -13,13 +13,13 @@ This inventory retains the published 2026-10-09 baseline and records the bounded
 - Exact delivered generation: `governance-shared-study-20261009-v1`; generation SHA256 `0013e30892b4292a342531b84b5e8ace1269f18453e665c130a672715138041b`. It contains `preflight.json`, `postbuild-inventory.json`, `source-evidence-index.json`, `metric-dictionary.json`, `study-contract.json`, source snapshots/manifests, and `validation.json`.
 - Validation: 74,948 native geometry parts, 90,864 reporting cells, 485 scalar comparison samples across 15 families. Comparison uses separate scalar calculations with the same projection/GEOS libraries; it is not an independent geometry engine or legal review.
 
-The new candidate rebuild contains 107,727 native geometry parts. Permanent validation and activation remain a separate gate; the baseline release above remains preserved.
+The v2 local bundle contains 107,727 native geometry parts, wide R6/R8 deliveries with 2,621/88,243 rows and 173 fields each, and separate fishing crosswalks with 853/26,616 relations across 17 WDFW recreational provider records. Its immutable generation SHA256 is `03eede3945e7ccfc206e843085dbb1042f28c361f8019c3b560bc7473332bbd5`. Full prepared-bundle validation passed; permanent-path validation is recorded by the external local receipt. The v1 current pointer remains preserved: no activation or deployment. The producer code revision is `d8e039311d1d066e354b43880056822be81fc7bc`; later documentation commits do not rewrite this data identity.
 
 ## All 24 catalog families
 
 Acceptance for a reference family requires a declared source-system roster, qualified rights/authority, complete source-query/ID receipts for intended support, preserved geometry/attribute relations and independently compared overlays. Regulatory families additionally require controlling instrument versions, applicability, exceptions, source-specific time precision and supersession/conflict review. A cached source alone passes none of these completeness gates.
 
-| Family | Rebuilt native parts (v2 candidate) | Status | Remaining acceptance work |
+| Family | Native parts (v2 local bundle) | Status | Remaining acceptance work |
 | --- | ---: | --- | --- |
 | `coast_guard_sectors` | 110 | research-only | Both USCG and CCG cached rosters use the earlier mask. Requalify expanded support; USCG redistribution clause is unresolved and CCG 2021 administrative region is not a USCG sector or operational jurisdiction. |
 | `conservation_designations` | 311 | research-only | Expanded-envelope BIOME=M roster now contains all 154 returned IDs, using retained and newly acquired pages; provider categories and reused wildlife evidence are non-additive. |
@@ -105,6 +105,8 @@ The published baseline has five snapshots selected against a prior water-mask ha
 The user approved 500,000,000 total decoded direct-response bytes. The completed incremental batch used **48,338,209 bytes** (metadata 340,577; ECCC 9,117,230; NRCan 9,492,156; NOAA lines 29,388,246). Including previous counted acquisition, cumulative use is **445,230,077 bytes**, leaving **54,769,923 bytes**. Hard batch caps were 1 MB metadata, 24 MB ECCC, 25 MB NRCan and 50 MB NOAA lines, within a 100 MB aggregate batch. Acquisition took 342.08 seconds. Exact raw response hashes, per-source selectors, stable before/after IDs and complete page rosters are retained locally. Truncated pilot pages are excluded. Search/view proxy transfer sizes are not exposed. No catch/effort quantities were downloaded.
 
 The 2.7 GB staging guard remains unchanged. Reused raw cache leaves are references to preserved immutable data; new bundles dereference them and contain no symlinks. Final build/publication costs and resulting native counts must come from the new local validation receipts, not the baseline measurements below.
+
+The v2 local bundle retains 1,023,027,692 member bytes across 2,044 members. Prepared staging, local copy and owned acquisition intermediates used a measured 2,243,291,320 bytes at copy/readback, under the unchanged 2.7 GB guard. The worker was stopped on a parent handover instruction after assembly, then validation resumed without reacquisition/rebuild: 514.35 s before interruption and 218.00 s for complete preserved-bundle validation. Peak build RSS was 3,226,255,360 bytes; final permanent-path costs travel with local resource receipts.
 
 The successful prior build/publication retained 870,319,005 generation-member bytes across 158 members. Preparation plus publication consumed 1,740,669,935 bytes under the 2.7 GB staging cap. Recovery overlay plus validation took 483.49 s; permanent publication/validation took 212.85 s with 2.82 GB measured RSS and 6.29 GB peak memory footprint. These are measured prior-run costs, not promises for expanded sources. Retain old releases/caches and stage new outputs separately; no cleanup of pre-existing files.
 
