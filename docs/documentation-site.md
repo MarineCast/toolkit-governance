@@ -3,6 +3,14 @@
 The site renders tracked Markdown and assets in `docs/`. It does not run acquisition,
 scientific producers, or publish datasets, local migration evidence or generated maps.
 
+## Theme and navigation
+
+MkDocs Material follows meteorology's teal/cyan palette, light/dark toggle,
+banner-led home page, card navigation, code-copy controls, search, and Mermaid
+flow diagrams. Governance keeps its own banner and boundary-themed logo. The
+[layers](layers.md) page covers all fifteen implemented collections, and
+[how to use](how-to-use.md) provides a complete single-collection workflow.
+
 ## Build and preview locally
 
 Use an isolated Python 3.11+ environment from the checkout:
@@ -14,6 +22,11 @@ python -m venv .venv
 .venv/bin/python -m mkdocs build --strict
 .venv/bin/python -m mkdocs serve
 ```
+
+Documentation-only environments can use `requirements-docs.txt` without
+installing the geospatial runtime. For an already provisioned toolkit development
+environment, `python -m pip install -e '.[docs]'` installs the same pinned MkDocs
+and Material versions through the optional package extra.
 
 Open the address printed by MkDocs. Navigation coverage, missing Markdown links
 and anchors are warnings that fail the strict build. Repository source notes are
@@ -61,8 +74,9 @@ These settings were inspected, not changed. Documentation/site setup and agent
 guidance are consolidated with the study implementation in
 [PR7](https://github.com/MarineCast/toolkit-governance/pull/7); it incorporates the
 earlier PR6 documentation change, so PR6 is not a separate merge dependency.
-Publication is blocked on user review/merge of the combined change followed by
-the authorized manual main dispatch.
+That checkpoint predates the merged study change. It does not establish the
+current hosted state; publication still requires an authorized manual main dispatch
+and fresh deployment/content readback.
 Recheck settings and environment protections at dispatch time. If administrator
 settings or permissions must change, obtain that approval explicitly.
 

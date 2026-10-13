@@ -62,7 +62,7 @@ focused checks.
 | Ownership or imports | [Architecture](docs/ARCHITECTURE.md); focused tests, then full suite |
 | Scientific / schema change | [Contracts](docs/CONTRACTS.md); focused tests, then full suite |
 | Behavior change | `python -m pytest -q tests/<relevant_test>.py`, then `python -m pytest -q` |
-| Documentation-only | Verify references/names, inspect diff and `git diff --check`; no package suite |
+| Documentation-only | Verify references/names, run `python -m mkdocs build --strict`, inspect diff and `git diff --check`; no package suite |
 | Package / resources | Focused/full tests plus [installed-wheel acceptance](docs/agent-checks.md#installed-wheel-acceptance) outside the checkout in a new external workspace; block application imports |
 | Explicit H3 overlay | [H3 matrix](docs/h3-matrix.md), `.[test,h3]`, `python -m pytest -q tests/test_h3_matrix.py`, then full suite |
 | Acquisition / rebuild / inspection | [Workflows](docs/WORKFLOWS.md) and [production readiness](docs/production-readiness.md); review source pins, rights, paths and effects before execution |

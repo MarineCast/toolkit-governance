@@ -1,57 +1,102 @@
-# Governance Toolkit
-
 ![Ink coastal chart with islands, navigation markers, and boundary lines](assets/governance-toolkit-banner.png)
 
-Species-neutral, source-backed marine governance geometry: protected areas,
-sanctuaries, jurisdictional reference boundaries and fisheries management areas.
-The distribution is **`toolkit-governance`**; the Python package and command are
-**`governance`**. It installs independently of OrcaCast and sibling toolkits.
+# Source-backed context for marine governance
 
-Fifteen collection pipelines are implemented; the 24-entry catalog includes nine
-planned families. All current collections are **research-only**. Collection names
-do not establish complete U.S./Canadian coverage, current regulatory compliance or
-legal applicability. Canonical products retain native EPSG:4326 geometry and all
-fields remain **model-ineligible by default**. Missing support is never observed
-absence. Read the [scientific contracts](CONTRACTS.md) and
-[production readiness and limitations](production-readiness.md) before using outputs.
+`toolkit-governance` turns agency datasets into inspectable marine governance
+geometry: protected areas, sanctuaries, jurisdictional reference boundaries, and
+fisheries management areas. It installs independently, with a **`governance`**
+Python package and command.
 
-## Get started
+The toolkit preserves source identity, native geometry, citations, dates, and
+coverage. Every canonical product uses **EPSG:4326 GeoParquet**, paired with a
+checksum manifest. Geometry is reference evidence; legal instruments and official
+coordinates remain the controlling authorities.
 
-Python 3.11+ and a compatible geospatial stack are required. From a repository checkout:
+<div class="grid cards" markdown>
+
+- :material-layers-outline: **Explore the layers**<br>
+  Fifteen implemented collections, their source inputs, exact output files, and
+  interpretation limits.<br>
+  [Inputs and outputs →](layers.md)
+
+- :material-play-circle-outline: **Run the toolkit**<br>
+  Install, initialize a workspace, acquire a selected collection, build, and
+  inspect it.<br>
+  [How to use →](how-to-use.md)
+
+- :material-file-check-outline: **Read the evidence**<br>
+  Feature identities, geometry parts, coverage, effective dates, and verified
+  manifests.<br>
+  [Product contracts →](CONTRACTS.md)
+
+- :material-map-outline: **Choose a consumer grid**<br>
+  An optional explicit H3 overlay keeps native products intact and retains
+  missingness and provenance.<br>
+  [H3 overlay →](h3-matrix.md)
+
+</div>
+
+## What is implemented
+
+| Family | Collections | Published context |
+| --- | --- | --- |
+| Protected areas | MPAs; sanctuaries; critical habitat; selected refuges; reported marine classifications | Native reference geometry, separate interest points, authority records, and qualified classification views |
+| Jurisdiction | International boundaries; federal waters; state/provincial waters; counties; BIA/NRCan administrative references | Source-preserving boundaries, derived support, availability, reconciliation, and distinct provider systems |
+| Fisheries management | Management areas | WDFW recreational marine-area polygons and optional study crosswalks; quantity systems remain qualified separately |
+| Vessel management | Shipping references; traffic-separation components | Typed CHS/NOAA source and component roles, without pooled route claims |
+| Administrative context | Ports; Coast Guard references | Physical port points and separate USCG/CCG administrative inventories |
+
+The catalog contains **24 entries: fifteen implemented collections and nine planned
+families**. Implementation does not imply complete regional coverage. The default
+processing extent is the Northeast Pacific, from 180°W to 109°W and 32°N to 72°N.
+See [layers](layers.md) for collection-specific support.
+
+## Start with an empty workspace
+
+From a clone, with Python 3.11+:
 
 ```sh
+python -m venv .venv
+source .venv/bin/activate
 python -m pip install .
-governance --help
-governance --workspace /path/to/workspace init
-governance --workspace /path/to/workspace catalog
+governance --workspace ./governance-workspace init
+governance --workspace ./governance-workspace catalog
 ```
 
-Initialization copies missing configuration only; it preserves edits and downloads
-nothing. Review the workspace's extent, source pins, rights and paths before
-acquisition or builds. Follow the [workflows](WORKFLOWS.md) for explicit downloads,
-partial-build acceptance and overwrite boundaries. The [repository README](https://github.com/MarineCast/toolkit-governance/blob/main/README.md)
-contains installation and API examples.
+These commands install the toolkit, copy missing configuration, and inspect the
+catalog. They acquire no source data. Continue with [how to use](how-to-use.md)
+to review configuration and explicitly download and build a collection.
 
-The current local frozen-study checkpoint contains 2,621 R6 cells and 88,243 R8
-cells with 173 delivery fields. It is a bounded research release; cached query
-footprints and unknown completeness remain explicit. See [current readiness](production-readiness.md#current-frozen-study-checkpoint-2026-10-09).
+## How data flows
 
-## Documentation guide
+```mermaid
+flowchart LR
+  A[Agency archives and services] --> B[Explicit acquisition]
+  L[Provisioned local spatial support] --> C[Family normalization and clipping]
+  B --> C
+  C --> D[Native GeoParquet and manifests]
+  C --> E[Authority records and QC products]
+  D --> F[Inspection map]
+  D --> G[Optional explicit H3 overlay]
+  H[Consumer-provided H3 grid] --> G
+```
 
-- [Install and configure](getting-started.md): practical installation and workspace setup.
-- [CLI reference](cli.md): command effects and required arguments.
-- [Frozen study](study-guide.md): PR7 workflow, inputs, recovery and validation.
-- [Source and quality index](sources.md): pinned family notes and acceptance evidence.
-- [Troubleshooting](troubleshooting.md): configuration, staging, locks and publication.
-- [Scientific contracts](CONTRACTS.md): geometry, grain, provenance, time and missingness.
-- [Workflows](WORKFLOWS.md): acquisition, build, inspection and external inputs.
-- [Explicit H3 matrix](h3-matrix.md): optional consumer-grid overlays retaining native authority.
-- [Production readiness](production-readiness.md): source-specific limitations and release boundaries.
-- [Architecture](ARCHITECTURE.md): package ownership and configuration.
-- [Migration and validation](MIGRATION.md): historical extraction evidence and unrun checks.
-- [Documentation site](documentation-site.md): local preview, CI artifacts and publication.
+Downloads retain raw snapshots. Builds operate on local inputs and publish
+per-file outputs. Inspection writes a map and its manifest; it does not promote
+a release. International-boundary reconciliation also needs explicitly
+provisioned local spatial support.
 
-Software uses the [Apache 2.0 license](https://github.com/MarineCast/toolkit-governance/blob/main/LICENSE).
-Data has separate source-specific rights and attribution requirements. Offline tests
-and documentation builds do not establish source freshness, legal currency,
-complete coverage or downstream model integration.
+!!! note "Interpretation boundaries"
+    A missing source or empty intersection is not evidence of absence. Mapped
+    membership does not establish a legal activity rule. All fields remain
+    **model-ineligible by default**. Read [limitations](limitations.md) and
+    [sources and rights](reference/sources.md) before downstream use.
+
+## Frozen studies and local delivery
+
+The [frozen-study guide](study-guide.md) covers explicit grids, masks, cached
+source support, static inventory delivery, fishing-area relations, independent
+checks, and immutable local generations. Read the [source acceptance inventory](source-acceptance.md)
+and [production readiness](production-readiness.md) for retained evidence and
+remaining regional/scientific qualification. All current collections remain
+research-only; a new documentation build does not refresh that evidence.

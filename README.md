@@ -67,6 +67,30 @@ outputs use per-file atomic replacement, and multi-product builds are not whole-
 transactions. `--overwrite` is explicit. Local boundary reconciliation also needs externally
 provisioned seascape support; no sibling checkout is implicitly searched.
 
+## Documentation site
+
+The MkDocs Material site follows the MarineCast meteorology documentation style:
+
+- [Home and overview](docs/index.md)
+- [Layers, inputs, and outputs](docs/layers.md)
+- [How to use](docs/how-to-use.md)
+- [Configuration](docs/configuration.md), [CLI](docs/reference/cli.md), and
+  [sources and rights](docs/reference/sources.md)
+- [Limitations](docs/limitations.md) and [troubleshooting](docs/troubleshooting.md)
+
+From this checkout:
+
+```sh
+python -m pip install -e '.[docs]'
+mkdocs serve
+# Strict static build:
+mkdocs build --strict
+```
+
+See [documentation development](docs/documentation-site.md) for preview and the
+GitHub Pages workflow. Documentation builds run automatically; hosted publication
+requires a separate manual workflow run.
+
 ## Python API and documentation
 
 The [documentation site guide](docs/documentation-site.md) explains local preview,
