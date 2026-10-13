@@ -1,57 +1,76 @@
 site_name: Governance Toolkit
-site_description: Source-backed native-geometry marine governance reference products
+site_description: Source-backed native marine governance geometry, provenance, and inspection
 site_url: https://marinecast.github.io/toolkit-governance/
 repo_url: https://github.com/MarineCast/toolkit-governance
 repo_name: MarineCast/toolkit-governance
 edit_uri: edit/main/docs/
-copyright: MarineCast contributors · Apache-2.0 software license
+copyright: Apache-2.0 · MarineCast contributors
 theme:
   name: material
   font: false
-  icon:
-    logo: material/map-marker-radius
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - content.code.copy
+    - search.suggest
   palette:
     - scheme: default
       primary: teal
-      accent: teal
+      accent: cyan
       toggle:
         icon: material/weather-night
         name: Switch to dark mode
     - scheme: slate
       primary: teal
-      accent: teal
+      accent: cyan
       toggle:
         icon: material/weather-sunny
         name: Switch to light mode
-  features:
-    - navigation.sections
-    - navigation.top
-    - navigation.footer
-    - content.code.copy
 plugins:
   - search
 markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
   - tables
-  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
 nav:
   - Home: index.md
-  - Using the toolkit:
-      - Install and configure: getting-started.md
-      - CLI reference: cli.md
+  - Layers: layers.md
+  - How to use:
+      - Install, build, and inspect: how-to-use.md
+      - Installation details: getting-started.md
+      - Configuration: configuration.md
       - Frozen study: study-guide.md
+      - Optional H3 overlay: h3-matrix.md
       - Troubleshooting: troubleshooting.md
   - Reference:
-      - Source and quality index: sources.md
+      - CLI: reference/cli.md
+      - Delivery and publication: cli.md
+      - Sources and rights: reference/sources.md
+      - Source quality index: sources.md
       - Source acceptance inventory: source-acceptance.md
-      - Scientific contracts: CONTRACTS.md
-      - Workflows: WORKFLOWS.md
-      - Explicit H3 matrix: h3-matrix.md
-      - Production readiness and limitations: production-readiness.md
+      - Product contracts: CONTRACTS.md
+      - Limitations: limitations.md
+      - Production readiness: production-readiness.md
   - Development:
+      - Workflows and checks: WORKFLOWS.md
       - Architecture: ARCHITECTURE.md
-      - Migration and validation: MIGRATION.md
       - Conditional agent checks: agent-checks.md
       - Documentation site: documentation-site.md
+      - Migration history: MIGRATION.md
 validation:
   nav:
     omitted_files: warn

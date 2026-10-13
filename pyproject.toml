@@ -18,6 +18,12 @@ dependencies = [
 test = ["pytest>=8", "h3>=4", "jsonschema>=4.18"]
 contract = ["jsonschema>=4.18"]
 h3 = ["h3>=4"]
+docs = ["mkdocs==1.6.1", "mkdocs-material==9.6.23", "pymdown-extensions>=10.2,<12.2"]
+
+[project.urls]
+Documentation = "https://marinecast.github.io/toolkit-governance/"
+Repository = "https://github.com/MarineCast/toolkit-governance"
+Issues = "https://github.com/MarineCast/toolkit-governance/issues"
 
 [project.scripts]
 governance = "governance.cli:main"

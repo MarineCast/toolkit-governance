@@ -1,9 +1,8 @@
 # Frozen study rebuild and validation
 
-The study workflow is introduced by [PR7](https://github.com/MarineCast/toolkit-governance/pull/7),
-inspected at `fe1dcc0e9e244b111a0b80d33acd0ab6fe9feaaf`. Use a reviewed revision
-containing that PR before running the commands below. They are unavailable on the
-main baseline documented in the [CLI reference](cli.md). The documentation alone does not supply study code or authorize new acquisitions.
+The current toolkit includes explicit offline study preparation and validation.
+The documentation does not provision study definitions, cached inputs, grids,
+masks, or approved schemas, and does not authorize new acquisitions.
 
 The [current checkpoint](production-readiness.md#current-frozen-study-checkpoint-2026-10-09)
 is a cache-only, local research release. Frozen membership does not establish
@@ -66,7 +65,7 @@ schema/geometry and companions, raw-source bindings, exact grid order/membership
 matrix/delivery values, static temporal interpretation, shared-schema validation,
 all positive-area mask intersections and sampled independent overlay calculations.
 The independent calculation still shares GEOS/projection libraries and is not legal
-certification. PR7 repeats semantic validation before a study-contract generation
+certification. The publisher repeats semantic validation before a study-contract generation
 can be activated or selected for rollback; baseline byte verification alone is insufficient.
 At the permanent path, the generation release identity, scientific method and
 software revision must agree with every delivery companion; shared and local
