@@ -11,7 +11,7 @@ import yaml
 from shapely.geometry import LineString, MultiPoint, Polygon, box, Point
 
 from governance import (get_layer, get_fishery_management_areas, get_marine_protected_areas,
-                        get_speed_restriction_zones, LayerNotImplementedError)
+                        get_gear_restrictions, LayerNotImplementedError)
 from governance._config.document import ConfigDocument
 from governance.shared import acquisition
 from governance.shared.acquisition import AcquisitionBudget, CacheScopeError, SourceUnavailableError
@@ -233,3 +233,95 @@ def test_native_pair_failure_restores_prior_outputs(tmp_path,snapshot_fixture,mo
     with pytest.raises(OSError):publish_native_pair(result.features,collection.artifact_path,collection.manifest_path,payload,overwrite=True)
     assert original==(collection.artifact_path.read_bytes(),collection.manifest_path.read_bytes())
     load_manifest(collection.manifest_path)
+
+
+def test_empty_mpa_builder_and_secondary_publishers(tmp_path,snapshot_fixture,monkeypatch):
+    cfg=configured(tmp_path);source=cfg.sources['dfo_oceans_act_marine_protected_areas']
+    source.snapshot_path.parent.mkdir(parents=True)
+    raw=gpd.GeoDataFrame({'OBJECTID':pd.Series(dtype='int'),'NAME_E':pd.Series(dtype='str'),'ZONE_E':pd.Series(dtype='str')},geometry=[],crs=4326)
+    source.snapshot_path.write_text(json.dumps(snapshot_fixture(source,raw)))
+    config_data=yaml.safe_load(cfg.path.read_text())
+    config_data['collections']={'marine_protected_areas':config_data['collections']['marine_protected_areas']}
+    config_data['collections']['marine_protected_areas']['source_ids']=[source.source_id]
+    cfg.path.write_text(yaml.safe_dump(config_data))
+    monkeypatch.setenv('GOVERNANCE_WORKSPACE',str(tmp_path))
+    from governance.protected_areas.marine_protected_areas.build import build
+    path=build(config_path=cfg.path,allow_partial=True)
+    assert gpd.read_parquet(path).empty
+    manifest=load_manifest(path.parent/'manifest.json')
+    assert manifest['valid_empty_result'] is True
+    assert gpd.read_parquet(path.parent/'mpa_designation_polygons.parquet').empty
+    assert gpd.read_parquet(path.parent/'area_of_interest_geometry.parquet').empty
+
+
+def test_request_key_is_reused_offline_and_refresh_failure_is_qualified(tmp_path,monkeypatch):
+    cfg=configured(tmp_path);source=cfg.sources['wdfw_recreational_marine_areas']
+    def response(url,*,params,timeout):
+        if not url.endswith('/query'):return {'objectIdField':'OBJECTID','maxRecordCount':2,'fields':[{'name':'OBJECTID','type':'esriFieldTypeOID'},{'name':'AreaName','type':'esriFieldTypeString'}]}
+        if params.get('returnIdsOnly'):return {'objectIds':[1]}
+        return {'features':[{'type':'Feature','properties':{'OBJECTID':1,'AreaName':'7'},'geometry':{'type':'Polygon','coordinates':[[[-123.1,48.4],[-122.9,48.4],[-122.9,48.6],[-123.1,48.6],[-123.1,48.4]]]}}]}
+    monkeypatch.setattr(acquisition,'_response_json',response)
+    kwargs=dict(config=cfg,sources=source.source_id,allow_partial=True)
+    cold=get_fishery_management_areas((-124,47,-122,49),**kwargs)
+    archived=Path(cold.provenance['sources'][0]['snapshot_path']);original=archived.read_bytes()
+    monkeypatch.setattr(acquisition,'_response_json',lambda *a,**k:pytest.fail('offline attempted acquisition'))
+    warm=get_fishery_management_areas((-124,47,-122,49),mode='offline',**kwargs)
+    assert warm.features.equals(cold.features)
+    def failed(*a,**k):raise SourceUnavailableError('injected provider failure')
+    monkeypatch.setattr(acquisition,'_response_json',failed)
+    failed_result=get_fishery_management_areas((-124,47,-122,49),mode='refresh',**kwargs)
+    assert failed_result.coverage.status.tolist()==['unavailable']
+    assert archived.read_bytes()==original
+
+
+def test_cross_border_and_single_country_do_not_require_matching_both_countries(tmp_path,snapshot_fixture):
+    cfg=configured(tmp_path)
+    usa=cfg.sources['noaa_mpa_inventory_2023'];can=cfg.sources['dfo_oceans_act_marine_protected_areas']
+    us_frame=gpd.GeoDataFrame({'site_id':['us'],'site_name':['US fixture']},geometry=[box(-124,47.5,-123.5,48)],crs=4326)
+    local=tmp_path/'usa.parquet';us_frame.to_parquet(local,index=False)
+    usa=replace(usa,local_path=local,expected_sha256=sha256_file(local))
+    local.with_suffix('.parquet.metadata.json').write_text(json.dumps(dict(source_id=usa.source_id,source_url=usa.url,provider=usa.provider,source_as_of=usa.source_as_of,sha256=sha256_file(local),full_source_dataset=True)))
+    cfg=replace(cfg,sources={**cfg.sources,usa.source_id:usa})
+    can_frame=gpd.GeoDataFrame({'OBJECTID':[1],'NAME_E':['Canadian fixture'],'ZONE_E':['Core']},geometry=[box(-124,49,-123.5,49.5)],crs=4326)
+    can.snapshot_path.parent.mkdir(parents=True);can.snapshot_path.write_text(json.dumps(snapshot_fixture(can,can_frame)))
+    kwargs=dict(config=cfg,sources=[usa.source_id,can.source_id],mode='offline',allow_partial=True)
+    across=get_marine_protected_areas((-124.5,47,-123,50),**kwargs)
+    assert set(across.features.COUNTRY_CODE)=={'USA','CAN'}
+    single=get_marine_protected_areas((-124.5,47,-123,48.5),**kwargs)
+    assert set(single.features.COUNTRY_CODE)=={'USA'}
+    assert single.coverage.set_index('source_id').loc[can.source_id,'status']=='empty'
+
+
+def test_pydantic_validation_remains_a_supported_configuration_extension(tmp_path):
+    from pydantic import BaseModel,ConfigDict,ValidationError
+    class Extension(BaseModel):
+        model_config=ConfigDict(extra='forbid')
+        value:int
+    p=tmp_path/'extension.yaml';p.write_text('value: 7\n')
+    assert ConfigDocument.load(p).validate_as(Extension).value==7
+    p.write_text('value: 7\ntypo: true\n')
+    with pytest.raises(ValidationError):ConfigDocument.load(p).validate_as(Extension)
+
+
+def test_bare_vector_pin_is_not_a_scope_receipt(tmp_path):
+    source=load_governance_config().sources['wdfw_recreational_marine_areas']
+    path=tmp_path/'subset.parquet'
+    gpd.GeoDataFrame({'OBJECTID':[1],'AreaName':['7']},geometry=[box(-123.1,48.4,-122.9,48.6)],crs=4326).to_parquet(path,index=False)
+    source=replace(source,local_path=path,expected_sha256=sha256_file(path))
+    with pytest.raises(CacheScopeError,match='scope'):acquisition.read_source_frame(source,bbox=(-124,47,-122,49))
+    path.with_suffix('.parquet.metadata.json').write_text(json.dumps(dict(source_id=source.source_id,source_url=source.url,sha256=sha256_file(path),geometry_roster_complete=True,requested_bbox_wgs84=[-123.1,48.4,-122.9,48.6])))
+    with pytest.raises(CacheScopeError,match='smaller'):acquisition.read_source_frame(source,bbox=(-124,47,-122,49))
+
+
+def test_shapefile_dataset_pin_covers_sidecars_without_circular_receipt_hash(tmp_path):
+    from governance.shared.artifacts import sha256_dataset
+    source=load_governance_config().sources['wdfw_recreational_marine_areas']
+    path=tmp_path/'vector.shp'
+    gpd.GeoDataFrame({'OBJECTID':[1],'AreaName':['7']},geometry=[box(-123.1,48.4,-122.9,48.6)],crs=4326).to_file(path)
+    digest=sha256_dataset(path)
+    source=replace(source,local_path=path,expected_sha256=digest)
+    path.with_suffix('.shp.metadata.json').write_text(json.dumps(dict(source_id=source.source_id,source_url=source.url,sha256=digest,full_source_dataset=True)))
+    assert sha256_dataset(path)==digest
+    assert len(acquisition.read_source_frame(source,bbox=(-124,47,-122,49)))==1
+    with path.with_suffix('.dbf').open('ab') as handle:handle.write(b'changed')
+    with pytest.raises(ValueError,match='checksum'):acquisition.read_source_frame(source,bbox=(-124,47,-122,49))

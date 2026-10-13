@@ -99,9 +99,24 @@ def validate_governance_geometry(
     intervals = frame.loc[frame.EFFECTIVE_START.notna() & frame.EFFECTIVE_END.notna()]
     if (intervals.EFFECTIVE_START > intervals.EFFECTIVE_END).any():
         raise ValueError("Effective interval start exceeds end")
+    if not np.isfinite(frame.total_bounds).all() or frame.total_bounds[0] < -180 or frame.total_bounds[2] > 180 or frame.total_bounds[1] < -90 or frame.total_bounds[3] > 90:
+        raise ValueError("Geometry bounds must be finite and within WGS84 support")
+    for value in frame.SYSTEM_LEARNED_AT.dropna():
+        parsed = pd.to_datetime(value, errors="coerce", utc=True)
+        if not isinstance(value, str) or pd.isna(parsed) or not (value.endswith('Z') or value.endswith('+00:00')):
+            raise ValueError('SYSTEM_LEARNED_AT must be an ISO UTC timestamp or null')
+    if 'ESTABLISHMENT_DATE_PRECISION' in frame and not set(frame.ESTABLISHMENT_DATE_PRECISION.dropna()).issubset({'year', 'day', 'unknown'}):
+        raise ValueError('Invalid establishment date precision')
+    if 'SOURCE_ROLE' in frame:
+        support = frame.SOURCE_ROLE.eq('spatial_support_only')
+        if not frame.loc[support, 'LEGAL_BINDING_STATUS'].eq('derived_reference_geometry').all():
+            raise ValueError('Spatial support cannot be relabeled as controlling legal authority')
     legal = {"reference_geometry", "derived_reference_geometry", "proposal_reference_geometry", "non_binding_physical_reference", "non_binding_cartographic_reference", "binding_designation_reference_geometry"}
     if not set(frame.LEGAL_BINDING_STATUS).issubset(legal):
         raise ValueError("Invalid LEGAL_BINDING_STATUS vocabulary")
+    qc_values = set(frame.QC_STATUS.dropna())
+    if not qc_values.issubset({'review_required', 'support_only', 'pass_with_limitations', 'passed_with_legal_source_caveat', 'passed'}):
+        raise ValueError('Invalid QC_STATUS vocabulary')
     statuses = frame.SOURCE_COVERAGE_STATUS.astype(str)
     if not statuses.map(lambda s: any(s == state or s.startswith(state + "_") for state in ("complete", "partial", "unknown", "unavailable", "not_applicable"))).all():
         raise ValueError("Invalid SOURCE_COVERAGE_STATUS vocabulary")

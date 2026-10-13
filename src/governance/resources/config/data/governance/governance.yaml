@@ -88,6 +88,7 @@ sources:
     acquisition_type: arcgis
     url: https://proxyinternet.nrcan-rncan.gc.ca/arcgis/rest/services/CLSS-SATC/CLSS_Administrative_Boundaries/MapServer/0
     snapshot_path: data/raw/governance/nrcan_indian_reserves/features.pages.json
+    selection_where: "jurisdictionEng='British Columbia' AND distributionTypeEng='Indian Reserve'"
     source_as_of: Current provider snapshot at page receipts; no inferred legal establishment/effective
       dates
     license: Open Government Licence - Canada; https://open.canada.ca/en/open-government-licence-canada
@@ -186,6 +187,7 @@ sources:
     acquisition_type: arcgis
     url: https://maps-cartes.ec.gc.ca/arcgis/rest/services/CWS_SCF/CPCAD/MapServer/0
     snapshot_path: data/raw/governance/eccc_marine_classification/features.pages.json
+    selection_where: "BIOME='M'"
     source_as_of: CPCAD December 2025 release; mixed per-page acquisition receipts preserved
     license: Open Government Licence - Canada v2.0; https://open.canada.ca/en/open-government-licence-canada
     attribution: Environment and Climate Change Canada, Canadian Protected and Conserved
@@ -1149,27 +1151,36 @@ sources:
 
   dfo_pacific_fishery_management_areas:
     provider: Fisheries and Oceans Canada
-    acquisition_type: reference_only
-    url: https://www.pac.dfo-mpo.gc.ca/fm-gp/maps-cartes/areas-secteurs/index-eng.html
-    source_as_of: unknown
-    license: Open Government Licence - Canada where applicable
+    acquisition_type: arcgis
+    url: https://egisp.dfo-mpo.gc.ca/arcgis/rest/services/Pacific/DFO_BC_PFMA_SUBAREAS_50K_V3_1/MapServer/0
+    source_as_of: DFO_BC_PFMA_SUBAREAS_50K_V3_1 current service; exact geometry vintage/effective
+      history not declared
+    license: Public DFO Pacific service; source-specific licence/copyright fields
+      are blank; redistribution unqualified
     attribution: Fisheries and Oceans Canada
     legal_citation: Pacific Fishery Management Area Regulations, 2007
-    redistribution: Machine-readable authoritative geometry source not yet pinned
-    authority_scope: DFO Pacific Fishery Management Areas and Subareas
-    source_status: unavailable
-    server_filter: false
-    source_limitation: Official maps and legal descriptions are known, but no approved machine-readable geometry snapshot is configured.
+    redistribution: Local research/inspection reference only; obtain source-specific
+      reuse/redistribution confirmation before sharing datasets
+    authority_scope: Named DFO Pacific PFMA subarea polygon hierarchy only; preserve
+      MGNT_AREA, SUBAREA_, original OBJECTID and GLOBALID
+    source_status: available_after_download
+    server_filter: true
+    source_limitation: Official Pacific service discovered/metadata checked 2026-10-13.
+      V3.1/1:50000 name is retained, not a verified vintage/accuracy guarantee. No
+      governing order, species/gear/activity applicability or historical law inferred.
+      Service supplies no source-specific licence statement; redistribution remains
+      unqualified. Parent area codes do not manufacture separate whole-area polygons.
     coverage:
       california: not_applicable
       oregon: not_applicable
       washington: not_applicable
       alaska: not_applicable
-      british_columbia_canada: unavailable
+      british_columbia_canada: partial
       us_federal_offshore: not_applicable
-      canadian_federal_offshore: unavailable
+      canadian_federal_offshore: partial
       international_boundary: not_applicable
-
+    snapshot_path: data/raw/governance/dfo_pacific_fishery_management_areas/features.pages.json
+    page_size: 10
   noaa_critical_habitat_polygon:
     provider: NOAA National Marine Fisheries Service
     acquisition_type: arcgis
@@ -1257,6 +1268,98 @@ sources:
       canadian_federal_offshore: partial
       international_boundary: partial
 
+  odfw_marine_reserves_2016:
+    provider: Oregon Department of Fish and Wildlife
+    acquisition_type: direct_archive
+    url: https://oregonmarinereserves.com/content/uploads/2016/02/OregonMarineReserves_KMZ_GoogleEarth.zip
+    snapshot_path: data/raw/governance/odfw_marine_reserves_2016/oregon.zip
+    expected_sha256: 29d3d8c9f1fec34bad77d16d7999cee2c601636c5bb54f73e7a21eee83c50d8f
+    source_as_of: Published 2016-02 archive; source geometry date and current legal
+      validity unverified
+    license: ODFW public download; publication does not independently clear redistribution
+    attribution: Oregon Department of Fish and Wildlife, Oregon Marine Reserves
+    legal_citation: OAR 635-012; OAR 141-142; OAR 736-029; current rules control
+    redistribution: Local research reference; retain source archive and attribution;
+      no public source-data redistribution authorized
+    authority_scope: Published marine reserves, MPAs and seabird protection area boundaries;
+      provider placemark IDs, not five site counts
+    source_status: available_after_download
+    server_filter: false
+    source_limitation: Pinned 2016 KML contains 14 provider placemarks including multipart
+      boundaries. No exact establishment/effective dates or complete current Oregon
+      law inferred; NOAA overlap is non-additive.
+    coverage:
+      california: not_applicable
+      oregon: partial
+      washington: not_applicable
+      alaska: not_applicable
+      british_columbia_canada: not_applicable
+      us_federal_offshore: not_applicable
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+  adfg_groundfish_statistical_areas:
+    provider: Alaska Department of Fish and Game, Commercial Fisheries Division
+    acquisition_type: arcgis
+    url: https://gis.adfg.alaska.gov/mapping/rest/services/CF_public/Groundfish/MapServer/3
+    snapshot_path: data/raw/governance/adfg_groundfish_statistical_areas/features.pages.json
+    source_as_of: Current service PVG_Statewide_2001_Present_GCS_WGS1984; per-record
+      geometry dates retained
+    license: ADF&G source-specific terms; no warranty; reference/analysis use
+    attribution: Alaska Department of Fish and Game, Commercial Fisheries Division
+    legal_citation: Provider groundfish statistical reporting areas; ADF&G regulations
+      remain controlling
+    redistribution: Provider forbids reproduction/distribution without explicit consent;
+      local query/reference use only; retain attribution and describe modifications
+    authority_scope: Groundfish statistical reporting system; six-digit area codes;
+      no equivalence to WDFW recreation or legal water jurisdiction
+    source_status: available_after_download
+    server_filter: true
+    page_size: 10
+    source_limitation: Service extent reaches about 68.5 N; Southeast, Gulf and Aleutian/dateline
+      acquisition require separate query receipts. Arctic completeness not established.
+      GEOMETRY_START/END_DATE are geometry validity, not legal effective time; shellfish
+      applicability varies by region.
+    coverage:
+      california: not_applicable
+      oregon: not_applicable
+      washington: not_applicable
+      alaska: partial
+      british_columbia_canada: not_applicable
+      us_federal_offshore: partial
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+  tc_srkw_interim_order_2026:
+    provider: Transport Canada
+    acquisition_type: direct_archive
+    url: https://tc.canada.ca/en/interim-order-protection-killer-whale-orcinus-orca-waters-southern-british-columbia
+    snapshot_path: data/raw/governance/tc_srkw_interim_order_2026/instrument.html
+    expected_sha256: f60dfcdb32688a7bca30fa0eff08d3c4ca1fa49524575f32ef5957124b8bb426
+    source_as_of: Interim Order version 2026-05-22; retrieved qualification 2026-10-13
+    license: Government of Canada published instrument; source terms and attribution
+      retained
+    attribution: Transport Canada; Minister of Transport
+    legal_citation: Canada Shipping Act 2001 s10.1(1); 2026 interim order sections
+      2,5-8,10 and Schedules 2-3
+    redistribution: Acquire instrument directly; local research derivatives only;
+      no source-data publication authorized
+    authority_scope: 'Closed coordinate rings: Saturna/Pender vessel zones and Swiftsure
+      speed zone only'
+    source_status: available_after_download
+    server_filter: false
+    source_limitation: Nitinat coastline closure lacks pinned authoritative support
+      and is excluded. Approach distance rules depend on moving animals and are excluded.
+      Source-version geometry and clause dates are not compliance/current-law certification;
+      full exceptions remain in the pinned instrument.
+    coverage:
+      california: not_applicable
+      oregon: not_applicable
+      washington: not_applicable
+      alaska: not_applicable
+      british_columbia_canada: partial
+      us_federal_offshore: not_applicable
+      canadian_federal_offshore: partial
+      international_boundary: not_applicable
+
 collections:
   shipping_lanes:
     category: vessel_management
@@ -1318,6 +1421,7 @@ collections:
       - noaa_mpa_inventory_2023
       - dfo_oceans_act_marine_protected_areas
       - dfo_oceans_act_areas_of_interest
+      - odfw_marine_reserves_2016
     artifact_path: data/processed/domain/governance/protected_areas/marine_protected_areas/marine_protected_areas.parquet
     manifest_path: data/processed/domain/governance/protected_areas/marine_protected_areas/manifest.json
     color: '#33A02C'
@@ -1392,6 +1496,7 @@ collections:
     source_ids:
       - wdfw_recreational_marine_areas
       - dfo_pacific_fishery_management_areas
+      - adfg_groundfish_statistical_areas
     artifact_path: data/processed/domain/governance/fisheries_management/management_areas/management_areas.parquet
     manifest_path: data/processed/domain/governance/fisheries_management/management_areas/manifest.json
     color: '#E31A1C'
@@ -1456,5 +1561,28 @@ collections:
     artifact_path: data/processed/domain/governance/jurisdiction/tribal_first_nations_areas/tribal_first_nations_areas.parquet
     manifest_path: data/processed/domain/governance/jurisdiction/tribal_first_nations_areas/manifest.json
     color: '#6A3D9A'
+    default_visible: false
+    implementation_status: implemented_partial
+
+  exclusion_zones:
+    category: vessel_management
+    display_name: Fixed vessel exclusion zones
+    normalization_profile: tc_2026_closed_fixed_zones
+    source_ids:
+    - tc_srkw_interim_order_2026
+    artifact_path: data/processed/domain/governance/vessel_management/exclusion_zones/zones.parquet
+    manifest_path: data/processed/domain/governance/vessel_management/exclusion_zones/manifest.json
+    color: '#FF7F00'
+    default_visible: false
+    implementation_status: implemented_partial
+  speed_restriction_zones:
+    category: vessel_management
+    display_name: Fixed speed restriction zones
+    normalization_profile: tc_2026_closed_fixed_zones
+    source_ids:
+    - tc_srkw_interim_order_2026
+    artifact_path: data/processed/domain/governance/vessel_management/speed_restriction_zones/zones.parquet
+    manifest_path: data/processed/domain/governance/vessel_management/speed_restriction_zones/manifest.json
+    color: '#FF7F00'
     default_visible: false
     implementation_status: implemented_partial

@@ -108,8 +108,10 @@ def _metadata_defaults() -> dict[str, object]:
 def _noaa(frame: gpd.GeoDataFrame, source: GovernanceSource) -> gpd.GeoDataFrame:
     program = NOAA_PROGRAMS[source.source_id]
     records = []
-    for index, row in frame.iterrows():
-        site_id = clean(_value(row, "site_id")) or str(clean(_value(row, "objectid")) or index)
+    for _, row in frame.iterrows():
+        site_id = clean(_value(row, "site_id"))
+        if site_id is None:
+            raise ValueError("NOAA MPA source site_id is required; row order is not identity")
         site_name = clean(_value(row, "site_name")) or clean(_value(row, "site_label")) or site_id
         management_authority = clean(_value(row, "mgmt_agen")) or source.provider
         authority_url = clean(_value(row, "url")) or source.url
@@ -193,8 +195,10 @@ def _noaa(frame: gpd.GeoDataFrame, source: GovernanceSource) -> gpd.GeoDataFrame
 
 def _dfo_active(frame: gpd.GeoDataFrame, source: GovernanceSource) -> gpd.GeoDataFrame:
     records = []
-    for index, row in frame.iterrows():
-        object_id = str(clean(row.get("OBJECTID")) or index)
+    for _, row in frame.iterrows():
+        object_id = clean(row.get("OBJECTID"))
+        if object_id is None:
+            raise ValueError("DFO MPA original OBJECTID required; row order is not identity")
         name = clean(row.get("NAME_E")) or clean(row.get("NAME_F")) or object_id
         regulation = clean(row.get("REGULATION"))
         authority_url = clean(row.get("URL_E")) or source.url
@@ -248,8 +252,10 @@ def _dfo_active(frame: gpd.GeoDataFrame, source: GovernanceSource) -> gpd.GeoDat
 
 def _dfo_aoi(frame: gpd.GeoDataFrame, source: GovernanceSource) -> gpd.GeoDataFrame:
     records = []
-    for index, row in frame.iterrows():
-        object_id = str(clean(row.get("OBJECTID")) or index)
+    for _, row in frame.iterrows():
+        object_id = clean(row.get("OBJECTID"))
+        if object_id is None:
+            raise ValueError("DFO MPA original OBJECTID required; row order is not identity")
         name = clean(row.get("NAME_E")) or clean(row.get("NAME_F")) or object_id
         authority_url = clean(row.get("URL_E")) or source.url
         designation_slug = _slug(name, object_id)
@@ -297,6 +303,9 @@ def _dfo_aoi(frame: gpd.GeoDataFrame, source: GovernanceSource) -> gpd.GeoDataFr
 def normalize(frame: gpd.GeoDataFrame, source: GovernanceSource) -> gpd.GeoDataFrame:
     """Dispatch source semantics without treating inventories as legal authority."""
 
+    if source.source_id == 'odfw_marine_reserves_2016':
+        from .oregon import normalize as normalize_oregon
+        return normalize_oregon(frame, source)
     if source.source_id in NOAA_PROGRAMS:
         return _noaa(frame, source)
     if source.source_id == "dfo_oceans_act_marine_protected_areas":

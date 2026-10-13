@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from contextvars import ContextVar
 import os
 import tempfile
 import shutil
@@ -19,6 +20,14 @@ from .config import GovernanceConfig, GovernanceSource
 from .spatial import bbox_parts, validate_bbox
 
 HEADERS = {"User-Agent": "MarineCastGovernance/0.2 (+https://github.com/MarineCast/toolkit-governance)", "Accept": "application/json, application/geo+json, */*"}
+
+@dataclass
+class _ResponseBudget:
+    maximum: int
+    received: int = 0
+
+_RESPONSE_BUDGET = ContextVar('governance_response_budget', default=None)
+
 
 class SourceUnavailableError(RuntimeError):
     """No qualified runtime source is available (never a verified zero)."""
@@ -56,6 +65,11 @@ def _response_json(url: str, *, params: dict[str, Any], timeout: int) -> dict[st
                 response.raise_for_status()
                 chunks = bytearray()
                 for chunk in response.iter_content(64 * 1024):
+                    shared_budget = _RESPONSE_BUDGET.get()
+                    if shared_budget is not None:
+                        shared_budget.received += len(chunk)
+                        if shared_budget.received > shared_budget.maximum:
+                            raise SourceUnavailableError('ArcGIS aggregate byte budget exceeded')
                     chunks.extend(chunk)
                     if len(chunks) > 16_000_000:
                         raise SourceUnavailableError('ArcGIS response exceeds 16000000 byte cap; use smaller batches')
@@ -127,7 +141,7 @@ def validate_snapshot(source, snapshot, *, bbox=None):
             raise CacheScopeError(f'{source.source_id}: cache spatial scope is smaller than request')
 
 
-def download_arcgis_snapshot(source: GovernanceSource, *, bbox, overwrite=False, budget: AcquisitionBudget | None = None) -> Path:
+def download_arcgis_snapshot(source: GovernanceSource, *, bbox, overwrite=False, budget: AcquisitionBudget | None = None, transfer_budget=None) -> Path:
     bbox = validate_bbox(bbox)
     if source.requested_grid_mask_sha256 is not None:
         raise SourceUnavailableError('Masked acquisition requires explicit qualified mask geometry; a hash alone cannot apply a mask')
@@ -141,13 +155,23 @@ def download_arcgis_snapshot(source: GovernanceSource, *, bbox, overwrite=False,
         return destination
     destination.parent.mkdir(parents=True, exist_ok=True)
     used_bytes = pages = features_count = 0
+    response_budget = transfer_budget or _ResponseBudget(budget.max_bytes)
+    starting_bytes = response_budget.received
     def request(url, params):
         nonlocal used_bytes, pages
         pages += 1
         if pages > budget.max_pages:
             raise SourceUnavailableError('ArcGIS request/page budget exceeded')
-        value = _response_json(url, params=params, timeout=60)
-        used_bytes += len(json.dumps(value).encode())
+        previous_bytes = response_budget.received
+        token = _RESPONSE_BUDGET.set(response_budget)
+        try:
+            value = _response_json(url, params=params, timeout=60)
+        finally:
+            _RESPONSE_BUDGET.reset(token)
+        # Offline mocks bypass byte-stream accounting; retain the same aggregate contract.
+        if response_budget.received == previous_bytes:
+            response_budget.received += len(json.dumps(value).encode())
+        used_bytes = response_budget.received - starting_bytes
         if used_bytes > budget.max_bytes:
             raise SourceUnavailableError('ArcGIS aggregate byte budget exceeded')
         return value
@@ -285,12 +309,13 @@ def download_arcgis_snapshot(source: GovernanceSource, *, bbox, overwrite=False,
     return destination
 
 
-def download_direct_snapshot(source, *, overwrite=False, max_bytes=64_000_000):
+def download_direct_snapshot(source, *, overwrite=False, max_bytes=64_000_000, transfer_budget=None):
     if source.snapshot_path is None:
         raise ValueError(f'Direct source {source.source_id!r} has no snapshot_path')
     destination = source.snapshot_path
     if destination.exists() and not overwrite:
         _validate_expected_checksum(source, destination)
+        _validate_direct_receipt(source, destination, bbox=None)
         return destination
     destination.parent.mkdir(parents=True, exist_ok=True)
     fd, name = tempfile.mkstemp(dir=destination.parent, prefix='.' + destination.name, suffix='.part')
@@ -302,6 +327,10 @@ def download_direct_snapshot(source, *, overwrite=False, max_bytes=64_000_000):
                 received = 0
                 for chunk in response.iter_content(chunk_size=1024*1024):
                     received += len(chunk)
+                    if transfer_budget is not None:
+                        transfer_budget.received += len(chunk)
+                        if transfer_budget.received > transfer_budget.maximum:
+                            raise SourceUnavailableError('Aggregate query acquisition byte budget exhausted')
                     if received > (max_bytes or 64_000_000):
                         raise SourceUnavailableError(f'Download exceeds {max_bytes} byte cap: {source.source_id}')
                     stream.write(chunk)
@@ -314,7 +343,9 @@ def download_direct_snapshot(source, *, overwrite=False, max_bytes=64_000_000):
             staged_metadata = atomic_write_json(stage / 'metadata.json',
                 dict(snapshot_schema_version=2, source_id=source.source_id, source_url=source.url,
                      retrieved_at_utc=datetime.now(UTC).isoformat(), bytes=received, sha256=sha256_file(temporary),
-                     archive_member=source.archive_member, archive_layer=source.archive_layer))
+                     archive_member=source.archive_member, archive_layer=source.archive_layer,
+                     provider=source.provider, source_as_of=source.source_as_of, full_source_dataset=True,
+                     selection_where=source.selection_where, requested_grid_mask_sha256=source.requested_grid_mask_sha256))
             backups = {}
             for index, path in enumerate((destination, metadata_path)):
                 if path.exists():
@@ -354,15 +385,48 @@ def acquire_collection_sources(config, collection_id, *, overwrite=False):
     return [path for sid in config.collections[collection_id].source_ids if (path := acquire_source(config, sid, overwrite=overwrite)) is not None]
 
 
+def _validate_direct_receipt(source, path, *, bbox):
+    receipt_path = path.with_suffix(path.suffix + '.metadata.json')
+    if not receipt_path.is_file():
+        # A pinned official archive identifies full immutable source bytes. Derived/local
+        # vectors need their own declared support; a bare hash does not establish selectors.
+        if bbox is not None and path.suffix.lower() != '.zip':
+            raise CacheScopeError(f'{source.source_id}: vector cache lacks a provider/scope/completeness receipt')
+        return {}
+    receipt = json.loads(receipt_path.read_text())
+    if receipt.get('sha256') != sha256_dataset(path) or receipt.get('source_id') != source.source_id or receipt.get('source_url') != source.url:
+        raise CacheScopeError(f'{source.source_id}: direct/vector cache receipt mismatch')
+    if receipt.get('provider', source.provider) != source.provider or receipt.get('source_as_of', source.source_as_of) != source.source_as_of:
+        raise CacheScopeError(f'{source.source_id}: direct/vector source/version mismatch')
+    if receipt.get('selection_where', '1=1') != source.selection_where or receipt.get('requested_grid_mask_sha256') != source.requested_grid_mask_sha256:
+        raise CacheScopeError(f'{source.source_id}: direct/vector selector/mask mismatch')
+    if bbox is not None and receipt.get('full_source_dataset') is not True:
+        if receipt.get('geometry_roster_complete') is not True or receipt.get('requested_bbox_wgs84') is None:
+            raise CacheScopeError(f'{source.source_id}: vector support/completeness is unverified')
+        from shapely.ops import unary_union
+        if not unary_union(bbox_parts(receipt['requested_bbox_wgs84'])).covers(unary_union(bbox_parts(bbox))):
+            raise CacheScopeError(f'{source.source_id}: vector cache scope is smaller than request')
+    return receipt
+
+
 def read_source_frame(source: GovernanceSource, *, bbox=None) -> gpd.GeoDataFrame:
     path = resolve_source_path(source)
     if path is None:
         raise SourceUnavailableError(f'No runtime snapshot is available for {source.source_id}')
     _validate_expected_checksum(source, path)
+    if source.source_id in {'odfw_marine_reserves_2016', 'tc_srkw_interim_order_2026'}:
+        receipt = _validate_direct_receipt(source, path, bbox=bbox)
+        if source.source_id == 'odfw_marine_reserves_2016':
+            from governance.protected_areas.marine_protected_areas.oregon import source_frame
+        else:
+            from governance.vessel_management.fixed_rules import source_frame
+        frame = source_frame(path)
+        frame.attrs['retrieved_at_utc'] = receipt.get('retrieved_at_utc')
+        return frame
     if path.suffix.lower() != '.json':
-        if source.archive_member and source.archive_layer:
+        if path.suffix.lower() == '.zip' and source.archive_member and source.archive_layer:
             frame = gpd.read_file(f'/vsizip/{path.resolve()}/{source.archive_member}', layer=source.archive_layer)
-        elif source.archive_member:
+        elif path.suffix.lower() == '.zip' and source.archive_member:
             frame = gpd.read_file(f'zip://{path.resolve()}!{source.archive_member}')
         elif path.suffix.lower() in {'.parquet', '.geoparquet'}:
             frame = gpd.read_parquet(path)
@@ -370,12 +434,8 @@ def read_source_frame(source: GovernanceSource, *, bbox=None) -> gpd.GeoDataFram
             frame = gpd.read_file(path)
         if frame.crs is None:
             raise ValueError(f'Governance source has no CRS: {path}')
-        receipt_path = path.with_suffix(path.suffix + '.metadata.json')
-        if receipt_path.exists():
-            receipt = json.loads(receipt_path.read_text())
-            if receipt.get('sha256') != sha256_file(path) or receipt.get('source_id') != source.source_id or receipt.get('source_url') != source.url:
-                raise CacheScopeError(f'{source.source_id}: direct cache receipt mismatch')
-            frame.attrs['retrieved_at_utc'] = receipt.get('retrieved_at_utc')
+        receipt = _validate_direct_receipt(source, path, bbox=bbox)
+        frame.attrs['retrieved_at_utc'] = receipt.get('retrieved_at_utc')
         return frame.to_crs(4326)
     snapshot = json.loads(path.read_text())
     if snapshot.get('snapshot_schema_version') not in {1, 2}:

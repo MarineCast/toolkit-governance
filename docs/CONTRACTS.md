@@ -33,7 +33,7 @@ envelope verifies exact membership and checksums and atomically switches `curren
 prepared immutable multi-artifact generation. Readers resolve that pointer once per operation;
 per-family writes must never target a published generation. See [workflows](WORKFLOWS.md).
 
-The catalog has 24 entries and fifteen implemented map families. `catalog --verify-artifacts` verifies
+The catalog has 24 entries and seventeen implemented map families. `catalog --verify-artifacts` verifies
 present configured primary artifacts; missing artifacts are skipped, not certified as complete.
 Secondary products and legal/source completeness require their own checks. The inspector reports
 unavailable/planned layers separately. Native manifests are not the proposed MarineCast H3

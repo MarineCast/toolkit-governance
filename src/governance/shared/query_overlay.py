@@ -42,10 +42,22 @@ def overlay(grid, native, *, source_ids, coverage, max_memberships):
                 row[prefix+'part_count'] = len(selected) if selected else None
                 if 'DESIGNATION_ID' in native:
                     row[prefix+'designation_count'] = len({feature.DESIGNATION_ID for feature, _, _ in selected if pd.notna(feature.DESIGNATION_ID)}) if selected else None
+                if 'SOURCE_ZONE_NAME' in native and 'DESIGNATION_ID' in native:
+                    row[prefix+'zone_count'] = len({(feature.get('DESIGNATION_ID'), feature.get('SOURCE_ZONE_NAME')) for feature, _, _ in selected if pd.notna(feature.get('SOURCE_ZONE_NAME'))}) if selected else None
                 row[prefix+'polygon_coverage_full_cell_fraction'] = min(1., _measure(unary_union(polygons))/_measure(cell.geometry)) if polygons else None
                 row[prefix+'line_union_length_m'] = _measure(unary_union(lines)) if lines else None
                 row[prefix+'point_count'] = int(_measure(unary_union(points))) if points else None
                 row[prefix+'status'] = 'partial' if selected else 'unknown' if availability.get(source) in {'available', 'empty'} else 'unavailable'
         metrics.append(row)
     table = pd.DataFrame(metrics) if metrics else pd.DataFrame({'H3_INDEX': pd.Series(dtype='str'), 'H3_RESOLUTION': pd.Series(dtype='int64'), 'MODEL_ELIGIBLE': pd.Series(dtype='bool')})
-    return table, pd.DataFrame(relations, columns=MEMBERSHIP_FIELDS)
+    for field in table:
+        if field.endswith(('_count', 'H3_RESOLUTION')):
+            table[field] = table[field].astype('Int64')
+        elif field.endswith(('fraction', '_length_m')):
+            table[field] = table[field].astype('Float64')
+    memberships = pd.DataFrame(relations, columns=MEMBERSHIP_FIELDS)
+    for field in ('H3_RESOLUTION', 'POINT_COUNT'):
+        memberships[field] = memberships[field].astype('Int64')
+    for field in ('INTERSECTION_AREA_M2', 'INTERSECTION_LENGTH_M'):
+        memberships[field] = memberships[field].astype('Float64')
+    return table, memberships

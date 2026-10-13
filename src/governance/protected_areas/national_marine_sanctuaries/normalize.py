@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from typing import Any
 
 import geopandas as gpd
@@ -108,20 +107,6 @@ def _float(value: Any) -> float | None:
         return None
 
 
-def _system_learned_at(source: GovernanceSource) -> str | None:
-    """Use the archived acquisition time so cached rebuilds remain deterministic."""
-
-    if source.retrieved_at_utc is not None:
-        return source.retrieved_at_utc
-    if source.snapshot_path is None:
-        return None
-    metadata_path = source.snapshot_path.with_suffix(f"{source.snapshot_path.suffix}.metadata.json")
-    if not metadata_path.is_file():
-        return None
-    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
-    return clean(metadata.get("retrieved_at_utc"))
-
-
 def normalize(frame: gpd.GeoDataFrame, source: GovernanceSource) -> gpd.GeoDataFrame:
     """Retain source polygon parts while attaching current controlling CFR references."""
 
@@ -141,7 +126,7 @@ def normalize(frame: gpd.GeoDataFrame, source: GovernanceSource) -> gpd.GeoDataF
         if abs(area_difference_pct) <= 0.5
         else "outside_0_5_percent_of_current_cfr_approx_area"
     )
-    system_learned_at = _system_learned_at(source)
+    system_learned_at = source.retrieved_at_utc
 
     records = []
     for index, row in frame.iterrows():

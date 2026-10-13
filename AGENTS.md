@@ -4,7 +4,7 @@
 
 This repository owns the standalone `governance` package for species-neutral native-geometry
 marine protected areas, jurisdictional reference boundaries and fisheries management products.
-Fifteen collection build pipelines are implemented; the 24-entry catalog includes 9 planned
+Seventeen collection build pipelines are implemented; the 24-entry catalog includes 7 planned
 families. Critical-habitat acquisition remains explicitly budgeted/provisioned; read
 [production readiness](docs/production-readiness.md) before operational execution.
 Preserve unrelated changes and read deeper instructions before editing a subdirectory.

@@ -124,3 +124,7 @@ The successful prior build/publication retained 870,319,005 generation-member by
 Working-day ranges are earlier source-planning estimates, not measured execution times or deadlines. Full-scope readiness remains blocked by unresolved source access/rights, complete source-system rosters, fisheries applicability and historical/legal qualification. OSM may serve a labeled physical/reference fallback with its licence/attribution; it cannot establish law, jurisdiction, regulatory status or effective time.
 
 Each subsequent local release must freeze its source qualification and acceptance evidence, retain native companions, pass installed-package and semantic validation, and publish as a new immutable ID. Existing delivered tables are usable as qualified research inventories while these gaps remain explicit.
+
+## Version 0.2 source additions
+
+See [regional qualification](coverage.md) for the 2026-10-13 bounded ODFW/ADF&G/TC source inspection and new implementation scope. Historical source pins, release artifacts, byte budgets and counts above are unchanged; they do not certify the new API or expanded domain.

@@ -1,6 +1,6 @@
 # Layers, inputs, and outputs
 
-Fifteen implemented collections have normalization, build, and inspection modules.
+Seventeen implemented collections have normalization, build, and inspection modules.
 Acquisition is explicit; some families require provisioned bounded snapshots. The table below summarizes the configured inputs and primary
 outputs; the sections that follow describe secondary products and coverage.
 
@@ -479,13 +479,21 @@ The H3 overlay retains input cell identity and native attribute sets, with nulls
 for unsupported empty intersections. It is model-ineligible and does not change
 canonical native geometry. See the [full overlay contract](h3-matrix.md).
 
+## Fixed vessel and speed references
+
+`exclusion_zones` and `speed_restriction_zones` now have bounded TC 2026 adapters.
+See [regional/source qualification](coverage.md) and the [single-layer API](query-api.md)
+for exact instrument/coordinate-ring scope, retained quantities/units/dates/exceptions,
+and unresolved coastline/moving-animal support. The new ODFW and ADF&G providers retain
+distinct native identities and provider systems; they do not redefine historical study outputs.
+
 ## Planned families
 
-These nine catalog entries have no implemented collection pipeline. Their presence
+These seven catalog entries have no implemented collection pipeline. Their presence
 supports planning and inspection status; it does not make them downloadable.
 
 | Category | Planned collection IDs |
 | --- | --- |
 | Fisheries management | `seasonal_closures`, `gear_restrictions`, `harvest_regulations`, `salmon_management_zones` |
-| Vessel management | `exclusion_zones`, `speed_restriction_zones`, `whale_approach_regulation_zones` |
+| Vessel management | `whale_approach_regulation_zones` |
 | Administrative context | `management_regions`, `reporting_areas` |

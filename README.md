@@ -29,14 +29,15 @@ remain separate explicit operations.
 
 ## Implemented scope
 
-Fifteen collections have normalization, build and inspection modules; acquisition is explicit and bounded:
+Seventeen collections have normalization, build and inspection modules; acquisition is explicit and bounded:
 
-- Marine protected areas (NOAA inventory and DFO designations/areas of interest).
+- Marine protected areas (NOAA inventory, DFO designations/optional proposals, and ODFW published reference boundaries).
 - National marine sanctuaries (six NOAA ONMS boundary sources).
 - International boundaries (source-preserving reference geometry and reconciliation).
 - Federal waters (U.S./Canadian maritime limits and derived reference products).
 - State/provincial waters (configured BOEM submerged-lands boundary source).
-- Fisheries management areas (configured WDFW recreational marine areas).
+- Fisheries management areas (WDFW recreational, DFO Pacific subareas, and ADF&G groundfish statistical systems).
+- Fixed vessel/speed references (qualified closed-ring subsets of TC 2026; unresolved coastline/approach rules excluded).
 - Ports (NGA physical point inventory).
 - Critical habitat (provisioned NOAA NMFS polygon and line references).
 - County/regional boundaries (U.S. Census county equivalents; Canadian regional gap retained).
@@ -46,7 +47,7 @@ Fifteen collections have normalization, build and inspection modules; acquisitio
 - ECCC-reported marine classifications (source-qualified, non-additive views of CPCAD evidence).
 - BIA land-area and NRCan Indian Reserve administrative references (source systems remain distinct; no traditional territories).
 
-The catalog includes 24 collections; 9 remain planned. Collection names do not establish
+The catalog includes 24 collections; 7 remain planned. Collection names do not establish
 complete U.S./Canadian coverage. Read [contracts](docs/CONTRACTS.md) and the per-family
 `DATA_SOURCES.md` files before interpreting outputs. Canonical products use **native geometry**,
 not H3; all fields remain **model-ineligible by default**. Reference maps, legal authority,

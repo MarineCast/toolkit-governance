@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import hashlib
 import math
+import numpy as np
+import shapely
 from pyproj import Transformer, Geod
-from shapely.ops import transform
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from typing import Iterable
 
 import geopandas as gpd
@@ -36,8 +37,10 @@ class ClipDiagnostics:
     excluded_rows: int
     output_parts: int
     clipped_source_rows: int
+    repair_dimension_remnant_rows: int = 0
+    repair_measure_delta_by_family: dict[str, float] = field(default_factory=dict)
 
-    def to_dict(self) -> dict[str, int]:
+    def to_dict(self) -> dict[str, object]:
         return asdict(self)
 
 
@@ -145,13 +148,17 @@ _AREA_TRANSFORM = Transformer.from_crs(4326, 6933, always_xy=True, force_over=Tr
 _GEOD = Geod(ellps="WGS84")
 
 
+def _area_coordinates(coordinates):
+    return np.column_stack(_AREA_TRANSFORM(coordinates[:, 0], coordinates[:, 1]))
+
+
 def _measure(geometry: BaseGeometry) -> float:
     if geometry.is_empty:
         return 0.0
     family = _dimension_family(geometry)
     unwrapped = _unwrap_geometry(geometry)
     if family == "polygon":
-        return float(transform(_AREA_TRANSFORM, unwrapped).area)
+        return float(shapely.transform(unwrapped, _area_coordinates).area)
     if family == "line":
         return float(_GEOD.geometry_length(unwrapped))
     if family == "point":
@@ -186,6 +193,8 @@ def clip_to_full_area(
     repaired_rows = 0
     intersecting_rows = 0
     clipped_source_rows = 0
+    repair_dimension_remnant_rows = 0
+    repair_measure_delta_by_family = {}
 
     for _, row in work.iterrows():
         original = row.geometry
@@ -195,6 +204,17 @@ def clip_to_full_area(
         unwrapped = _unwrap_geometry(original)
         repaired = unwrapped if unwrapped.is_valid else make_valid(unwrapped)
         repaired_rows += int(not unwrapped.is_valid)
+        repair_delta = None
+        repair_status = 'not_required'
+        if not unwrapped.is_valid:
+            if not _parts(repaired, family):
+                raise ValueError(f'Geometry repair loses source dimension for {row[source_id_column]!r}')
+            remnants = any(_dimension_family(part) != family and not part.is_empty for part in getattr(repaired, 'geoms', [repaired]))
+            repair_dimension_remnant_rows += int(remnants)
+            repair_status = 'repaired_lower_dimension_remnants_reported' if remnants else 'repaired_preserving_dimension'
+            # Invalid pre-repair measure is diagnostic only; never a certified area/length.
+            repair_delta = sum(_measure(part) for part in _parts(repaired, family)) - _measure(unwrapped)
+            repair_measure_delta_by_family[family] = repair_measure_delta_by_family.get(family, 0.0) + repair_delta
         if family == "collection":
             raise ValueError(
                 f"Unsupported mixed source geometry for {row[source_id_column]!r}: "
@@ -225,6 +245,9 @@ def clip_to_full_area(
                 SOURCE_MAX_LON=float(max_x),
                 SOURCE_MAX_LAT=float(max_y),
                 RETAINED_GEOMETRY_TYPE=part.geom_type,
+                GEOMETRY_REPAIR_STATUS=repair_status,
+                REPAIR_MEASURE_DELTA=repair_delta,
+                REPAIR_MEASURE_UNIT={"polygon":"square_metres", "line":"metres", "point":"points"}[family],
                 RETAINED_MEASURE_FRACTION=retained_fraction,
                 geometry=part,
             )
@@ -256,6 +279,8 @@ def clip_to_full_area(
         excluded_rows=int(len(work) - intersecting_rows),
         output_parts=int(len(output_frame)),
         clipped_source_rows=clipped_source_rows,
+        repair_dimension_remnant_rows=repair_dimension_remnant_rows,
+        repair_measure_delta_by_family=repair_measure_delta_by_family,
     )
     return output_frame, diagnostics
 

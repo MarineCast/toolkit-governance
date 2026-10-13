@@ -342,7 +342,27 @@ collections:
       role: provenance
       measurement_status: observed
       model_eligible: false
+      unit: source_specific_square_kilometers_or_null
+    - name: SOURCE_MARINE_AREA_KM2
+      role: provenance
+      measurement_status: observed
+      model_eligible: false
       unit: square_kilometers_or_null
+    - name: SOURCE_TOTAL_SITE_AREA_KM2
+      role: provenance
+      measurement_status: observed
+      model_eligible: false
+      unit: square_kilometers_or_null
+    - name: ESTABLISHMENT_YEAR
+      role: support
+      measurement_status: observed
+      model_eligible: false
+      unit: year_or_null
+    - name: ESTABLISHMENT_DATE_PRECISION
+      role: support
+      measurement_status: derived
+      model_eligible: false
+      unit: year_day_or_unknown
     - name: SOURCE_GEOMETRY_STATUS
       role: qc
       measurement_status: derived
@@ -2609,22 +2629,407 @@ collections:
       unit: text
   exclusion_zones:
     category: vessel_management
-    display_name: Exclusion Zones
-    implementation_status: planned
-    artifact: null
-    manifest: null
-    map_layer: false
-    model_policy: ineligible_not_implemented
-    features: []
+    display_name: Fixed vessel exclusion zones
+    implementation_status: implemented_partial
+    artifact: data/processed/domain/governance/vessel_management/exclusion_zones/zones.parquet
+    manifest: data/processed/domain/governance/vessel_management/exclusion_zones/manifest.json
+    map_layer: true
+    model_policy: ineligible_pending_temporal_leakage_review
+    features:
+    - name: GOVERNANCE_FEATURE_ID
+      role: support
+      measurement_status: derived
+      model_eligible: false
+      unit: identifier
+    - name: SOURCE_DATASET_ID
+      role: provenance
+      measurement_status: observed
+      model_eligible: false
+      unit: identifier
+    - name: SOURCE_FEATURE_ID
+      role: provenance
+      measurement_status: observed
+      model_eligible: false
+      unit: identifier
+    - name: GEOMETRY_PART_ID
+      role: support
+      measurement_status: derived
+      model_eligible: false
+      unit: identifier
+    - name: FEATURE_NAME
+      role: state
+      measurement_status: observed
+      model_eligible: false
+      unit: text
+    - name: FEATURE_TYPE
+      role: state
+      measurement_status: observed
+      model_eligible: false
+      unit: category
+    - name: AUTHORITY
+      role: provenance
+      measurement_status: observed
+      model_eligible: false
+      unit: text
+    - name: JURISDICTION
+      role: state
+      measurement_status: observed
+      model_eligible: false
+      unit: category
+    - name: LEGAL_BINDING_STATUS
+      role: evidence
+      measurement_status: derived
+      model_eligible: false
+      unit: category
+    - name: LEGAL_AUTHORITY
+      role: evidence
+      measurement_status: observed
+      model_eligible: false
+      unit: citation
+    - name: LEGAL_SOURCE_URL
+      role: provenance
+      measurement_status: observed
+      model_eligible: false
+      unit: url
+    - name: EFFECTIVE_START
+      role: support
+      measurement_status: observed
+      model_eligible: false
+      unit: date
+    - name: EFFECTIVE_END
+      role: support
+      measurement_status: observed
+      model_eligible: false
+      unit: date
+    - name: SYSTEM_LEARNED_AT
+      role: provenance
+      measurement_status: derived
+      model_eligible: false
+      unit: datetime
+    - name: SOURCE_VINTAGE
+      role: provenance
+      measurement_status: observed
+      model_eligible: false
+      unit: date_or_unknown
+    - name: SOURCE_COVERAGE_STATUS
+      role: coverage
+      measurement_status: derived
+      model_eligible: false
+      unit: category
+    - name: MEASUREMENT_STATUS
+      role: provenance
+      measurement_status: derived
+      model_eligible: false
+      unit: category
+    - name: MODEL_ELIGIBLE
+      role: qc
+      measurement_status: derived
+      model_eligible: false
+      unit: boolean
+    - name: QC_STATUS
+      role: qc
+      measurement_status: derived
+      model_eligible: false
+      unit: category
+    - name: QC_REASON
+      role: qc
+      measurement_status: derived
+      model_eligible: false
+      unit: text
+    - name: CLIPPED_TO_FULL_AREA
+      role: qc
+      measurement_status: derived
+      model_eligible: false
+      unit: boolean
+    - name: SOURCE_MIN_LON
+      role: provenance
+      measurement_status: derived
+      model_eligible: false
+      unit: degrees_east
+    - name: SOURCE_MIN_LAT
+      role: provenance
+      measurement_status: derived
+      model_eligible: false
+      unit: degrees_north
+    - name: SOURCE_MAX_LON
+      role: provenance
+      measurement_status: derived
+      model_eligible: false
+      unit: degrees_east
+    - name: SOURCE_MAX_LAT
+      role: provenance
+      measurement_status: derived
+      model_eligible: false
+      unit: degrees_north
+    - name: RETAINED_GEOMETRY_TYPE
+      role: qc
+      measurement_status: derived
+      model_eligible: false
+      unit: category
+    - name: RETAINED_MEASURE_FRACTION
+      role: qc
+      measurement_status: derived
+      model_eligible: false
+      unit: fraction
+    - name: geometry
+      role: support
+      measurement_status: observed
+      model_eligible: false
+      unit: native_geometry
+    - name: INSTRUMENT_ID
+      role: evidence
+      measurement_status: observed
+      model_eligible: false
+      unit: text_or_null
+    - name: INSTRUMENT_VERSION
+      role: evidence
+      measurement_status: observed
+      model_eligible: false
+      unit: text_or_null
+    - name: RULE_CLAUSE
+      role: evidence
+      measurement_status: observed
+      model_eligible: false
+      unit: text_or_null
+    - name: ISSUING_AUTHORITY
+      role: evidence
+      measurement_status: observed
+      model_eligible: false
+      unit: text_or_null
+    - name: APPLICABILITY
+      role: evidence
+      measurement_status: observed
+      model_eligible: false
+      unit: text_or_null
+    - name: EXCEPTIONS
+      role: evidence
+      measurement_status: observed
+      model_eligible: false
+      unit: text_or_null
+    - name: RESTRICTION_STATUS
+      role: evidence
+      measurement_status: observed
+      model_eligible: false
+      unit: text_or_null
+    - name: GEOMETRY_ROLE
+      role: evidence
+      measurement_status: observed
+      model_eligible: false
+      unit: text_or_null
+    - name: TC_ZONE_ID
+      role: evidence
+      measurement_status: observed
+      model_eligible: false
+      unit: text_or_null
+    - name: EFFECTIVE_DATE_PRECISION
+      role: evidence
+      measurement_status: observed
+      model_eligible: false
+      unit: text_or_null
+    - name: UNIMPLEMENTED_SUPPORT
+      role: evidence
+      measurement_status: observed
+      model_eligible: false
+      unit: text_or_null
   speed_restriction_zones:
     category: vessel_management
-    display_name: Speed Restriction Zones
-    implementation_status: planned
-    artifact: null
-    manifest: null
-    map_layer: false
-    model_policy: ineligible_not_implemented
-    features: []
+    display_name: Fixed speed restriction zones
+    implementation_status: implemented_partial
+    artifact: data/processed/domain/governance/vessel_management/speed_restriction_zones/zones.parquet
+    manifest: data/processed/domain/governance/vessel_management/speed_restriction_zones/manifest.json
+    map_layer: true
+    model_policy: ineligible_pending_temporal_leakage_review
+    features:
+    - name: GOVERNANCE_FEATURE_ID
+      role: support
+      measurement_status: derived
+      model_eligible: false
+      unit: identifier
+    - name: SOURCE_DATASET_ID
+      role: provenance
+      measurement_status: observed
+      model_eligible: false
+      unit: identifier
+    - name: SOURCE_FEATURE_ID
+      role: provenance
+      measurement_status: observed
+      model_eligible: false
+      unit: identifier
+    - name: GEOMETRY_PART_ID
+      role: support
+      measurement_status: derived
+      model_eligible: false
+      unit: identifier
+    - name: FEATURE_NAME
+      role: state
+      measurement_status: observed
+      model_eligible: false
+      unit: text
+    - name: FEATURE_TYPE
+      role: state
+      measurement_status: observed
+      model_eligible: false
+      unit: category
+    - name: AUTHORITY
+      role: provenance
+      measurement_status: observed
+      model_eligible: false
+      unit: text
+    - name: JURISDICTION
+      role: state
+      measurement_status: observed
+      model_eligible: false
+      unit: category
+    - name: LEGAL_BINDING_STATUS
+      role: evidence
+      measurement_status: derived
+      model_eligible: false
+      unit: category
+    - name: LEGAL_AUTHORITY
+      role: evidence
+      measurement_status: observed
+      model_eligible: false
+      unit: citation
+    - name: LEGAL_SOURCE_URL
+      role: provenance
+      measurement_status: observed
+      model_eligible: false
+      unit: url
+    - name: EFFECTIVE_START
+      role: support
+      measurement_status: observed
+      model_eligible: false
+      unit: date
+    - name: EFFECTIVE_END
+      role: support
+      measurement_status: observed
+      model_eligible: false
+      unit: date
+    - name: SYSTEM_LEARNED_AT
+      role: provenance
+      measurement_status: derived
+      model_eligible: false
+      unit: datetime
+    - name: SOURCE_VINTAGE
+      role: provenance
+      measurement_status: observed
+      model_eligible: false
+      unit: date_or_unknown
+    - name: SOURCE_COVERAGE_STATUS
+      role: coverage
+      measurement_status: derived
+      model_eligible: false
+      unit: category
+    - name: MEASUREMENT_STATUS
+      role: provenance
+      measurement_status: derived
+      model_eligible: false
+      unit: category
+    - name: MODEL_ELIGIBLE
+      role: qc
+      measurement_status: derived
+      model_eligible: false
+      unit: boolean
+    - name: QC_STATUS
+      role: qc
+      measurement_status: derived
+      model_eligible: false
+      unit: category
+    - name: QC_REASON
+      role: qc
+      measurement_status: derived
+      model_eligible: false
+      unit: text
+    - name: CLIPPED_TO_FULL_AREA
+      role: qc
+      measurement_status: derived
+      model_eligible: false
+      unit: boolean
+    - name: SOURCE_MIN_LON
+      role: provenance
+      measurement_status: derived
+      model_eligible: false
+      unit: degrees_east
+    - name: SOURCE_MIN_LAT
+      role: provenance
+      measurement_status: derived
+      model_eligible: false
+      unit: degrees_north
+    - name: SOURCE_MAX_LON
+      role: provenance
+      measurement_status: derived
+      model_eligible: false
+      unit: degrees_east
+    - name: SOURCE_MAX_LAT
+      role: provenance
+      measurement_status: derived
+      model_eligible: false
+      unit: degrees_north
+    - name: RETAINED_GEOMETRY_TYPE
+      role: qc
+      measurement_status: derived
+      model_eligible: false
+      unit: category
+    - name: RETAINED_MEASURE_FRACTION
+      role: qc
+      measurement_status: derived
+      model_eligible: false
+      unit: fraction
+    - name: geometry
+      role: support
+      measurement_status: observed
+      model_eligible: false
+      unit: native_geometry
+    - name: INSTRUMENT_ID
+      role: evidence
+      measurement_status: observed
+      model_eligible: false
+      unit: identifier
+    - name: INSTRUMENT_VERSION
+      role: evidence
+      measurement_status: observed
+      model_eligible: false
+      unit: date
+    - name: RULE_CLAUSE
+      role: evidence
+      measurement_status: observed
+      model_eligible: false
+      unit: clause
+    - name: ISSUING_AUTHORITY
+      role: evidence
+      measurement_status: observed
+      model_eligible: false
+      unit: text
+    - name: APPLICABILITY
+      role: evidence
+      measurement_status: observed
+      model_eligible: false
+      unit: text
+    - name: EXCEPTIONS
+      role: evidence
+      measurement_status: observed
+      model_eligible: false
+      unit: clause_reference
+    - name: ORIGINAL_QUANTITY
+      role: state
+      measurement_status: observed
+      model_eligible: false
+      unit: source_units
+    - name: ORIGINAL_UNIT
+      role: provenance
+      measurement_status: observed
+      model_eligible: false
+      unit: unit
+    - name: EFFECTIVE_DATE_PRECISION
+      role: support
+      measurement_status: derived
+      model_eligible: false
+      unit: day
+    - name: TC_ZONE_ID
+      role: support
+      measurement_status: observed
+      model_eligible: false
+      unit: identifier
   whale_approach_regulation_zones:
     category: vessel_management
     display_name: Whale Approach Regulation Zones

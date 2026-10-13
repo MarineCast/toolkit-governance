@@ -26,7 +26,7 @@ systems=None, workspace=None, cache=None, config=None, config_path=..., allow_pa
 include_proposed=False, mode="cache-first", as_of=None, budget=None,
 max_cells=100000, max_memberships=1000000)` is the common engine. Named wrappers accept
 one bounding box and the same keyword options. `sources` and `systems` currently select
-exact configured source IDs; these mutually exclusive options never infer equivalence
+exact configured source IDs (and canonical WDFW/DFO/ADF&G system IDs); these mutually exclusive options never infer equivalence
 between recreational, commercial, reporting, Indigenous or routing systems. Explicit
 `GovernanceConfig` objects and workspace-relative configuration avoid process-global
 workspace mutation. The legacy CLI retains its environment precedence.
@@ -67,7 +67,7 @@ provider, source vintage, selector, mask and spatial support in their identity. 
 verified superset can serve a smaller query. Mask-selected or smaller caches cannot silently
 serve a larger request. Legacy snapshots lacking reconciled complete receipts remain readable
 for migration inspection, but request-aware builds/getters reject them with a migration message.
-Use a new workspace to reacquire them; old caches/releases and source pins remain intact.
+Derived/local vectors require their own provider/version/selector/support receipt even when their bytes are pinned. A `full_source_dataset: true` receipt explicitly qualifies an unfiltered vector; a bounded receipt needs reconciled completeness and containing bounds. Use a new workspace to reacquire them; old caches/releases and source pins remain intact.
 
 Default acquisition caps are 64 MB decoded response bytes per query, 50,000 source features
 per source and 2,000 requests per source. One ArcGIS response is capped at 16 MB, with bounded
@@ -126,3 +126,15 @@ ordered native values and geometry independently of build metadata/Parquet byte 
 Native artifact/manifest staging rolls back handled failures under a per-product writer lock;
 readers still verify exact hashes. Two renames are not a crash-atomic or workspace transaction.
 Use the existing immutable-release envelope when coherent multi-product publication is authorized.
+
+
+## Coverage inventory
+
+`governance availability` prints the [packaged availability matrix](coverage.md), covering
+all 24 catalog layers and eight separate regional qualifications. Seventeen reference
+families have adapters; seven are planned. New source dispatch includes ODFW's pinned 2016
+reference, ADF&G groundfish reporting polygons, and closed-ring subsets of the TC 2026
+instrument. BC provincial classifications, DFO whole-area/legal applicability, Oregon fisheries, complete
+Alaska fishery systems, universal Indigenous territory/rights and legal history remain gaps.
+
+Geometry repairs report their status, source-dimension remnants and diagnostic measure change. Pre-repair measures of invalid shapes are QC evidence, never certified area/length.

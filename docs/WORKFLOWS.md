@@ -52,7 +52,7 @@ git diff --check
 ```
 
 Verify a regular wheel installation from outside the checkout, initialize a fresh external
-workspace, validate its catalog and import all fifteen families without application imports. Keep
+workspace, validate its catalog and import all seventeen families without application imports. Keep
 `config/` and `src/governance/resources/config/` byte-identical. Regenerate the editable catalog
 with `python -m governance.maintenance.catalog`, then synchronize its packaged resource.
 

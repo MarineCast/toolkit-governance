@@ -17,7 +17,7 @@ coordinates remain the controlling authorities.
 <div class="grid cards" markdown>
 
 - :material-layers-outline: **Explore the layers**<br>
-  Fifteen implemented collections, their source inputs, exact output files, and
+  Seventeen implemented collections, their source inputs, exact output files, and
   interpretation limits.<br>
   [Inputs and outputs →](layers.md)
 
@@ -48,7 +48,7 @@ coordinates remain the controlling authorities.
 | Vessel management | Shipping references; traffic-separation components | Typed CHS/NOAA source and component roles, without pooled route claims |
 | Administrative context | Ports; Coast Guard references | Physical port points and separate USCG/CCG administrative inventories |
 
-The catalog contains **24 entries: fifteen implemented collections and nine planned
+The catalog contains **24 entries: seventeen implemented collections and seven planned
 families**. Implementation does not imply complete regional coverage. The default
 processing extent is the Northeast Pacific, from 180°W to 109°W and 32°N to 72°N.
 See [layers](layers.md) for collection-specific support.

@@ -36,3 +36,33 @@ Official source candidates remain qualified separately:
 These candidates are not completed native adapters or a complete source-system roster.
 No common geometry/code equivalence, current law, quantities or redistribution clearance
 is inferred from discovery.
+
+
+## Bounded Alaska groundfish adapter (0.2)
+
+The [ADF&G Groundfish layer 3](https://gis.adfg.alaska.gov/mapping/rest/services/CF_public/Groundfish/MapServer/3)
+exposes queryable polygon geometry, original OBJECTID, six-digit STAT_AREA and geometry
+start/end dates. The current `PVG_Statewide_2001_Present_GCS_WGS1984` service is a separate
+commercial statistical/reporting system; geometry dates are not legal effective dates.
+The getter reconciles a bounded bbox ID roster and preserves all source attributes.
+Southeast, Gulf and Aleutian/dateline query completeness are qualified separately;
+the declared layer extent ends about 68.5 N and establishes no Arctic completeness.
+The layer's metadata forbids reproduction/distribution without ADF&G consent; retain
+attribution and processing changes, and keep retrieved data local. A query receipt does
+not establish all fisheries, shellfish applicability, current regulations or legal jurisdiction.
+The legacy normalization-profile label is retained for CLI/config compatibility; dispatch
+now explicitly distinguishes WDFW and ADF&G source IDs.
+
+
+## DFO Pacific subarea adapter (0.2)
+
+A fresh 2026-10-13 official Pacific service-directory check discovered
+[DFO_BC_PFMA_SUBAREAS_50K_V3_1, layer 0](https://egisp.dfo-mpo.gc.ca/arcgis/rest/services/Pacific/DFO_BC_PFMA_SUBAREAS_50K_V3_1/MapServer/0).
+The earlier reference-only source entry now names this bounded ArcGIS adapter. There was no
+existing checksum pin to replace. Original OBJECTID/GLOBALID and MGNT_AREA/SUBAREA_ hierarchy
+are retained; codes stay in `dfo.pacific.pfma.subareas`, separate from WDFW/ADF&G.
+The layer name supplies V3.1/50K reference identity, not an exact geometry vintage or legal
+accuracy guarantee. Source licence/copyright metadata is blank: no automatic OGL claim or
+redistribution clearance. Local research/inspection only; source-specific reuse confirmation
+is required before sharing datasets. Subarea shapes do not manufacture whole-area polygons,
+fishery/species/gear applicability, current law or historical rules.

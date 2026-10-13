@@ -42,6 +42,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     sub.add_argument('--local-manifest', required=True, type=Path)
     sub.add_argument('--schema', required=True, type=Path)
     sub.add_argument('--schema-reference', required=True)
+    commands.add_parser('availability', help='Read implementation/source/regional qualification without acquisition.')
     commands.add_parser('preflight', help='Read-only source and full catalog readiness inventory.')
     sub = commands.add_parser('export-delivery', help='Project a verified overlay into single-resolution wide tables.')
     sub.add_argument('--matrix', required=True, type=Path)
@@ -136,6 +137,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         elif args.command == 'export-shared-manifest':
             from .shared_contract import export_shared_manifest
             print(export_shared_manifest(args.artifact, args.local_manifest, args.schema, schema_reference=args.schema_reference))
+        elif args.command == 'availability':
+            from .shared.availability import availability_matrix
+            print(json.dumps(availability_matrix(load_governance_config()), indent=2))
         elif args.command == 'preflight':
             from .preflight import preflight
             print(json.dumps(preflight(), indent=2))

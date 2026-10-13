@@ -10,42 +10,7 @@ import yaml
 from governance._config.paths import project_root
 from governance.shared.config import load_governance_config
 
-CATEGORY_COLLECTIONS = {
-    "protected_areas": (
-        "marine_protected_areas",
-        "critical_habitat",
-        "national_marine_sanctuaries",
-        "wildlife_refuges",
-        "conservation_designations",
-    ),
-    "jurisdiction": (
-        "international_boundaries",
-        "federal_waters",
-        "state_provincial_waters",
-        "county_regional_boundaries",
-        "tribal_first_nations_areas",
-    ),
-    "fisheries_management": (
-        "management_areas",
-        "seasonal_closures",
-        "gear_restrictions",
-        "harvest_regulations",
-        "salmon_management_zones",
-    ),
-    "vessel_management": (
-        "shipping_lanes",
-        "traffic_separation_schemes",
-        "exclusion_zones",
-        "speed_restriction_zones",
-        "whale_approach_regulation_zones",
-    ),
-    "administrative_context": (
-        "ports",
-        "coast_guard_sectors",
-        "management_regions",
-        "reporting_areas",
-    ),
-}
+from governance.shared.registry import CATEGORY_COLLECTIONS
 
 CORE_FEATURES = (
     ("GOVERNANCE_FEATURE_ID", "support", "derived", "identifier"),
@@ -79,6 +44,14 @@ CORE_FEATURES = (
 )
 
 EXTRA_FEATURES = {
+    "exclusion_zones": tuple((field, "evidence", "observed", "text_or_null") for field in ("INSTRUMENT_ID", "INSTRUMENT_VERSION", "RULE_CLAUSE", "ISSUING_AUTHORITY", "APPLICABILITY", "EXCEPTIONS", "RESTRICTION_STATUS", "GEOMETRY_ROLE", "TC_ZONE_ID", "EFFECTIVE_DATE_PRECISION", "UNIMPLEMENTED_SUPPORT")),
+    "speed_restriction_zones": (
+        ("INSTRUMENT_ID", "evidence", "observed", "identifier"), ("INSTRUMENT_VERSION", "evidence", "observed", "date"),
+        ("RULE_CLAUSE", "evidence", "observed", "clause"), ("ISSUING_AUTHORITY", "evidence", "observed", "text"),
+        ("APPLICABILITY", "evidence", "observed", "text"), ("EXCEPTIONS", "evidence", "observed", "clause_reference"),
+        ("ORIGINAL_QUANTITY", "state", "observed", "source_units"), ("ORIGINAL_UNIT", "provenance", "observed", "unit"),
+        ("EFFECTIVE_DATE_PRECISION", "support", "derived", "day"), ("TC_ZONE_ID", "support", "observed", "identifier"),
+    ),
     "tribal_first_nations_areas": tuple((field, "provenance", "derived", "text") for field in ("ADMIN_REFERENCE_ROLE", "ADMIN_REFERENCE_DESCRIPTION", "PROVIDER_AREA_ID")),
     "coast_guard_sectors": (("ADMIN_UNIT_ROLE", "state", "derived", "category"), ("ADMIN_UNIT_DESCRIPTION", "provenance", "derived", "text")),
     "conservation_designations": tuple((field, "provenance", "derived", "text") for field in ("CLASSIFICATION_ROLE", "PROVIDER_CLASS_LABEL", "PROVIDER_STATUS_LABEL", "PROVIDER_EVIDENCE_KEY", "EVIDENCE_OVERLAP_POLICY")),
@@ -145,7 +118,11 @@ EXTRA_FEATURES = {
         ("ACTIVITY_METADATA_STATUS", "qc", "derived", "category"),
         ("IUCN_REPORTING_CLASS", "evidence", "unavailable", "category_or_null"),
         ("IUCN_CLASS_STATUS", "qc", "derived", "category"),
-        ("SOURCE_AREA_KM2", "provenance", "observed", "square_kilometers_or_null"),
+        ("SOURCE_AREA_KM2", "provenance", "observed", "source_specific_square_kilometers_or_null"),
+        ("SOURCE_MARINE_AREA_KM2", "provenance", "observed", "square_kilometers_or_null"),
+        ("SOURCE_TOTAL_SITE_AREA_KM2", "provenance", "observed", "square_kilometers_or_null"),
+        ("ESTABLISHMENT_YEAR", "support", "observed", "year_or_null"),
+        ("ESTABLISHMENT_DATE_PRECISION", "support", "derived", "year_day_or_unknown"),
         ("SOURCE_GEOMETRY_STATUS", "qc", "derived", "category"),
         ("MPA_QC_REASON", "qc", "derived", "text"),
     ),

@@ -49,6 +49,7 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Query API: query-api.md
+  - Coverage: coverage.md
   - Layers: layers.md
   - How to use:
       - Install, build, and inspect: how-to-use.md
@@ -69,6 +70,7 @@ nav:
   - Development:
       - Workflows and checks: WORKFLOWS.md
       - Architecture: ARCHITECTURE.md
+      - Hardening handoff: hardening-report.md
       - Conditional agent checks: agent-checks.md
       - Documentation site: documentation-site.md
       - Migration history: MIGRATION.md

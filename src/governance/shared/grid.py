@@ -51,18 +51,31 @@ def cell_geometry(cell):
 def candidate_grid(bbox, resolution, *, max_cells=100_000):
     import h3
     from shapely.ops import unary_union
-    from .spatial import bbox_parts, _measure
+    from .spatial import bbox_parts
     validate_resolution(resolution)
     if type(max_cells) is not int or max_cells <= 0:
         raise ValueError('max_cells must be a positive integer')
     parts = bbox_parts(bbox)
-    area = sum(_measure(part) for part in parts)
-    if area / (h3.average_hexagon_area(resolution, unit='m^2') * 0.5) + 20 > max_cells:
+    import math
+    west, south, east, north = bbox
+    if south <= -89 or north >= 89:
+        raise ValueError('Generic H3 polar bounding boxes require a separately qualified support contract')
+    width = east-west if west < east else 360-west+east
+    area = 6371008.8**2 * math.radians(width) * (math.sin(math.radians(north))-math.sin(math.radians(south)))
+    perimeter = 2*6371008.8*(math.radians(north-south)+math.radians(width))
+    if area / (h3.average_hexagon_area(resolution, unit='m^2') * 0.5) + perimeter / h3.average_hexagon_edge_length(resolution, unit='m') + 20 > max_cells:
         raise ValueError('Candidate H3 grid exceeds cell budget; use a smaller bounding_box or resolution')
     if not hasattr(h3, 'h3shape_to_cells_experimental'):
         raise ImportError('Generic H3 queries require h3>=4.2 with overlap containment')
     cells = set()
+    # Avoid ambiguous >180-degree polygon edges even at coarse permitted resolutions.
+    from shapely.geometry import box
+    split_parts = []
     for part in parts:
+        west, south, east, north = part.bounds
+        sections = max(1, math.ceil((east-west)/90))
+        split_parts.extend(box(west+i*(east-west)/sections,south,west+(i+1)*(east-west)/sections,north) for i in range(sections))
+    for part in split_parts:
         shape = h3.LatLngPoly([(y, x) for x, y in part.exterior.coords])
         cells.update(h3.h3shape_to_cells_experimental(shape, resolution, contain='overlap'))
         if len(cells) > max_cells:

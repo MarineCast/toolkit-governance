@@ -442,3 +442,7 @@ After a confirmed stopped process, `run-study --resume-native` reuses complete n
 only when all original input bindings and retained grids/mask/schema match. Native products and
 source checksums are reverified; assembled delivery directories are refused. It does not resume
 partial native builds or replace published data. Inspect processes first to avoid concurrent runs.
+
+## Version 0.2 software hardening
+
+The current software adds the [single-layer API](query-api.md) and [regional availability matrix](coverage.md). Seventeen reference families have adapters; seven remain planned. Historical study/release counts above are preserved evidence, not freshly rebuilt acceptance. No production products or current pointer were changed.

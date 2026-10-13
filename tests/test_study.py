@@ -1,4 +1,5 @@
 import json
+from governance.shared.artifacts import sha256_file
 from pathlib import Path
 
 import geopandas as gpd
@@ -36,7 +37,7 @@ def test_preflight_preserves_pending_registry_and_all_planned_products(inputs):
     assert result['central_registry_status']=='pending'
     assert result['grids'][0]['rows']==1
     assert len(result['inventory']['products'])==24
-    assert sum(p['implementation_status']=='planned' for p in result['inventory']['products'].values())==9
+    assert sum(p['implementation_status']=='planned' for p in result['inventory']['products'].values())==7
     assert all(s['study_geographic_completeness']=='unknown' for s in result['inventory']['sources'].values())
     assert result['new_acquisition_bytes']==0
 
@@ -116,6 +117,8 @@ def test_offline_study_bundle_relocates_and_validates_from_permanent_path(inputs
     (cache/'data/raw').mkdir(parents=True)
     gpd.GeoDataFrame({'OBJECTID':[1],'AreaName':['fixture'],'geometry':[box(-123.02,48.98,-122.98,49.02)]},crs=4326).to_file(cache/'data/raw/test.geojson',driver='GeoJSON')
     raw=(cache/'data/raw/test.geojson').read_bytes()
+    source=config['sources']['wdfw_recreational_marine_areas']
+    (cache/'data/raw/test.geojson.metadata.json').write_text(json.dumps(dict(source_id='wdfw_recreational_marine_areas',source_url=source['url'],provider=source['provider'],source_as_of=source['source_as_of'],sha256=sha256_file(cache/'data/raw/test.geojson'),full_source_dataset=True)))
     root=tmp_path/'releases';identity='regional';permanent=root/identity
     output=tmp_path/'prepared'
     schema=Path(__file__).parent/'fixtures/reference-geometry-v0.2.schema.json'

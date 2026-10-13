@@ -142,7 +142,7 @@ def load_governance_config(path: str | Path = DEFAULT_CONFIG_PATH, *, workspace:
         "inspection", "catalog_path", "coverage_regions", "sources", "collections", "selected_collection",
     })
     raw = _mapping(document.data, "governance configuration")
-    if int(raw.get("schema_version", 0)) != 1:
+    if type(raw.get("schema_version")) is not int or raw.get("schema_version") != 1:
         raise ValueError("Governance configuration schema_version must equal 1.")
 
     area_name = str(raw.get("area", "")).strip()

@@ -16,7 +16,7 @@ from shapely.geometry import box
 from shapely.ops import unary_union
 
 from .shared.acquisition import (AcquisitionBudget, CacheScopeError, SourceUnavailableError,
-    download_arcgis_snapshot, download_direct_snapshot, read_source_frame, resolve_source_path)
+    download_arcgis_snapshot, download_direct_snapshot, read_source_frame, resolve_source_path, _ResponseBudget)
 from .shared.artifacts import source_record
 from .shared.config import GovernanceConfig, DEFAULT_CONFIG_PATH, load_governance_config, strict_bool
 from .shared.grid import validate_resolution
@@ -87,18 +87,22 @@ def get_layer(collection_id: str, bounding_box, *, make_h3: bool = False, h3_res
         initialize_workspace(root)
         config = load_governance_config(config_path, workspace=root)
     if collection_id not in config.collections:
-        from .maintenance.catalog import CATEGORY_COLLECTIONS
+        from .shared.registry import CATEGORY_COLLECTIONS
         if collection_id not in {name for names in CATEGORY_COLLECTIONS.values() for name in names}:
             raise ValueError(f'Unknown governance layer {collection_id!r}')
         raise LayerNotImplementedError(f'{collection_id}: no qualified provider geometry; see coverage matrix')
     collection = config.collections[collection_id]
     selected = sources if sources is not None else systems
+    if systems is not None:
+        aliases = {'wdfw.recreational_marine_catch_reporting':'wdfw_recreational_marine_areas', 'adfg.groundfish.statistical':'adfg_groundfish_statistical_areas', 'dfo.pacific.pfma.subareas':'dfo_pacific_fishery_management_areas'}
+        selected = aliases.get(selected, selected) if isinstance(selected, str) else [aliases.get(value, value) for value in selected]
     source_ids = (selected,) if isinstance(selected, str) else tuple(selected) if selected is not None else collection.source_ids
     if not source_ids or any(not isinstance(s, str) for s in source_ids) or len(set(source_ids)) != len(source_ids):
         raise ValueError('Source selectors must contain unique, nonempty source IDs')
     unknown = set(source_ids).difference(collection.source_ids)
     if unknown:
         raise ValueError(f'Invalid source/system selectors for {collection_id}: {sorted(unknown)}')
+    excluded_proposals = 'dfo_oceans_act_areas_of_interest' in source_ids and not include_proposed
     if not include_proposed:
         source_ids = tuple(s for s in source_ids if s != 'dfo_oceans_act_areas_of_interest')
     grid = None
@@ -109,8 +113,9 @@ def get_layer(collection_id: str, bounding_box, *, make_h3: bool = False, h3_res
         if not grid.empty:
             support = _support_bbox(grid, bbox)
     selector_shape = unary_union(grid.geometry) if grid is not None and not grid.empty else unary_union(bbox_parts(bbox))
+    from .shared.availability import provider_region_states
     frames, coverage, receipts, timings = [], [], [], []
-    remaining_bytes = (budget or AcquisitionBudget()).max_bytes
+    transfer_budget = _ResponseBudget((budget or AcquisitionBudget()).max_bytes)
     for source_id in source_ids:
         source = config.sources[source_id]
         if cache is not None and source.snapshot_path is not None:
@@ -121,6 +126,8 @@ def get_layer(collection_id: str, bounding_box, *, make_h3: bool = False, h3_res
             request_source = replace(source, local_path=None, snapshot_path=source.snapshot_path.parent / 'queries' / identity / 'features.pages.json')
             if resolve_source_path(source) is None and resolve_source_path(request_source) is not None:
                 source = request_source
+        if mode == 'refresh' and source.local_path is not None and source.local_path.exists():
+            raise ValueError(f'{source_id}: refresh conflicts with an explicit local_path override; use offline/cache-first or remove the override')
         acquisition_start = time.perf_counter()
         state, reason, raw = 'unavailable', source.source_limitation, None
         try:
@@ -139,21 +146,18 @@ def get_layer(collection_id: str, bounding_box, *, make_h3: bool = False, h3_res
                 if mode == 'offline':
                     raise SourceUnavailableError(f'{source_id}: no compatible offline cache')
                 if source.acquisition_type in {'arcgis', 'local_vector_or_arcgis'}:
-                    identity = hashlib.sha256(json.dumps([source.url, source.provider, source.source_as_of, source.selection_where, source.requested_grid_mask_sha256, support], sort_keys=True).encode()).hexdigest()[:24]
                     if source.snapshot_path is None:
                         raise SourceUnavailableError(f'{source_id}: missing cache destination')
                     source = request_source
-                    if remaining_bytes <= 0:
+                    if transfer_budget.received >= transfer_budget.maximum:
                         raise SourceUnavailableError('Aggregate query acquisition byte budget exhausted')
-                    download_arcgis_snapshot(source, bbox=support, overwrite=mode == 'refresh', budget=replace(budget or AcquisitionBudget(), max_bytes=remaining_bytes))
-                    remaining_bytes -= json.loads(source.snapshot_path.read_text()).get('response_bytes', source.snapshot_path.stat().st_size)
+                    download_arcgis_snapshot(source, bbox=support, overwrite=mode == 'refresh', budget=budget, transfer_budget=transfer_budget)
                 elif source.acquisition_type == 'direct_archive':
                     if source.snapshot_path is None or source.snapshot_path.suffix.lower() in {'.parquet', '.geoparquet'}:
                         raise SourceUnavailableError(f'{source_id}: requires provisioned provider-specific source frame; automatic bulk download unsupported')
-                    if remaining_bytes <= 0:
+                    if transfer_budget.received >= transfer_budget.maximum:
                         raise SourceUnavailableError('Aggregate query acquisition byte budget exhausted')
-                    download_direct_snapshot(source, overwrite=mode == 'refresh', max_bytes=remaining_bytes)
-                    remaining_bytes -= source.snapshot_path.stat().st_size
+                    download_direct_snapshot(source, overwrite=mode == 'refresh', max_bytes=(budget or AcquisitionBudget()).max_bytes, transfer_budget=transfer_budget)
                 else:
                     raise SourceUnavailableError(f'{source_id}: acquisition type {source.acquisition_type} unavailable')
                 raw = read_source_frame(source, bbox=support)
@@ -179,11 +183,16 @@ def get_layer(collection_id: str, bounding_box, *, make_h3: bool = False, h3_res
         coverage.append({'collection': collection_id, 'source_id': source_id, 'provider': source.provider,
             'status': state, 'acquisition_completeness': 'complete' if raw is not None else 'unavailable',
             'geographic_completeness': geographic, 'legal_currentness': 'not_verified',
-            'temporal_capability': 'inventory_snapshot_only', 'source_regions': dict(source.coverage),
+            'temporal_capability': 'instrument_version_snapshot' if source_id == 'tc_srkw_interim_order_2026' else 'inventory_snapshot_only', 'source_regions': dict(source.coverage), 'regional_support': provider_region_states(source),
             'requested_bbox': list(bbox), 'source_support_bbox': list(support), 'limitation': reason})
     if not allow_partial and any(row['geographic_completeness'] == 'partial' for row in coverage):
         raise SourceUnavailableError('Geographic completeness is partial/unknown; pass allow_partial=True for research inventories')
     from .maintenance.catalog import EXTRA_FEATURES
+    if excluded_proposals:
+        coverage.append({'collection': collection_id, 'source_id': 'dfo_oceans_act_areas_of_interest', 'provider': config.sources['dfo_oceans_act_areas_of_interest'].provider,
+            'status': 'not_applicable', 'acquisition_completeness': 'not_applicable', 'geographic_completeness': 'not_applicable', 'legal_currentness': 'not_verified',
+            'temporal_capability': 'inventory_snapshot_only', 'source_regions': dict(config.sources['dfo_oceans_act_areas_of_interest'].coverage), 'requested_bbox': list(bbox),
+            'source_support_bbox': list(support), 'limitation': 'Proposals excluded by default; no source query executed'})
     features = concatenate_clipped_frames(frames) if frames else empty_governance_frame(extra_fields=[field[0] for field in EXTRA_FEATURES.get(collection_id, ())])
     metrics = memberships = None
     h3_start = time.perf_counter()
@@ -195,7 +204,7 @@ def get_layer(collection_id: str, bounding_box, *, make_h3: bool = False, h3_res
         'sources': receipts, 'config_hash': config.config_hash,
         'query_time_utc': datetime.now(UTC).isoformat(), 'time_semantics': 'Knowledge timestamps retain source receipts; query/build time is separate. No historical legal inference.',
         'spatial_semantics': 'Full native boundaries selected by intersection; H3 requests select full cell support, never bbox-truncated cell denominators.',
-        'model_eligible': False, 'measurements': {'polygon_coverage_full_cell_fraction': 'EPSG:6933 union area / full cell area; no water denominator', 'line_union_length_m': 'WGS84 geodesic length', 'point_count': 'distinct recorded coordinates; boundary points count in each touching cell'},
+        'model_eligible': False, 'acquisition_decoded_bytes': transfer_budget.received, 'measurements': {'polygon_coverage_full_cell_fraction': 'EPSG:6933 union area / full cell area; no water denominator', 'line_union_length_m': 'WGS84 geodesic length', 'point_count': 'distinct recorded coordinates; boundary points count in each touching cell'},
         'timings': {'sources': timings, 'h3_s': time.perf_counter()-h3_start, 'total_s': time.perf_counter()-started}}
     return GovernanceResult(features, metrics, memberships, pd.DataFrame(coverage), provenance)
 
@@ -203,11 +212,14 @@ def get_layer(collection_id: str, bounding_box, *, make_h3: bool = False, h3_res
 def _getter(collection_id):
     def getter(bounding_box, **options):
         return get_layer(collection_id, bounding_box, **options)
+    import inspect
+    signature = inspect.signature(get_layer)
+    getter.__signature__ = signature.replace(parameters=list(signature.parameters.values())[1:])
     getter.__name__ = 'get_' + collection_id
     getter.__doc__ = f'Query {collection_id}. Keyword options and return contract follow governance.get_layer.'
     return getter
 
-from .maintenance.catalog import CATEGORY_COLLECTIONS
+from .shared.registry import CATEGORY_COLLECTIONS
 for _collections in CATEGORY_COLLECTIONS.values():
     for _collection in _collections:
         globals()['get_' + _collection] = _getter(_collection)

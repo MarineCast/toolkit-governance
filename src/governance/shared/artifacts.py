@@ -34,7 +34,10 @@ def sha256_dataset(path: str | Path) -> str:
     if source.is_file() and source.suffix.lower() != ".shp":
         return sha256_file(source)
     if source.suffix.lower() == ".shp":
-        candidates = sorted(source.parent.glob(f"{source.stem}.*"))
+        # Acquisition receipts are provenance companions, not vector components;
+        # including their own checksum field would create a circular hash.
+        candidates = sorted(candidate for candidate in source.parent.glob(f"{source.stem}.*")
+                            if not candidate.name.endswith(('.metadata.json', '.part', '.lock')))
     elif source.is_dir():
         candidates = sorted(item for item in source.rglob("*") if item.is_file())
     else:
@@ -274,10 +277,17 @@ def publish_native_pair(frame, artifact_path, manifest_path, payload, *, overwri
 def semantic_hash(frame):
     """Hash native values/geometry independent of Parquet encoding and build metadata."""
     import pandas as pd
+    import numpy as np
+    def scalar(value):
+        if isinstance(value, dict):
+            return {key: scalar(item) for key, item in value.items()}
+        if isinstance(value, (list, tuple, np.ndarray)):
+            return [scalar(item) for item in value]
+        return None if pd.isna(value) else value
     columns = sorted(column for column in frame.columns if column != frame.geometry.name)
     digest = hashlib.sha256()
     for _, row in frame.sort_values(["SOURCE_DATASET_ID", "SOURCE_FEATURE_ID", "GEOMETRY_PART_ID"], kind="stable").iterrows():
-        values = {column: None if pd.isna(row[column]) else row[column] for column in columns}
+        values = {column: scalar(row[column]) for column in columns}
         digest.update(json.dumps(values, sort_keys=True, default=str).encode())
         digest.update(row.geometry.wkb)
     digest.update(json.dumps(columns).encode())
