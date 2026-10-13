@@ -19,7 +19,8 @@ import pyarrow.parquet as pq
 import shapely
 
 from .delivery import export_delivery, validate_delivery, METHOD_VERSION, METRICS
-from .h3_matrix import _grid, export_h3_matrix
+from .h3_matrix import export_h3_matrix
+from .shared.grid import read_grid
 from .preflight import preflight
 from .shared.artifacts import sha256_file, sha256_dataset
 from .shared.config import load_governance_config
@@ -74,7 +75,7 @@ def study_preflight(study, grids, mask, *, mask_layer, mask_manifest, cache_work
         raise ValueError('Unsupported study configuration/timezone')
     if config['domain']['selection_policy']['reporting_support'] != 'positive_area_intersection_with_materialized_coastal_plus_inland_water_mask':
         raise ValueError('Unsupported study reporting policy')
-    frames = [_grid(Path(p)) for p in grids]
+    frames = [read_grid(Path(p)) for p in grids]
     resolutions = [set(f.H3_RESOLUTION) for f in frames]
     if any(len(r) != 1 for r in resolutions) or len(set.union(*resolutions)) != len(frames):
         raise ValueError('Each study grid must have one distinct resolution')
@@ -145,7 +146,7 @@ def _sample_overlay(matrix, manifests, map_path):
     from shapely.ops import transform, unary_union
     table = pq.read_table(matrix)
     meta = json.loads(table.schema.metadata[b'governance_h3_matrix'])
-    grids = _grid(matrix)
+    grids = read_grid(matrix)
     projection = Transformer.from_crs(4326, 6933, always_xy=True).transform
     lengths = Transformer.from_crs(6933, meta['length_crs'], always_xy=True).transform
     checks = []
@@ -268,7 +269,7 @@ def validate_study_release(root, *, independent=True):
                 local['overlay']['sha256'] != sha256_file(matrix_path) or
                 local['configuration_hash'] != config.config_hash):
             raise ValueError('Delivery lineage mismatch')
-        grid = _grid(map_path(item['grid']))
+        grid = read_grid(map_path(item['grid']))
         cells = pq.read_table(artifact, columns=['h3_index'])['h3_index'].to_pylist()
         if sha256_file(map_path(item['grid'])) != item['grid_sha256'] or cells != list(grid.H3_INDEX):
             raise ValueError('Exact frozen grid membership/order mismatch')

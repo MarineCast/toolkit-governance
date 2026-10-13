@@ -49,13 +49,13 @@ def test_invalid_geometry_and_duplicate_source_records_fail_closed():
     with pytest.raises(ValueError,match='Unique'):normalize(raw,source)
 
 
-def test_provider_area_identity_deduplicates_parts_without_pooling_agencies(tmp_path,monkeypatch):
+def test_provider_area_identity_deduplicates_parts_without_pooling_agencies(tmp_path,monkeypatch,snapshot_fixture):
     initialize_workspace(tmp_path);monkeypatch.setenv('GOVERNANCE_WORKSPACE',str(tmp_path))
     p=tmp_path/'config/data/governance/governance.yaml';cfg=yaml.safe_load(p.read_text())
     cfg['collections']={'tribal_first_nations_areas':cfg['collections']['tribal_first_nations_areas']};p.write_text(yaml.safe_dump(cfg))
     cfg=load_governance_config();source=cfg.sources['bia_administrative_lar'];source.snapshot_path.parent.mkdir(parents=True)
     raw=gpd.GeoDataFrame([{'OBJECTID':1,'LARID':'same-area','LARNAME':'name','CLASSIFICATION':'1'},{'OBJECTID':2,'LARID':'same-area','LARNAME':'name','CLASSIFICATION':'1'}],geometry=[box(-123.01,48.49,-122.99,48.51)]*2,crs=4326)
-    source.snapshot_path.write_text(json.dumps({'snapshot_schema_version':1,'pages':[{'response':json.loads(raw.to_json())}]}))
+    source.snapshot_path.write_text(json.dumps(snapshot_fixture(source,raw)))
     from governance.jurisdiction.tribal_first_nations_areas.build import build
     native=gpd.read_parquet(build(allow_partial=True));assert native.SOURCE_FEATURE_ID.nunique()==2;assert native.GOVERNANCE_FEATURE_ID.nunique()==1
     grid=tmp_path/'grid.parquet';pq.write_table(pa.table({'H3_INDEX':[h3.latlng_to_cell(48.5,-123,6)],'H3_RESOLUTION':[6]}),grid)

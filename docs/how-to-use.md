@@ -1,5 +1,7 @@
 # Install, build, and inspect
 
+Start with the [single-layer getter](query-api.md); use the advanced workflows below for local products and releases.
+
 This guide starts with a fresh workspace and builds one collection. Acquisition
 is an explicit network operation; initialization, catalog inspection, and local
 product reading need no download.

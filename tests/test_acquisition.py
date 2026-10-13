@@ -19,18 +19,14 @@ def test_arcgis_acquisition_archives_pages_and_bounded_query(monkeypatch, tmp_pa
 
     def fake_response(url, *, params, timeout):
         requests.append((url, dict(params), timeout))
-        if params["f"] == "json":
-            return {"maxRecordCount": 2, "geometryType": "esriGeometryPoint"}
-        offset = params["resultOffset"]
+        if not url.endswith('/query'):
+            return {"maxRecordCount": 2, "geometryType": "esriGeometryPoint", "objectIdField": "OBJECTID"}
+        if params.get('returnIdsOnly'):
+            return {'objectIds':[0,1,2]}
         features = [
-            {
-                "type": "Feature",
-                "properties": {"OBJECTID": offset + index},
-                "geometry": {"type": "Point", "coordinates": [-123.0, 48.0]},
-            }
-            for index in range(2 if offset == 0 else 1)
-        ]
-        return {"type": "FeatureCollection", "features": features}
+            {"type":"Feature","properties":{"OBJECTID":identity},"geometry":{"type":"Point","coordinates":[-123.,48.]}}
+            for identity in map(int,params['objectIds'].split(','))]
+        return {"type":"FeatureCollection","features":features}
 
     monkeypatch.setattr(acquisition, "_response_json", fake_response)
     path = acquisition.download_arcgis_snapshot(
@@ -40,8 +36,9 @@ def test_arcgis_acquisition_archives_pages_and_bounded_query(monkeypatch, tmp_pa
     payload = json.loads(path.read_text(encoding="utf-8"))
     assert payload["server_filtered"] is True
     assert len(payload["pages"]) == 2
-    assert payload["pages"][0]["request_params"]["geometry"] == "-180.0,32.0,-109.0,72.0"
-    assert [request[1].get("resultOffset") for request in requests[1:]] == [0, 2]
+    assert requests[1][1]["geometry"] == "-180.0,32.0,-109.0,72.0"
+    assert payload["selected_object_ids"] == [0,1,2]
+    assert payload["geometry_roster_complete"] is True
     assert len(acquisition.read_source_frame(source)) == 3
 
 

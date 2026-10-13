@@ -111,6 +111,8 @@ def _float(value: Any) -> float | None:
 def _system_learned_at(source: GovernanceSource) -> str | None:
     """Use the archived acquisition time so cached rebuilds remain deterministic."""
 
+    if source.retrieved_at_utc is not None:
+        return source.retrieved_at_utc
     if source.snapshot_path is None:
         return None
     metadata_path = source.snapshot_path.with_suffix(f"{source.snapshot_path.suffix}.metadata.json")

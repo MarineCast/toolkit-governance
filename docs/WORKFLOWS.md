@@ -6,8 +6,7 @@ workspace. Never use the original application as a runtime root.
 1. Run `governance --workspace /path/to/workspace init`. It copies missing YAML defaults/catalog
    and preserves edits. Review extent, source pins, rights and all configured input/output paths.
 2. Request `download <collection>` explicitly. Archive/ArcGIS acquisition writes configured raw
-   snapshots and metadata; downloads are not part of `build` or `init`. Existing snapshots are
-   reused unless `--overwrite` is supplied. Pinned archives verify SHA-256.
+   snapshots and metadata; downloads are not part of `build` or `init`. Existing snapshots are reused only after request-scope, identity, checksum and completeness validation; `--overwrite` stages a replacement. Pinned archives verify SHA-256.
 3. Build one collection from local inputs. The default rejects incomplete full-area support;
    `--allow-partial` permits explicit research/context products. Each family normalizes, clips,
    validates and writes its products/manifests. `--overwrite` allows replacement. Inspect family

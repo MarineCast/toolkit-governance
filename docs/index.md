@@ -1,5 +1,7 @@
 ![Ink coastal chart with islands, navigation markers, and boundary lines](assets/governance-toolkit-banner.png)
 
+Start with the [single-layer getter](query-api.md); use the advanced workflows below for local products and releases.
+
 # Source-backed context for marine governance
 
 `toolkit-governance` turns agency datasets into inspectable marine governance

@@ -73,3 +73,5 @@ other collections retain their established columns. Empty role
 subsets retain the native schema and produce nulls. Delivery1.1.0 includes only dimensionally
 applicable routing metrics and retains source-specific coverage and overlap policy. Full native
 record relationships remain the companion authority for chart/attribute inspection.
+
+The [generic getter H3 output](query-api.md#h3-and-spatial-semantics) is a separate single-resolution API with relational memberships, geodesic length and wrapped-cell support. The study matrix above retains its historical definitions and explicit grid/CRS contract.

@@ -7,8 +7,8 @@ from collections.abc import Mapping
 from .document import ConfigDocument
 
 
-def bbox_for_area(area_name_value: str, *, common_config_path: str | Path) -> dict[str, float]:
-    raw = ConfigDocument.load(common_config_path).data
+def bbox_for_area(area_name_value: str, *, common_config_path: str | Path, workspace: str | Path | None = None) -> dict[str, float]:
+    raw = ConfigDocument.load(common_config_path, workspace=workspace).data
     areas = raw.get('areas')
     if not isinstance(areas, Mapping):
         raise ValueError('Common configuration must define areas.')

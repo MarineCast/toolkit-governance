@@ -13,6 +13,7 @@ from governance.shared.normalization import (
     clean,
     column,
     date_value,
+    source_date,
     records_frame,
 )
 
@@ -63,16 +64,6 @@ def _integer(value: object) -> int | None:
     return None if parsed is None else int(parsed)
 
 
-def _source_date(value: object) -> str | None:
-    """Handle ArcGIS epoch-millisecond dates and ordinary source dates."""
-
-    numeric = _number(value)
-    if numeric is not None and abs(numeric) >= 10_000_000_000:
-        parsed = pd.to_datetime(numeric, unit="ms", utc=True, errors="coerce")
-        return None if pd.isna(parsed) else parsed.date().isoformat()
-    return date_value(value)
-
-
 def _noaa(frame: gpd.GeoDataFrame, source: GovernanceSource) -> gpd.GeoDataFrame:
     zone = NOAA_ZONES[source.source_id]
     records = []
@@ -81,7 +72,7 @@ def _noaa(frame: gpd.GeoDataFrame, source: GovernanceSource) -> gpd.GeoDataFrame
         rule_id = _integer(row.get("RULEID"))
         rule_label = clean(row.get("RULE")) or clean(row.get("RULE_DESC"))
         region = clean(row.get("REGION"))
-        publication_date = _source_date(row.get("PUB_DATE"))
+        publication_date = source_date(frame, "PUB_DATE", row.get("PUB_DATE"), arcgis_date=True)
         source_feature_id = f"{source.source_id}:{boundary_id}"
         geometry_role = NOAA_RULE_ROLES.get(rule_id, "source_value_unknown")
         record = base_record(
@@ -108,7 +99,7 @@ def _noaa(frame: gpd.GeoDataFrame, source: GovernanceSource) -> gpd.GeoDataFrame
             SOURCE_RECORD_ID=boundary_id,
             REGION=region,
             PUBLICATION_DATE=publication_date,
-            APPROVAL_DATE=_source_date(row.get("APPRV_DATE")),
+            APPROVAL_DATE=source_date(frame, "APPRV_DATE", row.get("APPRV_DATE"), arcgis_date=True),
             SOURCE_POSITIONAL_ACCURACY_M=_number(row.get("POS_ACC")),
             SOURCE_AGENCY=clean(row.get("AOR")) or source.provider,
             SOURCE_STATUS=clean(row.get("STATUS")),

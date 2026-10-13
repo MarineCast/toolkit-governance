@@ -48,6 +48,7 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
 nav:
   - Home: index.md
+  - Query API: query-api.md
   - Layers: layers.md
   - How to use:
       - Install, build, and inspect: how-to-use.md

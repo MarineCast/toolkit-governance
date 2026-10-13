@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import hashlib
+import math
+from pyproj import Transformer, Geod
+from shapely.ops import transform
 from dataclasses import asdict, dataclass
 from typing import Iterable
 
@@ -38,9 +41,26 @@ class ClipDiagnostics:
         return asdict(self)
 
 
-def full_area_polygon(config: GovernanceConfig) -> Polygon:
-    west, south, east, north = config.bbox_tuple
-    return box(west, south, east, north)
+def validate_bbox(bbox) -> tuple[float, float, float, float]:
+    if isinstance(bbox, (str, bytes)) or len(bbox) != 4 or any(isinstance(v, bool) for v in bbox):
+        raise ValueError("bounding_box must contain four numeric bounds")
+    west, south, east, north = map(float, bbox)
+    if not all(math.isfinite(v) for v in (west, south, east, north)):
+        raise ValueError("bounding_box bounds must be finite")
+    if not (-180 <= west <= 180 and -180 <= east <= 180 and west != east and -90 <= south < north <= 90):
+        raise ValueError("Invalid bounding_box; west > east denotes dateline wrapping")
+    return west, south, east, north
+
+
+def bbox_parts(bbox):
+    west, south, east, north = validate_bbox(bbox)
+    if west < east:
+        return [box(west, south, east, north)]
+    return [box(west, south, 180, north), box(-180, south, east, north)]
+
+
+def full_area_polygon(config: GovernanceConfig) -> BaseGeometry:
+    return unary_union(bbox_parts(config.bbox_tuple))
 
 
 def _unwrap_coordinates(coordinates: Iterable[tuple[float, ...]]) -> list[tuple[float, ...]]:
@@ -67,7 +87,12 @@ def _unwrap_geometry(geometry: BaseGeometry) -> BaseGeometry:
         return LineString(_unwrap_coordinates(geometry.coords))
     if isinstance(geometry, Polygon):
         exterior = _unwrap_coordinates(geometry.exterior.coords)
-        interiors = [_unwrap_coordinates(ring.coords) for ring in geometry.interiors]
+        center = Polygon(exterior).centroid.x
+        interiors = []
+        for ring in geometry.interiors:
+            hole = _unwrap_coordinates(ring.coords)
+            shift = 360 * round((center - Polygon(hole).centroid.x) / 360)
+            interiors.append([(x + shift, *rest) for x, *rest in hole])
         return Polygon(exterior, interiors)
     if isinstance(geometry, MultiPoint):
         return MultiPoint([_unwrap_geometry(item) for item in geometry.geoms])
@@ -115,16 +140,23 @@ def _antimeridian_intersection(geometry: BaseGeometry, aoi: Polygon) -> BaseGeom
     return unary_union(intersections) if intersections else GeometryCollection()
 
 
+# Reused across rows. force_over preserves narrow unwrapped dateline polygons.
+_AREA_TRANSFORM = Transformer.from_crs(4326, 6933, always_xy=True, force_over=True).transform
+_GEOD = Geod(ellps="WGS84")
+
+
 def _measure(geometry: BaseGeometry) -> float:
     if geometry.is_empty:
         return 0.0
     family = _dimension_family(geometry)
-    series = gpd.GeoSeries([geometry], crs="EPSG:4326").to_crs("EPSG:6933")
+    unwrapped = _unwrap_geometry(geometry)
     if family == "polygon":
-        return float(series.area.iloc[0])
+        return float(transform(_AREA_TRANSFORM, unwrapped).area)
     if family == "line":
-        return float(series.length.iloc[0])
-    return 1.0
+        return float(_GEOD.geometry_length(unwrapped))
+    if family == "point":
+        return float(len(geometry.geoms) if isinstance(geometry, MultiPoint) else 1)
+    return sum(_measure(part) for part in geometry.geoms)
 
 
 def _stable_part_sort_key(geometry: BaseGeometry) -> tuple[str, str]:
@@ -160,8 +192,9 @@ def clip_to_full_area(
         if original is None or original.is_empty:
             continue
         family = _dimension_family(original)
-        repaired = original if original.is_valid else make_valid(original)
-        repaired_rows += int(not original.is_valid)
+        unwrapped = _unwrap_geometry(original)
+        repaired = unwrapped if unwrapped.is_valid else make_valid(unwrapped)
+        repaired_rows += int(not unwrapped.is_valid)
         if family == "collection":
             raise ValueError(
                 f"Unsupported mixed source geometry for {row[source_id_column]!r}: "
@@ -201,7 +234,7 @@ def clip_to_full_area(
         gpd.GeoDataFrame(rows, geometry="geometry", crs=config.clip_crs)
         if rows
         else gpd.GeoDataFrame(
-            columns=[*work.columns, "GEOMETRY_PART_ID"], geometry="geometry", crs=config.clip_crs
+            columns=list(dict.fromkeys([*work.columns, "GEOMETRY_PART_ID", "CLIPPED_TO_FULL_AREA", "SOURCE_MIN_LON", "SOURCE_MIN_LAT", "SOURCE_MAX_LON", "SOURCE_MAX_LAT", "RETAINED_GEOMETRY_TYPE", "RETAINED_MEASURE_FRACTION"])), geometry="geometry", crs=config.clip_crs
         )
     )
     if not output_frame.empty:
@@ -228,7 +261,7 @@ def clip_to_full_area(
 
 
 def concatenate_clipped_frames(frames: Iterable[gpd.GeoDataFrame]) -> gpd.GeoDataFrame:
-    values = [frame for frame in frames if not frame.empty]
+    values = list(frames)
     if not values:
         return gpd.GeoDataFrame(columns=["geometry"], geometry="geometry", crs="EPSG:4326")
     return gpd.GeoDataFrame(

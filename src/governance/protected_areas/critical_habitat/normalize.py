@@ -1,5 +1,5 @@
 """Retain NOAA NMFS proposed/designated entity-specific reference geometry."""
-from governance.shared.normalization import base_record, records_frame, clean, date_value
+from governance.shared.normalization import base_record, records_frame, clean, source_date
 
 
 def normalize(frame,source):
@@ -11,7 +11,7 @@ def normalize(frame,source):
             feature_name=clean(row.get('LISTENTITY')) or clean(row.get('COMNAME')),feature_type='critical_habitat_inventory_reference',
             authority='NOAA National Marine Fisheries Service',jurisdiction='United States reference inventory',
             legal_authority=clean(row.get('ECFR')),legal_source_url=clean(row.get('ECFR')),source_coverage_status='partial_nmfs_only')
-        record.update(EFFECTIVE_START=date_value(row.get('EFFECTDATE')),geometry=row.geometry)
+        record.update(EFFECTIVE_START=source_date(frame, 'EFFECTDATE', row.get('EFFECTDATE'), arcgis_date=True),geometry=row.geometry)
         for name,value in row.items():
             if name!='geometry':record['NOAA_'+name]=clean(value)
         rows.append(record)

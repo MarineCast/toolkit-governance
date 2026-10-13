@@ -11,7 +11,7 @@ from typing import Any, Collection, Mapping, TypeVar
 import yaml
 from pydantic import BaseModel
 
-from .paths import project_root, resolve_config_path
+from .paths import project_root
 
 _ENV_PATTERN = re.compile(r"^\$\{env:([A-Z][A-Z0-9_]*)\}$")
 _REF_PATTERN = re.compile(r"^\$\{([a-zA-Z_][a-zA-Z0-9_.-]*)\}$")
@@ -39,11 +39,11 @@ def _lookup(mapping: Mapping[str, Any], dotted: str) -> Any:
     return value
 
 
-def _resolve_values(value: Any, root: Mapping[str, Any]) -> Any:
+def _resolve_values(value: Any, root: Mapping[str, Any], stack: tuple[str, ...] = ()) -> Any:
     if isinstance(value, Mapping):
-        return {key: _resolve_values(item, root) for key, item in value.items()}
+        return {key: _resolve_values(item, root, stack) for key, item in value.items()}
     if isinstance(value, list):
-        return [_resolve_values(item, root) for item in value]
+        return [_resolve_values(item, root, stack) for item in value]
     if isinstance(value, str):
         env_match = _ENV_PATTERN.match(value)
         if env_match:
@@ -53,7 +53,10 @@ def _resolve_values(value: Any, root: Mapping[str, Any]) -> Any:
             return os.environ[name]
         ref_match = _REF_PATTERN.match(value)
         if ref_match:
-            return _resolve_values(_lookup(root, ref_match.group(1)), root)
+            reference = ref_match.group(1)
+            if reference in stack:
+                raise ValueError(f"Configuration reference cycle: {' -> '.join((*stack, reference))}")
+            return _resolve_values(_lookup(root, reference), root, (*stack, reference))
     return value
 
 
@@ -75,6 +78,7 @@ class ConfigDocument:
     data: Mapping[str, Any]
     include_chain: tuple[Path, ...]
     config_hash: str
+    workspace: Path | None = None
 
     @classmethod
     def load(
@@ -82,9 +86,12 @@ class ConfigDocument:
         path: str | Path,
         *,
         allowed_keys: Collection[str] | None = None,
+        workspace: str | Path | None = None,
     ) -> "ConfigDocument":
-        source = resolve_config_path(path)
-        data, chain = _load_recursive(source, stack=())
+        workspace_root = Path(workspace).expanduser().resolve() if workspace is not None else project_root()
+        candidate = Path(path).expanduser()
+        source = candidate.resolve() if candidate.is_absolute() else (workspace_root / candidate).resolve()
+        data, chain = _load_recursive(source, stack=(), workspace=workspace_root)
         resolved = _resolve_values(data, data)
         if allowed_keys is not None:
             unknown = sorted(set(resolved) - set(allowed_keys))
@@ -95,6 +102,7 @@ class ConfigDocument:
         )
         return cls(
             source=source,
+            workspace=workspace_root,
             data=resolved,
             include_chain=chain,
             config_hash=hashlib.sha256(canonical.encode("utf-8")).hexdigest(),
@@ -102,7 +110,7 @@ class ConfigDocument:
 
     def resolve_path(self, value: str | Path) -> Path:
         candidate = Path(value).expanduser()
-        return candidate if candidate.is_absolute() else (project_root() / candidate).resolve()
+        return candidate if candidate.is_absolute() else ((self.workspace or project_root()) / candidate).resolve()
 
     def validate_as(self, model: type[ModelT]) -> ModelT:
         """Validate the resolved document through a strict Pydantic model."""
@@ -122,7 +130,7 @@ class ConfigDocument:
 
 
 def _load_recursive(
-    path: Path, *, stack: tuple[Path, ...]
+    path: Path, *, stack: tuple[Path, ...], workspace: Path
 ) -> tuple[dict[str, Any], tuple[Path, ...]]:
     path = path.resolve()
     if path in stack:
@@ -138,7 +146,7 @@ def _load_recursive(
         return dict(raw), (path,)
     parent = Path(parent_value).expanduser()
     if not parent.is_absolute():
-        root_candidate = project_root() / parent
+        root_candidate = workspace / parent
         parent = root_candidate if root_candidate.exists() else path.parent / parent
-    base, chain = _load_recursive(parent, stack=(*stack, path))
+    base, chain = _load_recursive(parent, stack=(*stack, path), workspace=workspace)
     return _deep_merge(base, raw), (*chain, path)

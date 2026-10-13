@@ -11,7 +11,7 @@ from governance.shared.config import GovernanceSource
 from governance.shared.normalization import (
     base_record,
     clean,
-    date_value,
+    source_date,
     records_frame,
 )
 
@@ -51,20 +51,12 @@ def _value(row: pd.Series, *names: str) -> object:
     return None
 
 
-def _source_date(value: object) -> str | None:
-    numeric = _number(value)
-    if numeric is not None and abs(numeric) >= 10_000_000_000:
-        parsed = pd.to_datetime(numeric, unit="ms", utc=True, errors="coerce")
-        return None if pd.isna(parsed) else parsed.date().isoformat()
-    return date_value(value)
-
-
-def _established_date(value: object) -> str | None:
+def _established_year(value: object) -> str | None:
     text = clean(value)
     if text is None:
         return None
     match = re.search(r"\b(18|19|20)\d{2}\b", text)
-    return f"{match.group(0)}-01-01" if match else None
+    return int(match.group(0)) if match else None
 
 
 def _metadata_defaults() -> dict[str, object]:
@@ -104,6 +96,10 @@ def _metadata_defaults() -> dict[str, object]:
         "IUCN_REPORTING_CLASS": None,
         "IUCN_CLASS_STATUS": "unavailable_not_sourced",
         "SOURCE_AREA_KM2": None,
+        "SOURCE_MARINE_AREA_KM2": None,
+        "SOURCE_TOTAL_SITE_AREA_KM2": None,
+        "ESTABLISHMENT_YEAR": None,
+        "ESTABLISHMENT_DATE_PRECISION": "unknown",
         "SOURCE_GEOMETRY_STATUS": None,
         "MPA_QC_REASON": None,
     }
@@ -117,7 +113,7 @@ def _noaa(frame: gpd.GeoDataFrame, source: GovernanceSource) -> gpd.GeoDataFrame
         site_name = clean(_value(row, "site_name")) or clean(_value(row, "site_label")) or site_id
         management_authority = clean(_value(row, "mgmt_agen")) or source.provider
         authority_url = clean(_value(row, "url")) or source.url
-        source_vintage = _source_date(_value(row, "date_gis_u")) or source.source_as_of
+        source_vintage = source_date(frame, "date_gis_u", _value(row, "date_gis_u"), arcgis_date=True) or source.source_as_of
         government_level = clean(_value(row, "gov_level"))
         iucn_class = clean(_value(row, "IUCNcat"))
         map_group = (
@@ -139,7 +135,8 @@ def _noaa(frame: gpd.GeoDataFrame, source: GovernanceSource) -> gpd.GeoDataFrame
         )
         record.update(_metadata_defaults())
         record.update(
-            EFFECTIVE_START=_established_date(_value(row, "estab_yr")),
+            ESTABLISHMENT_YEAR=_established_year(_value(row, "estab_yr")),
+            ESTABLISHMENT_DATE_PRECISION="year" if clean(_value(row, "estab_yr")) else "unknown",
             SOURCE_VINTAGE=source_vintage,
             SOURCE_RECORD_ID=site_id,
             DESIGNATION_ID=f"USA:NOAA_MPA:{site_id}",
@@ -178,8 +175,9 @@ def _noaa(frame: gpd.GeoDataFrame, source: GovernanceSource) -> gpd.GeoDataFrame
                 if iucn_class
                 else "inventory_scope_uses_iucn_definition_but_category_not_sourced"
             ),
-            SOURCE_AREA_KM2=_number(_value(row, "AreaMar", "area_km_ma"))
-            or _number(_value(row, "AreaKm", "area_km_to")),
+            SOURCE_AREA_KM2=_number(_value(row, "AreaMar", "area_km_ma")),
+            SOURCE_MARINE_AREA_KM2=_number(_value(row, "AreaMar", "area_km_ma")),
+            SOURCE_TOTAL_SITE_AREA_KM2=_number(_value(row, "AreaKm", "area_km_to")),
             SOURCE_GEOMETRY_STATUS="inventory_reference_polygon_not_controlling_legal_source",
             MPA_QC_REASON=(
                 "NOAA MPA Inventory is retained as discovery/reference geometry. The source "

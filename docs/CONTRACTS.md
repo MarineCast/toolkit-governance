@@ -41,3 +41,5 @@ manifest v0.1. The optional `export-shared-manifest` command validates a deliver
 against a caller-supplied, pinned schema admitting `reference_geometry`; it requires the
 `contract` extra. This explicit adopter mapping does not change native manifests, establish
 organization-wide adoption or supply a schema automatically. See [CLI reference](cli.md).
+
+Version 0.2 rebuilds use `native-reference-2.0`: establishment years no longer fabricate exact dates, marine zero area is preserved separately from total-site area, and point/geodesic-line/unwrapped-equal-area measures have distinct definitions. Valid empty products retain canonical schema; unavailable input remains a failure/status. See [query contracts](query-api.md).

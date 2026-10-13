@@ -5,6 +5,8 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 import geopandas as gpd
+import numpy as np
+import pandas as pd
 
 CANONICAL_FIELDS: tuple[str, ...] = (
     "GOVERNANCE_FEATURE_ID",
@@ -61,14 +63,48 @@ def validate_governance_geometry(
         raise ValueError(f"Governance geometry is missing canonical fields: {missing}")
     if frame.crs is None or frame.crs.to_epsg() != 4326:
         raise ValueError("Governance geometry must use EPSG:4326.")
+    if any(str(column).upper().startswith("H3_") for column in frame.columns):
+        raise ValueError("Canonical governance artifacts cannot contain H3 fields.")
     if frame.empty:
-        raise ValueError("Governance geometry collection cannot be empty.")
+        return
     if frame.geometry.isna().any() or frame.geometry.is_empty.any():
         raise ValueError("Governance geometry contains null or empty shapes.")
     if (~frame.geometry.is_valid).any():
         raise ValueError("Governance geometry contains invalid shapes.")
-    if frame["GOVERNANCE_FEATURE_ID"].isna().any():
-        raise ValueError("GOVERNANCE_FEATURE_ID cannot be null.")
+    for field in ("GOVERNANCE_FEATURE_ID", "SOURCE_DATASET_ID", "SOURCE_FEATURE_ID", "GEOMETRY_PART_ID", "FEATURE_TYPE", "MEASUREMENT_STATUS", "SOURCE_COVERAGE_STATUS", "LEGAL_BINDING_STATUS"):
+        if frame[field].isna().any() or frame[field].map(lambda value: not isinstance(value, str) or not value.strip()).any():
+            raise ValueError(f"{field} must contain non-null nonempty strings")
+    for field in ("MODEL_ELIGIBLE", "CLIPPED_TO_FULL_AREA"):
+        if frame[field].isna().any() or frame[field].map(lambda value: not isinstance(value, (bool, np.bool_))).any():
+            raise ValueError(f"{field} must contain non-null boolean values")
+    if not frame.geometry.geom_type.isin(["Point", "LineString", "Polygon", "MultiPoint", "MultiLineString", "MultiPolygon"]).all():
+        raise ValueError("Unsupported canonical geometry family")
+    if not frame.RETAINED_GEOMETRY_TYPE.eq(frame.geometry.geom_type).all():
+        raise ValueError("RETAINED_GEOMETRY_TYPE disagrees with geometry")
+    for field in ("SOURCE_MIN_LON", "SOURCE_MIN_LAT", "SOURCE_MAX_LON", "SOURCE_MAX_LAT", "RETAINED_MEASURE_FRACTION", "SOURCE_AREA_KM2", "SOURCE_MARINE_AREA_KM2", "SOURCE_TOTAL_SITE_AREA_KM2"):
+        if field in frame:
+            values = frame[field].dropna()
+            if values.map(lambda value: isinstance(value, (str, bool))).any() or not np.isfinite(pd.to_numeric(values, errors="coerce")).all():
+                raise ValueError(f"{field} must contain finite numeric measurements or nulls")
+            if ("AREA_KM2" in field or field == "RETAINED_MEASURE_FRACTION") and (values < 0).any():
+                raise ValueError(f"{field} cannot be negative")
+    fractions = frame.RETAINED_MEASURE_FRACTION.dropna()
+    if (fractions > 1).any():
+        raise ValueError("RETAINED_MEASURE_FRACTION must lie in [0, 1]")
+    from .normalization import date_value
+    for field in ("EFFECTIVE_START", "EFFECTIVE_END"):
+        for value in frame[field].dropna():
+            if not isinstance(value, str) or date_value(value) != value:
+                raise ValueError(f"{field} must be exact ISO dates or null")
+    intervals = frame.loc[frame.EFFECTIVE_START.notna() & frame.EFFECTIVE_END.notna()]
+    if (intervals.EFFECTIVE_START > intervals.EFFECTIVE_END).any():
+        raise ValueError("Effective interval start exceeds end")
+    legal = {"reference_geometry", "derived_reference_geometry", "proposal_reference_geometry", "non_binding_physical_reference", "non_binding_cartographic_reference", "binding_designation_reference_geometry"}
+    if not set(frame.LEGAL_BINDING_STATUS).issubset(legal):
+        raise ValueError("Invalid LEGAL_BINDING_STATUS vocabulary")
+    statuses = frame.SOURCE_COVERAGE_STATUS.astype(str)
+    if not statuses.map(lambda s: any(s == state or s.startswith(state + "_") for state in ("complete", "partial", "unknown", "unavailable", "not_applicable"))).all():
+        raise ValueError("Invalid SOURCE_COVERAGE_STATUS vocabulary")
     if frame["GEOMETRY_PART_ID"].duplicated().any():
         raise ValueError("GEOMETRY_PART_ID must be unique within an artifact.")
     statuses = set(frame["MEASUREMENT_STATUS"].dropna().astype(str))
@@ -79,3 +115,12 @@ def validate_governance_geometry(
         raise ValueError("Governance fields are model-ineligible by default.")
     if any(str(column).upper().startswith("H3_") for column in frame.columns):
         raise ValueError("Canonical governance artifacts cannot contain H3 fields.")
+
+
+def empty_governance_frame(*, extra_fields=(), crs=4326) -> gpd.GeoDataFrame:
+    """Schema-preserving valid zero rows, with nullable canonical scalar dtypes."""
+    import pandas as pd
+    float_fields = {'SOURCE_MIN_LON', 'SOURCE_MIN_LAT', 'SOURCE_MAX_LON', 'SOURCE_MAX_LAT', 'RETAINED_MEASURE_FRACTION'}
+    bool_fields = {'MODEL_ELIGIBLE', 'CLIPPED_TO_FULL_AREA'}
+    data = {name: pd.Series(dtype='Float64' if name in float_fields else 'boolean' if name in bool_fields else 'object') for name in dict.fromkeys((*CANONICAL_FIELDS, *extra_fields)) if name != 'geometry'}
+    return gpd.GeoDataFrame(data, geometry=gpd.GeoSeries([], crs=crs), crs=crs)

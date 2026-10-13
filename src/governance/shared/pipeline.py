@@ -14,8 +14,7 @@ from .acquisition import (
     resolve_source_path,
 )
 from .artifacts import (
-    atomic_write_geoparquet,
-    finalize_manifest,
+    publish_native_pair,
     manifest_payload,
     source_record,
 )
@@ -74,6 +73,7 @@ def build_collection(
     diagnostics = []
     records = []
     limitations = []
+    available_sources = 0
     for source_id in collection.source_ids:
         source = config.sources[source_id]
         path = resolve_source_path(source)
@@ -81,19 +81,23 @@ def build_collection(
         if path is None:
             limitations.append(f"{source_id}: unavailable — {source.source_limitation}")
             continue
-        raw = read_source_frame(source)
-        normalized = normalizer(raw, source)
+        raw = read_source_frame(source, bbox=config.bbox_tuple)
+        available_sources += 1
+        from .registry import normalize_collection
+        normalized = normalize_collection(raw, source, collection, normalizer=normalizer)
         if normalized.empty:
-            limitations.append(f"{source_id}: no supported features intersected the source query.")
-            continue
+            from .schema import empty_governance_frame
+            from governance.maintenance.catalog import EXTRA_FEATURES
+            normalized = empty_governance_frame(extra_fields=[value[0] for value in EXTRA_FEATURES.get(collection_id, ())])
+        if normalized.empty:
+            limitations.append(f"{source_id}: successful source query with no selected records.")
         clipped, clip_diagnostic = clip_to_full_area(normalized, config)
         diagnostics.append({"source_id": source_id, **clip_diagnostic.to_dict()})
-        if not clipped.empty:
-            clipped_frames.append(clipped)
+        clipped_frames.append(clipped)
         limitations.append(f"{source_id}: {source.source_limitation}")
 
     output = concatenate_clipped_frames(clipped_frames)
-    if output.empty:
+    if not available_sources:
         write_coverage_matrix(config_path, overwrite=True)
         raise SourceUnavailableError(
             f"No supported in-AOI source geometry is available for {collection_id}."
@@ -102,7 +106,6 @@ def build_collection(
     extras = sorted(set(output.columns).difference(canonical))
     output = output[[*canonical[:-1], *extras, "geometry"]]
     validate_governance_geometry(output)
-    atomic_write_geoparquet(output, collection.artifact_path, overwrite=overwrite)
     payload = manifest_payload(
         config=config,
         collection=collection,
@@ -111,7 +114,7 @@ def build_collection(
         clip_diagnostics=diagnostics,
         limitations=limitations,
     )
-    finalize_manifest(collection.manifest_path, payload)
+    publish_native_pair(output, collection.artifact_path, collection.manifest_path, payload, overwrite=overwrite)
     write_coverage_matrix(config_path, overwrite=True)
     return collection.artifact_path
 

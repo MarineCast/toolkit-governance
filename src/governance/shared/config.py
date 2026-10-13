@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import math
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -25,6 +26,18 @@ VALID_COVERAGE_STATES = {
     "not_applicable",
 }
 VALID_SOURCE_STATES = {"available", "available_after_download", "unavailable"}
+
+
+def strict_bool(value: Any, label: str) -> bool:
+    if type(value) is not bool:
+        raise ValueError(f"{label} must be a boolean, received {value!r}.")
+    return value
+
+
+def _keys(values: Mapping[str, Any], allowed: set[str], label: str) -> None:
+    unknown = sorted(set(values).difference(allowed))
+    if unknown:
+        raise ValueError(f"Unknown {label} keys: {unknown}")
 
 
 def _mapping(value: Any, label: str) -> dict[str, Any]:
@@ -57,6 +70,9 @@ class GovernanceSource:
     page_size: int | None
     source_limitation: str
     coverage: Mapping[str, str]
+    selection_where: str = "1=1"
+    requested_grid_mask_sha256: str | None = None
+    retrieved_at_utc: str | None = None
 
 
 @dataclass(frozen=True)
@@ -120,8 +136,11 @@ class GovernanceConfig:
         return self.document.redacted_data()
 
 
-def load_governance_config(path: str | Path = DEFAULT_CONFIG_PATH) -> GovernanceConfig:
-    document = ConfigDocument.load(path)
+def load_governance_config(path: str | Path = DEFAULT_CONFIG_PATH, *, workspace: str | Path | None = None) -> GovernanceConfig:
+    document = ConfigDocument.load(path, workspace=workspace, allowed_keys={
+        "schema_version", "area", "common_config_path", "clipping", "raw", "output",
+        "inspection", "catalog_path", "coverage_regions", "sources", "collections", "selected_collection",
+    })
     raw = _mapping(document.data, "governance configuration")
     if int(raw.get("schema_version", 0)) != 1:
         raise ValueError("Governance configuration schema_version must equal 1.")
@@ -130,18 +149,22 @@ def load_governance_config(path: str | Path = DEFAULT_CONFIG_PATH) -> Governance
     if area_name != "full_area":
         raise ValueError("Governance Phase 1 requires the shared full_area scope.")
     common_config_path = document.resolve_path(str(raw.get("common_config_path", "")))
-    bounds = bbox_for_area(area_name, common_config_path=common_config_path)
+    bounds = bbox_for_area(area_name, common_config_path=common_config_path, workspace=document.workspace)
 
     clipping = _mapping(raw.get("clipping"), "clipping")
+    _keys(clipping, {"crs", "method", "tolerance_degrees"}, "clipping")
     if str(clipping.get("crs")) != "EPSG:4326":
         raise ValueError("Governance clipping CRS must be EPSG:4326.")
     tolerance = float(clipping.get("tolerance_degrees", 0.0))
-    if tolerance < 0:
+    if not math.isfinite(tolerance) or tolerance < 0:
         raise ValueError("clipping.tolerance_degrees cannot be negative.")
 
     raw_paths = _mapping(raw.get("raw"), "raw")
     output = _mapping(raw.get("output"), "output")
     inspection = _mapping(raw.get("inspection"), "inspection")
+    _keys(raw_paths, {"snapshot_root"}, "raw")
+    _keys(output, {"processed_root", "coverage_matrix_path"}, "output")
+    _keys(inspection, {"map_path", "map_manifest_path", "presentation_config_path", "simplify_tolerance_meters", "category_colors"}, "inspection")
     region_values = _mapping(raw.get("coverage_regions"), "coverage_regions")
     regions = {
         str(region_id): str(_mapping(value, f"coverage_regions.{region_id}")["label"])
@@ -154,6 +177,7 @@ def load_governance_config(path: str | Path = DEFAULT_CONFIG_PATH) -> Governance
     sources: dict[str, GovernanceSource] = {}
     for source_id, value in source_values.items():
         values = _mapping(value, f"sources.{source_id}")
+        _keys(values, {"provider", "acquisition_type", "url", "local_path", "snapshot_path", "archive_member", "archive_layer", "expected_sha256", "source_as_of", "license", "attribution", "legal_citation", "redistribution", "authority_scope", "source_status", "server_filter", "page_size", "source_limitation", "coverage", "selection_where", "requested_grid_mask_sha256"}, f"sources.{source_id}")
         coverage = _mapping(values.get("coverage"), f"sources.{source_id}.coverage")
         if set(coverage) != set(regions):
             missing = sorted(set(regions).difference(coverage))
@@ -183,6 +207,10 @@ def load_governance_config(path: str | Path = DEFAULT_CONFIG_PATH) -> Governance
                 raise ValueError(
                     f"Source {source_id!r} expected_sha256 must be a lowercase SHA-256 digest."
                 )
+        if values.get("page_size") is not None and (type(values["page_size"]) is not int or values["page_size"] <= 0):
+            raise ValueError(f"Source {source_id!r} page_size must be a positive integer")
+        if not isinstance(values.get("selection_where", "1=1"), str) or not values.get("selection_where", "1=1").strip():
+            raise ValueError(f"Source {source_id!r} selection_where must be a nonempty string")
         sources[str(source_id)] = GovernanceSource(
             source_id=str(source_id),
             provider=str(values["provider"]),
@@ -200,10 +228,12 @@ def load_governance_config(path: str | Path = DEFAULT_CONFIG_PATH) -> Governance
             redistribution=str(values["redistribution"]),
             authority_scope=str(values["authority_scope"]),
             source_status=source_status,
-            server_filter=bool(values.get("server_filter", True)),
+            server_filter=strict_bool(values.get("server_filter", True), f"sources.{source_id}.server_filter"),
             page_size=(int(values["page_size"]) if values.get("page_size") is not None else None),
             source_limitation=str(values.get("source_limitation", "")),
             coverage={str(key): str(status) for key, status in coverage.items()},
+            selection_where=str(values.get("selection_where", "1=1")),
+            requested_grid_mask_sha256=values.get("requested_grid_mask_sha256"),
         )
         if sources[str(source_id)].page_size is not None and sources[str(source_id)].page_size <= 0:
             raise ValueError(f"Source {source_id!r} page_size must be positive.")
@@ -212,10 +242,15 @@ def load_governance_config(path: str | Path = DEFAULT_CONFIG_PATH) -> Governance
     collections: dict[str, GovernanceCollection] = {}
     for collection_id, value in collection_values.items():
         values = _mapping(value, f"collections.{collection_id}")
+        _keys(values, {"category", "display_name", "normalization_profile", "source_ids", "artifact_path", "manifest_path", "color", "default_visible", "implementation_status"}, f"collections.{collection_id}")
         category = str(values["category"])
         if category not in VALID_CATEGORIES:
             raise ValueError(f"Collection {collection_id!r} has invalid category {category!r}.")
-        source_ids = tuple(str(item) for item in values.get("source_ids", ()))
+        if not isinstance(values.get("source_ids", []), list) or any(not isinstance(s, str) for s in values.get("source_ids", [])):
+            raise ValueError(f"Collection {collection_id!r} source_ids must be a list of strings")
+        source_ids = tuple(values.get("source_ids", ()))
+        if len(set(source_ids)) != len(source_ids):
+            raise ValueError(f"Collection {collection_id!r} has duplicate source_ids")
         unknown_sources = sorted(set(source_ids).difference(sources))
         if unknown_sources:
             raise ValueError(
@@ -230,12 +265,12 @@ def load_governance_config(path: str | Path = DEFAULT_CONFIG_PATH) -> Governance
             artifact_path=document.resolve_path(str(values["artifact_path"])),
             manifest_path=document.resolve_path(str(values["manifest_path"])),
             color=str(values["color"]),
-            default_visible=bool(values.get("default_visible", False)),
+            default_visible=strict_bool(values.get("default_visible", False), f"collections.{collection_id}.default_visible"),
             implementation_status=str(values.get("implementation_status", "planned")),
         )
 
     simplify_tolerance = float(inspection.get("simplify_tolerance_meters", 0.0))
-    if simplify_tolerance < 0:
+    if not math.isfinite(simplify_tolerance) or simplify_tolerance < 0:
         raise ValueError("inspection.simplify_tolerance_meters cannot be negative.")
     category_colors = _mapping(inspection.get("category_colors"), "inspection.category_colors")
     if set(category_colors) != VALID_CATEGORIES:

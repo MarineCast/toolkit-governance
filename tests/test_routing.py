@@ -54,7 +54,7 @@ def test_noaa_archive_preserves_fid_and_filters_nonrouting(tmp_path):
     assert result.LEGAL_AUTHORITY.isna().all()
 
 
-def test_role_delivery_never_pools_components_sources_or_absent_roles(tmp_path,monkeypatch):
+def test_role_delivery_never_pools_components_sources_or_absent_roles(tmp_path,monkeypatch,snapshot_fixture):
     initialize_workspace(tmp_path);monkeypatch.setenv('GOVERNANCE_WORKSPACE',str(tmp_path))
     p=tmp_path/'config/data/governance/governance.yaml';raw=yaml.safe_load(p.read_text())
     raw['collections']={'traffic_separation_schemes':raw['collections']['traffic_separation_schemes']}
@@ -62,7 +62,7 @@ def test_role_delivery_never_pools_components_sources_or_absent_roles(tmp_path,m
     source=config.sources['chs_routing_layer_4'];source.snapshot_path.parent.mkdir(parents=True)
     geom=box(-123.01,48.49,-122.99,48.51)
     features=gpd.GeoDataFrame([{'OBJECTID':1,'MERGE_SRC':'TSSLPT_A','LNAM':'a','ENC_NAME':'chart'}],geometry=[geom],crs=4326)
-    source.snapshot_path.write_text(json.dumps({'snapshot_schema_version':1,'pages':[{'response':json.loads(features.to_json())}]}))
+    source.snapshot_path.write_text(json.dumps(snapshot_fixture(source,features)))
     from governance.vessel_management.traffic_separation_schemes.build import build
     build(allow_partial=True)
     gp=tmp_path/'grid.parquet';pq.write_table(pa.table({'H3_INDEX':[h3.latlng_to_cell(48.5,-123,6)],'H3_RESOLUTION':[6]}),gp)

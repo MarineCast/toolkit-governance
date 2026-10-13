@@ -7,6 +7,26 @@ jurisdictional reference boundaries and fisheries management areas. The distribu
 **`toolkit-governance`**; the Python package and command are **`governance`**.
 It installs independently of OrcaCast and sibling toolkits.
 
+## Start with one getter
+
+```python
+from governance import get_marine_protected_areas
+
+result = get_marine_protected_areas(
+    (-125.0, 44.0, -123.0, 46.0),
+    workspace="/path/to/research-workspace",
+    allow_partial=True,
+    make_h3=False,
+)
+```
+
+The getter validates caches and can retrieve missing sources within fixed budgets.
+Use `mode="offline"` for guaranteed local reads. Native-only installation requires no H3;
+install `toolkit-governance[h3]` and set `make_h3=True` for cell metrics and exact memberships.
+Read the [query API](docs/query-api.md) for typed empty results, temporal limits, cache scope,
+source selection, wrapped bounds and full-cell semantics. Advanced release/study workflows
+remain separate explicit operations.
+
 ## Implemented scope
 
 Fifteen collections have normalization, build and inspection modules; acquisition is explicit and bounded:

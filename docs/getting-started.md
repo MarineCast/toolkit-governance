@@ -1,5 +1,7 @@
 # Install and configure
 
+Start with the [single-layer getter](query-api.md); use the advanced workflows below for local products and releases.
+
 Install from a reviewed checkout using Python 3.11+ and an isolated environment.
 The package requires a compatible GeoPandas/Shapely/PROJ/Arrow stack; use binary
 wheels supported by your interpreter and platform. Offline CI is separate from

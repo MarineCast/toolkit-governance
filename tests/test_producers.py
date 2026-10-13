@@ -238,7 +238,9 @@ def test_mpa_sources_preserve_inventory_regulation_and_proposal_semantics() -> N
     )
     us = normalize_marine_protected_areas(noaa, config.sources["noaa_mpa_inventory_states"])
     assert us["DESIGNATION_ID"].tolist() == ["USA:NOAA_MPA:CA001"]
-    assert us["EFFECTIVE_START"].tolist() == ["2012-01-01"]
+    assert us["EFFECTIVE_START"].isna().all()
+    assert us["ESTABLISHMENT_YEAR"].tolist() == [2012]
+    assert us["ESTABLISHMENT_DATE_PRECISION"].tolist() == ["year"]
     assert us["SOURCE_VINTAGE"].tolist() == ["2023-01-01"]
     assert us["MAP_GROUP"].tolist() == ["us_state_tribal_local_reference"]
     assert us["GOVERNING_RULE_STATUS"].tolist() == [
