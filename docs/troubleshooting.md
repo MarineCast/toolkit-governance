@@ -42,4 +42,3 @@ credentials and restricted source data out of public reports.
 | `.staging-*` or an unreferenced generation remains | Preserve prior `current.json` and candidate evidence. Verify exact membership/hashes; for study bundles run semantic validation too. A completed valid candidate can be explicitly activated; incomplete staging is not a generation. No automatic cleanup is promised. |
 | Semantic study validation fails | Keep the current pointer unchanged. Check retained masks/config/source/native/table/schema bindings and independent checks. A checksum pass does not override a scientific failure. Rebuild a new candidate after fixing qualified inputs/code. |
 | Pages build passes but site returns 404 | A preview is not publication. Merge the reviewed docs PR, dispatch the workflow on main and inspect the deploy URL plus HTTP/readback. See [publication](documentation-site.md). |
-
