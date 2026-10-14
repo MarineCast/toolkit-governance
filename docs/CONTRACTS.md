@@ -1,9 +1,14 @@
-# Native-geometry product contracts
+# Governance product contracts
+
+The [public output contract](parquet-products.md) is one static and optional dated metric
+Parquet per supplied resolution, a small update catalog, and OriginalData per dataset.
+There are no governance data releases or public manifest sidecars. Native normalization
+products described below are temporary build intermediates.
 
 The extraction preserves the original scientific calculations and source-specific distinctions.
-Canonical GeoParquet uses EPSG:4326. `GOVERNANCE_FEATURE_ID` identifies a source-backed feature;
+Internal native GeoParquet uses EPSG:4326. `GOVERNANCE_FEATURE_ID` identifies a source-backed feature;
 `GEOMETRY_PART_ID` is unique within each artifact and distinguishes clipped parts. Do not join
-by row order or hide duplicates. Canonical products contain no H3 fields or implicit grid.
+by row order or hide duplicates. Native intermediates contain no H3 fields. Public metric tables use the explicitly supplied H3 grid.
 
 Geometry remains native points/lines/polygons as appropriate. Shared clipping handles the
 antimeridian and preserves source bounds, retained geometry type, measure fraction and diagnostics.
@@ -26,21 +31,17 @@ response, temporal leakage and ecological interpretation require downstream revi
 
 Native manifests record configuration and common-extent hashes, sources, exact artifact SHA-256,
 clipping metadata, schema and known limitations. `load_manifest` verifies the artifact hash and
-rejects H3/model-eligible manifests. Atomic writes are per file; the multi-file family pipeline
-has no global rollback or combined atomic generation pointer of its own. Consumers must verify
-manifests and treat missing or inconsistent outputs as incomplete. The separate `releases`
-envelope verifies exact membership and checksums and atomically switches `current.json` for a
-prepared immutable multi-artifact generation. Readers resolve that pointer once per operation;
-per-family writes must never target a published generation. See [workflows](WORKFLOWS.md).
+rejects H3/model-eligible manifests. Public flat output embeds the source, field and coverage metadata in Parquet. A staged
+replacement is validated before installation, with a writer lock and restoration on handled
+installation errors. Readers check catalog hashes and retry if an update overlaps a read.
+There are no immutable generations or current pointers. See [workflows](WORKFLOWS.md).
 
 The catalog has 24 entries and seventeen implemented map families. `catalog --verify-artifacts` verifies
 present configured primary artifacts; missing artifacts are skipped, not certified as complete.
 Secondary products and legal/source completeness require their own checks. The inspector reports
-unavailable/planned layers separately. Native manifests are not the proposed MarineCast H3
-manifest v0.1. The optional `export-shared-manifest` command validates a delivery artifact
-against a caller-supplied, pinned schema admitting `reference_geometry`; it requires the
-`contract` extra. This explicit adopter mapping does not change native manifests, establish
-organization-wide adoption or supply a schema automatically. See [CLI reference](cli.md).
+unavailable/planned layers separately. The flat Parquet metadata defines its own governance product contract. It does not claim
+automatic organization-wide shared-schema adoption. No sidecar schema export is needed
+for normal public data writes. See the [CLI reference](cli.md).
 
 Version 0.2 rebuilds use `native-reference-2.0`: establishment years no longer fabricate exact dates, marine zero area is preserved separately from total-site area, and point/geodesic-line/unwrapped-equal-area measures have distinct definitions. Valid empty products retain canonical schema; unavailable input remains a failure/status. See [query contracts](query-api.md).
 

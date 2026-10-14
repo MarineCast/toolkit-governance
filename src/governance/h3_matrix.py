@@ -48,6 +48,7 @@ def overlay_collection(
     *,
     completeness: str,
     length_crs: str,
+    include_attributes: bool = True,
 ) -> dict[str, pa.Array]:
     """Overlay one validated native collection; preserve empty-intersection missingness."""
     if native.empty:
@@ -85,7 +86,7 @@ def overlay_collection(
                     (int(feature_index), geometry, dimension)
                 )
     size = len(grid)
-    names = [column for column in native.columns if column != native.geometry.name]
+    names = [column for column in native.columns if column != native.geometry.name] if include_attributes else []
     attributes = {name: [_attribute(value) for value in local[name]] for name in names}
     result: dict[str, list[Any]] = {
         key: [None] * size
@@ -179,6 +180,7 @@ def export_h3_matrix(
     config_path: str | Path = DEFAULT_CONFIG_PATH,
     allow_partial: bool = False,
     overwrite: bool = False,
+    include_attributes: bool = True,
 ) -> Path:
     """Write one explicit H3 overlay after validating every configured native product."""
     crs = CRS(length_crs)
@@ -300,7 +302,8 @@ def export_h3_matrix(
             if 'source_id' in group and not any(r['source_id'] == group['source_id'] and r['runtime_status'] == 'available' for r in records):
                 group_completeness = 'unavailable'
             columns = overlay_collection(
-                grid, subset, completeness=group_completeness, length_crs=length_crs
+                grid, subset, completeness=group_completeness, length_crs=length_crs,
+                include_attributes=include_attributes
             )
             for column, values in columns.items():
                 key = f"{prefix}__{column}"

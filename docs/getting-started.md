@@ -1,3 +1,7 @@
+> Version 0.3 public output uses the [flat Parquet workflow](parquet-products.md).
+> Native artifacts and release/study commands below describe historical or internal workflows;
+> they are not the current public data layout.
+
 # Install and configure
 
 Start with the [single-layer getter](query-api.md); use the advanced workflows below for local products and releases.
@@ -78,4 +82,4 @@ applicability. Existing snapshots/products require explicit `--overwrite` to rep
 `inspect` replaces configured HTML/map-manifest outputs; its date filter permits
 unknown dates and is not a legal applicability test. Open the printed HTML locally;
 basemap tiles may require network access. Continue with [H3 overlays](h3-matrix.md),
-[local releases](WORKFLOWS.md#coherent-local-releases) and [troubleshooting](troubleshooting.md).
+[local releases](parquet-products.md#build-and-update) and [troubleshooting](troubleshooting.md).

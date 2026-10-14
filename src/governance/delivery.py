@@ -53,76 +53,11 @@ def export_delivery(matrix_path: str | Path, output_directory: str | Path, *,
     written = []
     for resolution in sorted(set(keys.H3_RESOLUTION)):
         selected = table.filter(pc.equal(table['H3_RESOLUTION'], resolution))
-        columns = {'h3_index': selected['H3_INDEX']}
-        fields = {'h3_index': {'units': None, 'definition': 'H3 cell identity', 'nullable': False}}
-        coverage = {}
-        groups = metadata.get('metric_groups') or {name: {'collection': name} for name in metadata['native_manifests']}
-        for collection, group in groups.items():
-            native_record = metadata['native_manifests'][group['collection']]
-            native = native_record['manifest']
-            completeness = native.get('source_completeness', 'unknown')
-            state = 'observed' if completeness == 'complete' else 'partial' if completeness in ('partial', 'complete_current_noaa_west_coast_sanctuary_roster') else completeness
-            if state not in STATES:
-                raise ValueError('Invalid completeness')
-            records = [s for s in native['sources'] if 'source_id' not in group or s['source_id'] == group['source_id']]
-            if not records:
-                raise ValueError(f'Metric group has no source lineage: {collection}')
-            available = sum(s['runtime_status'] == 'available' for s in records)
-            if 'source_id' in group and available == 0:
-                state = 'unavailable'
-            coverage[collection] = {
-                'configured_source_receipt': {'numerator': available, 'denominator': len(records),
-                    'unit': 'configured source entries', 'method': 'Count available native-manifest source records / collection configured source records; equal weights',
-                    'meaning': 'Input receipt only; NOT geographic completeness or feature recall'},
-                'geographic_inventory_coverage': {'numerator': None, 'denominator': None, 'status': 'unknown',
-                    'meaning': 'No independently established exhaustive regional feature inventory; no geographic completeness fraction can be inferred'},
-                'scope': metadata['grid'], 'native_source_completeness': completeness,
-                'component_group': group,
-                'metric_support_state': state,
-                'overlap_policy': group.get('overlap_policy', ('Union geometry within this source/role; never add component or source groups as a unique route/scheme total. CHS object LNAM identifies repeated chart records when present; no inference of cross-source identity.' if 'role' in group else 'Established collection-level union across received native geometry; source-backed feature identity counts. Overlapping areas/lines are unioned, not summed.')),
-                'gaps': [s['source_id'] for s in records if s['runtime_status'] != 'available'],
-                'effect': 'Finite values summarize received records only. Empty intersections and absent geometry types stay null under incomplete support.',
-            }
-            for original, (suffix, units, definition) in METRICS.items():
-                if 'geometry_family' in group:
-                    applicable = 'POLYGON_COVERAGE_FRAC' if group['geometry_family'] == 'polygon' else 'LINE_LENGTH_M'
-                    if original not in ('FEATURE_COUNT', applicable):
-                        continue
-                    definition = group['description'] + ': ' + definition + '. ' + group['identity']
-                name = f'{collection}__{suffix}'
-                values = selected[f'{collection}__{original}']
-                statuses = []
-                for value in values.to_pylist():
-                    if state in ('unavailable', 'not_applicable', 'unknown') and value is not None:
-                        raise ValueError(f'Finite value contradicts source status: {name}')
-                    statuses.append(state if value is not None or state != 'observed' else 'unknown')
-                columns[name] = values
-                columns[name + '_status'] = pa.array(statuses)
-                fields[name] = {'units': units, 'definition': definition, 'nullable': True,
-                                'missing_reason_field': name + '_status', 'coverage_reference': collection,
-                                'interpretation': 'Recorded inventory geometry; not law, regulatory compliance, complete jurisdiction or effective-date history'}
-                fields[name + '_status'] = {'units': None, 'definition': 'Metric support state; observed means valid derived result', 'nullable': False, 'enum': STATES}
+        projected, manifest = project_delivery(selected, metadata, int(resolution), software_revision)
         artifact = output / f'governance-inventory-r{resolution}.parquet'
-        pq.write_table(pa.table(columns), artifact, compression='zstd')
-        manifest = {
-            'governance_delivery_schema_version': 1,
-            'shared_contract_conformance': {'status': 'not_claimed_by_local_envelope', 'reason': 'v0.1 has no reference_geometry category. An optional separately validated shared manifest can declare adoption of an explicitly supplied approved extension.'},
-            'product_id': f'governance.inventory_geometry_r{resolution}', 'semantic_product_version': '1.3.0',
-            'scientific_method_version': METHOD_VERSION, 'software': {'package': 'toolkit-governance', 'version': __version__, 'git_sha': software_revision},
-            'data_release_id': release_id, 'created_at_utc': datetime.now(UTC).isoformat(),
-            'identity': {'primary_key': ['h3_index'], 'grain': 'One row per supplied cell, static inventory snapshot'},
-            'spatial': {'h3_resolution': int(resolution), 'support': 'Full H3 cell', 'grid': metadata['grid'],
-                        'area_crs': metadata['area_crs'], 'length_crs': metadata['length_crs']},
-            'temporal': {'type': 'static', 'meaning': metadata['temporal_support']},
-            'fields': fields, 'coverage': coverage, 'model_eligible': False, 'readiness': 'research_only',
-            'native_manifests': metadata['native_manifests'], 'configuration_hash': metadata['config_hash'],
-            'overlay': {'path': str(matrix_path), 'sha256': sha256_file(matrix_path)},
-            'artifact': {'path': artifact.name, 'format': 'parquet', 'sha256': sha256_file(artifact), 'row_count': selected.num_rows},
-            'limitations': ['Retained snapshots do not establish current law or legal effective dates.',
-                            'Partial source receipt and unknown geographic coverage are distinct.',
-                            'Attribute relations remain in native companion records; no inferred legal authority.',
-                            'No antimeridian support; resolution is preserved from the explicit supplied grid.'],
-        }
+        pq.write_table(projected, artifact, compression='zstd')
+        manifest.update(data_release_id=release_id, overlay={'path': str(matrix_path), 'sha256': sha256_file(matrix_path)},
+                        artifact={'path': artifact.name, 'format': 'parquet', 'sha256': sha256_file(artifact), 'row_count': selected.num_rows})
         companion = artifact.with_suffix('.manifest.json')
         companion.write_text(json.dumps(manifest, indent=2, sort_keys=True, allow_nan=False) + '\n')
         validate_delivery(artifact, companion)
@@ -158,3 +93,76 @@ def validate_delivery(artifact: str | Path, manifest_path: str | Path) -> dict:
             if 'area_fraction' in name and value is not None and value > 1:
                 raise ValueError('Invalid area fraction')
     return {'rows': len(cells), 'resolution': resolution, 'sha256': manifest['artifact']['sha256'], 'status': 'passed'}
+
+
+def project_delivery(selected: pa.Table, metadata: dict, resolution: int, software_revision: str | None = None) -> tuple[pa.Table, dict]:
+    """Project metrics and statuses without writing companions or release records."""
+    columns = {'h3_index': selected['H3_INDEX']}
+    fields = {'h3_index': {'units': None, 'definition': 'H3 cell identity', 'nullable': False}}
+    coverage = {}
+    groups = metadata.get('metric_groups') or {name: {'collection': name} for name in metadata['native_manifests']}
+    for collection, group in groups.items():
+        native_record = metadata['native_manifests'][group['collection']]
+        native = native_record['manifest']
+        completeness = native.get('source_completeness', 'unknown')
+        state = 'observed' if completeness == 'complete' else 'partial' if completeness in ('partial', 'complete_current_noaa_west_coast_sanctuary_roster') else completeness
+        if state not in STATES:
+            raise ValueError('Invalid completeness')
+        records = [s for s in native['sources'] if 'source_id' not in group or s['source_id'] == group['source_id']]
+        if not records:
+            raise ValueError(f'Metric group has no source lineage: {collection}')
+        available = sum(s['runtime_status'] == 'available' for s in records)
+        if 'source_id' in group and available == 0:
+            state = 'unavailable'
+        coverage[collection] = {
+            'configured_source_receipt': {'numerator': available, 'denominator': len(records),
+                'unit': 'configured source entries', 'method': 'Count available native-manifest source records / collection configured source records; equal weights',
+                'meaning': 'Input receipt only; NOT geographic completeness or feature recall'},
+            'geographic_inventory_coverage': {'numerator': None, 'denominator': None, 'status': 'unknown',
+                'meaning': 'No independently established exhaustive regional feature inventory; no geographic completeness fraction can be inferred'},
+            'scope': metadata['grid'], 'native_source_completeness': completeness,
+            'component_group': group,
+            'metric_support_state': state,
+            'overlap_policy': group.get('overlap_policy', ('Union geometry within this source/role; never add component or source groups as a unique route/scheme total. CHS object LNAM identifies repeated chart records when present; no inference of cross-source identity.' if 'role' in group else 'Established collection-level union across received native geometry; source-backed feature identity counts. Overlapping areas/lines are unioned, not summed.')),
+            'gaps': [s['source_id'] for s in records if s['runtime_status'] != 'available'],
+            'effect': 'Finite values summarize received records only. Empty intersections and absent geometry types stay null under incomplete support.',
+        }
+        for original, (suffix, units, definition) in METRICS.items():
+            if 'geometry_family' in group:
+                applicable = 'POLYGON_COVERAGE_FRAC' if group['geometry_family'] == 'polygon' else 'LINE_LENGTH_M'
+                if original not in ('FEATURE_COUNT', applicable):
+                    continue
+                definition = group['description'] + ': ' + definition + '. ' + group['identity']
+            name = f'{collection}__{suffix}'
+            values = selected[f'{collection}__{original}']
+            statuses = []
+            for value in values.to_pylist():
+                if state in ('unavailable', 'not_applicable', 'unknown') and value is not None:
+                    raise ValueError(f'Finite value contradicts source status: {name}')
+                statuses.append(state if value is not None or state != 'observed' else 'unknown')
+            columns[name] = values
+            columns[name + '_status'] = pa.array(statuses)
+            fields[name] = {'units': units, 'definition': definition, 'nullable': True,
+                            'missing_reason_field': name + '_status', 'coverage_reference': collection,
+                            'interpretation': 'Recorded inventory geometry; not law, regulatory compliance, complete jurisdiction or effective-date history'}
+            fields[name + '_status'] = {'units': None, 'definition': 'Metric support state; observed means valid derived result', 'nullable': False, 'enum': STATES}
+    manifest = {
+        'governance_delivery_schema_version': 1,
+        'shared_contract_conformance': {'status': 'not_claimed_by_local_envelope', 'reason': 'v0.1 has no reference_geometry category. An optional separately validated shared manifest can declare adoption of an explicitly supplied approved extension.'},
+        'product_id': f'governance.inventory_geometry_r{resolution}', 'semantic_product_version': '1.3.0',
+        'scientific_method_version': METHOD_VERSION, 'software': {'package': 'toolkit-governance', 'version': __version__, 'git_sha': software_revision},
+        'created_at_utc': datetime.now(UTC).isoformat(),
+        'identity': {'primary_key': ['h3_index'], 'grain': 'One row per supplied cell, static inventory snapshot'},
+        'spatial': {'h3_resolution': int(resolution), 'support': 'Full H3 cell', 'grid': metadata['grid'],
+                    'area_crs': metadata['area_crs'], 'length_crs': metadata['length_crs']},
+        'temporal': {'type': 'static', 'meaning': metadata['temporal_support']},
+        'fields': fields, 'coverage': coverage, 'model_eligible': False, 'readiness': 'research_only',
+        'native_manifests': metadata['native_manifests'], 'configuration_hash': metadata['config_hash'],
+
+
+        'limitations': ['Retained snapshots do not establish current law or legal effective dates.',
+                        'Partial source receipt and unknown geographic coverage are distinct.',
+                        'Attribute relations remain in native companion records; no inferred legal authority.',
+                        'No antimeridian support; resolution is preserved from the explicit supplied grid.'],
+    }
+    return pa.table(columns), manifest

@@ -8,7 +8,12 @@ from shapely.geometry import Polygon
 def read_grid(path: Path) -> gpd.GeoDataFrame:
     import h3
 
-    table = pq.read_table(path, columns=["H3_INDEX", "H3_RESOLUTION"])
+    schema = pq.read_schema(path)
+    if 'h3_index' in schema.names:
+        cells = pq.read_table(path, columns=['h3_index'])['h3_index']
+        table = pa.table({'H3_INDEX': cells, 'H3_RESOLUTION': [h3.get_resolution(c) for c in cells.to_pylist()]})
+    else:
+        table = pq.read_table(path, columns=["H3_INDEX", "H3_RESOLUTION"])
     if not pa.types.is_integer(table.schema.field("H3_RESOLUTION").type):
         raise ValueError("H3_RESOLUTION must have an integer type.")
     frame = table.to_pandas()
