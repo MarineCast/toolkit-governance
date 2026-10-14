@@ -45,6 +45,8 @@ def test_habitat_publisher_string_dates_and_blank_preserve_raw_evidence():
     assert pd.isna(result.EFFECTIVE_START.iloc[3])
     assert result.EFFECTIVE_START.iloc[4]=='2021-09-01'
     assert result.NOAA_EFFECTDATE.iloc[:3].tolist()==values[:3]
+    assert frame.attrs['layer_metadata']['fields'][0]['type']=='esriFieldTypeString'
+    assert frame.EFFECTDATE.tolist()==values
     frame['EFFECTDATE']=frame['EFFECTDATE'].astype(object)
     for value in ('02/30/2015','20210230','31/01/2015','2015','nonsense',1590969600000):
         frame.loc[0,'EFFECTDATE']=value
