@@ -134,7 +134,7 @@ The retained Northeast Pacific study grids contain 2,621 R6 cells and 88,243 R8
 cells. Each static table has 94 metric columns and their 94 support-status columns,
 plus `h3_index`. A full offline rebuild from the 40 OriginalData datasets matched
 every existing validated metric value/status and every original attribute/geometry
-byte. The flat dataset uses about 428 MB, replacing roughly 3.8 GB of repeated
+byte. The flat dataset uses about 424 MiB, replacing roughly 3.8 GiB of repeated
 builds and releases. The catalog is approximately 11.7 KB.
 
 Validation here covers layout, exact delivery equivalence and offline reproducibility.

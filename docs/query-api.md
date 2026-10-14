@@ -1,5 +1,8 @@
 # Query one layer
 
+This API returns in-memory research objects. For public data files use the
+[flat Parquet build](parquet-products.md); getters do not write delivery companions.
+
 ```python
 from governance import get_marine_protected_areas
 
@@ -13,8 +16,9 @@ print(result.features)
 print(result.coverage)
 ```
 
-Install `toolkit-governance[h3]` and pass `make_h3=True` to obtain one resolution
-(default 7). Native-only use does not import H3. Each logical catalog collection has
+H3 is included in the base installation from version 0.3. Pass `make_h3=True` to
+request in-memory cell metrics at one resolution (default 7); `False` returns native
+features without calculating cell metrics. Each logical catalog collection has
 `get_<collection>`; `get_fishery_management_areas` aliases `get_management_areas`, and
 `get_marine_protected_area` aliases its plural. Planned collections raise
 `LayerNotImplementedError`; they never return a successful empty inventory.
@@ -29,7 +33,7 @@ one bounding box and the same keyword options. `sources` and `systems` currently
 exact configured source IDs (and canonical WDFW/DFO/ADF&G system IDs); these mutually exclusive options never infer equivalence
 between recreational, commercial, reporting, Indigenous or routing systems. Explicit
 `GovernanceConfig` objects and workspace-relative configuration avoid process-global
-workspace mutation. The legacy CLI retains its environment precedence.
+workspace mutation. The CLI retains its environment precedence.
 
 The stable `GovernanceResult` contains:
 

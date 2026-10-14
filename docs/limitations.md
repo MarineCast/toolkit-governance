@@ -21,7 +21,7 @@ availability is a separate dimension. `--allow-partial` accepts incomplete suppo
 it does not fill gaps or make a collection complete.
 
 An empty intersection under partial coverage is not observed absence. In the
-optional H3 overlay, unsupported counts/measures stay null. Where recorded
+explicit H3 overlay, unsupported counts/measures stay null. Where recorded
 geometry intersects, metrics describe those records rather than an exhaustive
 legal inventory. The configured sanctuary roster's completeness label does not
 certify arbitrary grid-cell coverage.
@@ -48,7 +48,7 @@ workflow provides a verified generation pointer; inspection does not promote a r
 
 ## Regional and model acceptance
 
-All native and optional H3 outputs remain **model-ineligible by default**.
+All original-geometry and H3 metric outputs remain **model-ineligible by default**.
 Ecological interpretation, policy-response leakage, temporal qualification,
 consumer-grid choice, and model eligibility require explicit downstream review.
 Governance context does not measure occurrence, detection, or reporting effort.
