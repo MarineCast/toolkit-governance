@@ -40,10 +40,11 @@ availability or legal correctness. `catalog --verify-artifacts` checks present
 primary products and skips missing artifacts. Family related products require
 their own checksum and consistency checks.
 
-Publication is atomic per file. A multi-file family build has no whole-workspace
-rollback or combined generation pointer; a failure can leave some outputs written.
-Validate the full intended file set before downstream use. Inspection is a display
-operation, not release promotion.
+Native artifact/manifest pairs stage and roll back handled failures under a writer lock.
+Readers still verify exact hashes; two renames are not crash-atomic. A multi-product family
+build has no whole-workspace rollback or combined generation pointer and can leave some
+outputs written. Validate all intended companions before use. The separate immutable-release
+workflow provides a verified generation pointer; inspection does not promote a release.
 
 ## Regional and model acceptance
 
@@ -54,8 +55,10 @@ Governance context does not measure occurrence, detection, or reporting effort.
 
 The loader currently requires the `full_area` name. Some family publishers need
 specific source subsets or the fixed sanctuary roster even for partial builds.
-The optional H3 grid must be bounded, cannot cross the antimeridian, and needs
-an appropriate explicit metre-based length CRS. See [overlay details](h3-matrix.md).
+The legacy study H3 matrix requires a bounded grid without antimeridian cells and an
+explicit metre-based length CRS. Generic getters support wrapped native/H3 geometry with
+geodesic line lengths, while polar source qualification remains separate. See the
+[query contract](query-api.md#h3-and-spatial-semantics) and [study overlay](h3-matrix.md).
 
 Offline tests and documentation builds do not establish fresh provider
 acquisition, complete regional rebuilds, current legal/source verification,

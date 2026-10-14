@@ -1,5 +1,7 @@
 # Install, build, and inspect
 
+Start with the [single-layer getter](query-api.md); use the advanced workflows below for local products and releases.
+
 This guide starts with a fresh workspace and builds one collection. Acquisition
 is an explicit network operation; initialization, catalog inspection, and local
 product reading need no download.
@@ -48,18 +50,23 @@ publisher's fixed six-site roster. See [configuration](configuration.md).
 
 ## 3. Acquire one collection
 
-For a first real-source run, the WDFW management-area collection has one
-machine-readable source and no external reconciliation-support prerequisite.
-The following command requests network acquisition:
+The collection now configures three distinct systems: WDFW recreational marine areas,
+DFO Pacific subareas and ADF&G groundfish reporting. For this WDFW-only build example,
+edit `collections.management_areas.source_ids` in the workspace governance YAML to contain
+only `wdfw_recreational_marine_areas`. Other source definitions can stay configured.
+This selects one source with no external reconciliation-support prerequisite; it does
+not merge systems or request all three inventories. The command requests network acquisition:
 
 ```sh
 governance --workspace ./governance-workspace download management_areas
 ```
 
-The downloader retains the WDFW snapshot under the configured raw path and writes
-the source coverage matrix. The configured DFO management-area reference is not a
-downloadable geometry source. Existing snapshots are reused by default. Review
-[sources and rights](reference/sources.md) before redistributing retained data.
+The downloader retains the selected WDFW snapshot under the configured raw path and
+writes the source coverage matrix. Cached bytes are reused only after pin/receipt and
+scope checks. For a small bbox query without configuring collection-wide builds, use
+[get_fishery_management_areas with sources="wdfw_recreational_marine_areas"](query-api.md).
+DFO and ADF&G have separate bounded adapters and rights qualifications; review
+[sources and rights](reference/sources.md) before acquisition or redistribution.
 
 Other collection IDs are listed on [layers](layers.md). The CLI has no acquisition
 `--dry-run`; review the selected collection's inputs and paths before downloading.
@@ -86,11 +93,13 @@ governance-workspace/
 
 `build` uses local inputs and does not download. `--allow-partial` acknowledges
 coverage limits; it does not create absent geometry or make coverage complete.
-The builder fails if no supported in-extent geometry exists.
+Valid zero-match products retain schema and qualified coverage. Missing/unqualified inputs
+remain failures or unavailable support; they never become observed absence.
 
 !!! note "Replacement and multi-file publication"
-    Existing product replacement requires `--overwrite`. Writes are atomic per
-    file; family builds can publish several files without a global rollback.
+    Existing product replacement requires `--overwrite`. Native artifact/manifest pairs
+    stage and roll back handled failures under a writer lock; readers verify exact hashes.
+    Two renames are not crash-atomic, and multi-product family builds have no global rollback.
     After a failed build, verify the primary and related files before use. A new
     workspace is useful when comparing a changed source/configuration with a
     retained build. See [workflows](WORKFLOWS.md).

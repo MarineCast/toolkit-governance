@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import date, datetime
+from numbers import Real
+import re
 from typing import Any
 
 import geopandas as gpd
@@ -20,13 +22,34 @@ def clean(value: Any) -> str | None:
     return text or None
 
 
-def date_value(value: Any) -> str | None:
-    """Normalize one source date to ISO calendar-date form."""
-
+def date_value(value: Any, *, encoding: str | None = None) -> str | None:
+    """Parse declared epoch-ms or unambiguous ISO dates; never guess numeric units."""
     if value is None or pd.isna(value):
         return None
-    parsed = pd.to_datetime(value, errors="coerce")
-    return None if pd.isna(parsed) else parsed.date().isoformat()
+    if isinstance(value, Real) and not isinstance(value, bool):
+        if encoding != "arcgis_epoch_ms":
+            raise ValueError(f"Numeric source date requires declared arcgis_epoch_ms encoding: {value!r}")
+        parsed = pd.to_datetime(value, unit="ms", utc=True, errors="coerce")
+    elif isinstance(value, (date, datetime, pd.Timestamp)):
+        parsed = pd.Timestamp(value)
+    elif isinstance(value, str) and re.fullmatch(r"\d{4}-\d{2}-\d{2}(?:[T ].*)?", value.strip()):
+        parsed = pd.to_datetime(value, utc=True, errors="coerce")
+    else:
+        raise ValueError(f"Malformed or ambiguous source date: {value!r}")
+    if pd.isna(parsed):
+        raise ValueError(f"Malformed source date: {value!r}")
+    return parsed.date().isoformat()
+
+
+def source_date(frame: gpd.GeoDataFrame, field: str, value: Any, *, arcgis_date: bool = False) -> str | None:
+    """Use archived field declarations; explicit provider contract covers offline fixtures."""
+    fields = {item["name"].casefold(): item.get("type") for item in frame.attrs.get("layer_metadata", {}).get("fields", [])}
+    declared = fields.get(field.casefold())
+    if declared is not None and declared != "esriFieldTypeDate":
+        if isinstance(value, Real):
+            raise ValueError(f"Upstream date schema drift for {field}: {declared}")
+        arcgis_date = False
+    return date_value(value, encoding="arcgis_epoch_ms" if declared == "esriFieldTypeDate" or arcgis_date else None)
 
 
 def column(frame: pd.DataFrame, *names: str) -> pd.Series:
@@ -44,7 +67,8 @@ def records_frame(records: list[dict[str, Any]], crs: Any) -> gpd.GeoDataFrame:
     """Create a WGS84-capable geometry frame from normalized source records."""
 
     if not records:
-        return gpd.GeoDataFrame(columns=["geometry"], geometry="geometry", crs=crs or "EPSG:4326")
+        from .schema import empty_governance_frame
+        return empty_governance_frame(crs=crs or "EPSG:4326")
     return gpd.GeoDataFrame(records, geometry="geometry", crs=crs or "EPSG:4326")
 
 
@@ -76,7 +100,7 @@ def base_record(
         "LEGAL_SOURCE_URL": legal_source_url or source.url,
         "EFFECTIVE_START": None,
         "EFFECTIVE_END": None,
-        "SYSTEM_LEARNED_AT": datetime.now(UTC).replace(microsecond=0).isoformat(),
+        "SYSTEM_LEARNED_AT": source.retrieved_at_utc,
         "SOURCE_VINTAGE": source.source_as_of,
         "SOURCE_COVERAGE_STATUS": source_coverage_status,
         "MEASUREMENT_STATUS": "observed",

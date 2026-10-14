@@ -8,7 +8,7 @@ scientific producers, or publish datasets, local migration evidence or generated
 MkDocs Material follows meteorology's teal/cyan palette, light/dark toggle,
 banner-led home page, card navigation, code-copy controls, search, and Mermaid
 flow diagrams. Governance keeps its own banner and boundary-themed logo. The
-[layers](layers.md) page covers all fifteen implemented collections, and
+[layers](layers.md) page covers all seventeen implemented collections, and
 [how to use](how-to-use.md) provides a complete single-collection workflow.
 
 ## Build and preview locally
@@ -30,8 +30,8 @@ and Material versions through the optional package extra.
 
 Open the address printed by MkDocs. Navigation coverage, missing Markdown links
 and anchors are warnings that fail the strict build. Repository source notes are
-linked to a pinned GitHub revision in the [source index](sources.md) because they
-live outside the site. External source availability requires a separate check;
+linked to pinned current and historical GitHub revisions in the [source index](sources.md)
+because they live outside the site. External source availability requires a separate check;
 MkDocs validates local navigation/links/anchors, not remote provider uptime. `site/` is ignored build output.
 
 ## Pull requests and main

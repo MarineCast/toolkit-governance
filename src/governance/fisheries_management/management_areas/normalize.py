@@ -16,8 +16,16 @@ def normalize(
 ) -> gpd.GeoDataFrame:
     """Preserve official WDFW management polygons and source semantics."""
 
+    if source.source_id == 'adfg_groundfish_statistical_areas':
+        from .alaska import normalize as normalize_alaska
+        return normalize_alaska(frame, source)
+    if source.source_id == 'dfo_pacific_fishery_management_areas':
+        from .pacific import normalize as normalize_pacific
+        return normalize_pacific(frame, source)
+    if source.source_id != 'wdfw_recreational_marine_areas':
+        raise ValueError(f'Unsupported fisheries provider system: {source.source_id}')
     records = []
-    for index, row in frame.iterrows():
+    for _, row in frame.iterrows():
         area_name = clean(row.get("AreaName"))
         object_id = clean(row.get("OBJECTID"))
         if area_name is None or object_id is None:

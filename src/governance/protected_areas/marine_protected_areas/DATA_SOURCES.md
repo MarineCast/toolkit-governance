@@ -67,3 +67,17 @@ not reinterpreted as exact allowed/prohibited activities.
 - `source_authority_evaluation.json`: U.S. authority and governing-rule gap audit
 - `manifest.json`: source snapshots, retrieval times, checksums, clipping,
   designation counts, and no-score policy
+
+
+## Oregon published reference adapter (0.2)
+
+[ODFW's maps/coordinates page](https://oregonmarinereserves.com/rules/) links a 2016
+KML/KMZ download. This additional source is pinned independently: 14 placemarks, including
+multipart geometry, five named reserve sites and related MPA/seabird zones. Placemark,
+zone, designation and whole-site counts are distinct. Original IDs, names, descriptions,
+polygon parts and holes are retained. No current-law completeness, exact establishment
+date or marine/total-site area interchange is inferred. Current OAR 635-012, 141-142 and
+736-029/source-agency verification remain controlling. The NOAA inventory overlaps this
+reference: cross-provider totals are non-additive. The newly added source pin was computed
+from the bounded official 20,803-byte archive on 2026-10-13; existing NOAA/ONMS pins were
+not changed. No source archive or generated dataset is committed or redistributed.

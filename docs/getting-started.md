@@ -1,5 +1,7 @@
 # Install and configure
 
+Start with the [single-layer getter](query-api.md); use the advanced workflows below for local products and releases.
+
 Install from a reviewed checkout using Python 3.11+ and an isolated environment.
 The package requires a compatible GeoPandas/Shapely/PROJ/Arrow stack; use binary
 wheels supported by your interpreter and platform. Offline CI is separate from
@@ -50,9 +52,10 @@ workspace even when `--config` is absolute. CLI artifact paths such as `--grid`,
 the process working directory; use absolute paths to avoid ambiguity.
 
 YAML composition supports includes, mapping merges, list replacement, references
-and environment values; hashes redact sensitive configuration. The loader is not
-a strict unknown-key schema. Follow existing configuration structure, review the
-resolved paths and source pins, and keep private values out of commits.
+and environment values; hashes redact sensitive configuration. The loader rejects
+unknown governance keys, malformed booleans and reference cycles. Follow the
+[configuration contract](configuration.md), review resolved paths and source pins,
+and keep private values out of commits.
 `preflight` inventories all configured sources, including unused alternatives;
 a missing artifact is unavailable, not a passing completeness check.
 

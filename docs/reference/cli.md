@@ -13,6 +13,8 @@ governance export-h3-matrix --help
 
 | Command | Required arguments | Options | Effects |
 | --- | --- | --- | --- |
+| `get` | Collection and `--bbox` | `--h3-res`, `--source`, `--mode`, `--cache`, `--allow-partial`, `--include-proposed`, `--output` | Single-layer bounded query; see [API](../query-api.md) |
+| `availability` | None | Global `--workspace` | Read source/region implementation qualification; no acquisition |
 | `init` | None | Global `--workspace` | Copies missing config/catalog defaults; no acquisition |
 | `preflight` | None | Global `--workspace`; no `--config` | Reads configured source/artifact readiness; no acquisition |
 | `catalog` | None | `--config`, `--verify-artifacts` | Validates/prints catalog; optionally verifies present primary artifacts |
@@ -43,6 +45,8 @@ shipping_lanes
 traffic_separation_schemes
 ports
 coast_guard_sectors
+exclusion_zones
+speed_restriction_zones
 ```
 
 Use these IDs with `download` and `build`. Planned catalog entries have no

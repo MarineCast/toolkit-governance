@@ -42,6 +42,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     sub.add_argument('--local-manifest', required=True, type=Path)
     sub.add_argument('--schema', required=True, type=Path)
     sub.add_argument('--schema-reference', required=True)
+    commands.add_parser('availability', help='Read implementation/source/regional qualification without acquisition.')
     commands.add_parser('preflight', help='Read-only source and full catalog readiness inventory.')
     sub = commands.add_parser('export-delivery', help='Project a verified overlay into single-resolution wide tables.')
     sub.add_argument('--matrix', required=True, type=Path)
@@ -59,7 +60,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     sub.add_argument('--release-id', required=True)
     sub = commands.add_parser('verify-generation', help='Verify exact immutable generation membership and checksums.')
     sub.add_argument('path', type=Path)
-    commands.add_parser('init', help='Copy missing configuration defaults; no downloads.')
+    sub = commands.add_parser('get', help='Query one research-reference layer with bounded acquisition.')
+    sub.add_argument('collection')
+    sub.add_argument('--bbox', nargs=4, type=float, required=True)
+    sub.add_argument('--h3-res', type=int)
+    sub.add_argument('--source', action='append')
+    sub.add_argument('--cache', type=Path)
+    sub.add_argument('--mode', choices=('cache-first', 'refresh', 'offline'), default='cache-first')
+    sub.add_argument('--allow-partial', action='store_true')
+    sub.add_argument('--include-proposed', action='store_true')
+    sub.add_argument('--as-of')
+    sub.add_argument('--output', type=Path, help='New directory for native/optional H3 tables and receipts.')
+    commands.add_parser('init' , help='Copy missing configuration defaults; no downloads.')
     sub = commands.add_parser('export-h3-matrix', help='Derive an explicit H3 context overlay from verified native products.')
     sub.add_argument('--grid', required=True, type=Path)
     sub.add_argument('--output', required=True, type=Path)
@@ -82,6 +94,27 @@ def main(argv: Sequence[str] | None = None) -> int:
     sub.add_argument('--config', default=DEFAULT_CONFIG_PATH)
     sub.add_argument('--verify-artifacts', action='store_true')
     args = parser.parse_args(argv)
+    if args.command == 'get':
+        from .query import get_layer
+        try:
+            collection_id = {'fishery_management_areas': 'management_areas', 'vessel_exclusion_zones': 'exclusion_zones'}.get(args.collection.replace('-', '_'), args.collection.replace('-', '_'))
+            result = get_layer(collection_id, args.bbox,
+                workspace=args.workspace or os.environ.get('GOVERNANCE_WORKSPACE'),
+                make_h3=args.h3_res is not None, h3_res=args.h3_res if args.h3_res is not None else 7,
+                sources=args.source, cache=args.cache, mode=args.mode, allow_partial=args.allow_partial,
+                include_proposed=args.include_proposed, as_of=args.as_of)
+            if args.output is not None:
+                args.output.mkdir(parents=True, exist_ok=False)
+                result.features.to_parquet(args.output / 'features.parquet', index=False)
+                if result.h3 is not None:
+                    result.h3.to_parquet(args.output / 'h3.parquet', index=False)
+                    result.memberships.to_parquet(args.output / 'memberships.parquet', index=False)
+                result.coverage.to_json(args.output / 'coverage.json', orient='records', indent=2)
+                (args.output / 'provenance.json').write_text(json.dumps(result.provenance, indent=2, default=str) + '\n')
+            print(json.dumps({'features': len(result.features), 'h3_cells': None if result.h3 is None else len(result.h3), 'coverage': result.coverage.to_dict('records')}, indent=2))
+            return 0
+        except (ValueError, RuntimeError, NotImplementedError, OSError, ImportError) as error:
+            parser.error(str(error))
     previous = os.environ.get('GOVERNANCE_WORKSPACE')
     if args.workspace is not None:
         os.environ['GOVERNANCE_WORKSPACE'] = str(args.workspace.expanduser().resolve())
@@ -104,6 +137,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         elif args.command == 'export-shared-manifest':
             from .shared_contract import export_shared_manifest
             print(export_shared_manifest(args.artifact, args.local_manifest, args.schema, schema_reference=args.schema_reference))
+        elif args.command == 'availability':
+            from .shared.availability import availability_matrix
+            print(json.dumps(availability_matrix(load_governance_config()), indent=2))
         elif args.command == 'preflight':
             from .preflight import preflight
             print(json.dumps(preflight(), indent=2))

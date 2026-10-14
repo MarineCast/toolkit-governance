@@ -1,0 +1,148 @@
+{
+  "benchmark_schema_version": 1,
+  "date": "2026-10-13",
+  "baseline_commit": "17f4b3b5f91f1126686fbb6fa301137627529ddd",
+  "environment": {
+    "python": "3.14.6",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "packages": {
+      "geopandas": "1.1.4",
+      "pandas": "3.0.3",
+      "shapely": "2.1.2",
+      "pyproj": "3.7.2",
+      "h3": "4.4.1",
+      "numpy": "2.4.6"
+    }
+  },
+  "clipping": [
+    {
+      "stage": "normalization_clipping",
+      "implementation": "baseline",
+      "python": "3.14.6",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "source_features": 500,
+      "output_parts": 500,
+      "elapsed_s": 0.5327708330005407,
+      "peak_rss_bytes": 165134336,
+      "fixture": "500 identical ordinary WGS84 polygons; no network"
+    },
+    {
+      "stage": "normalization_clipping",
+      "implementation": "current",
+      "python": "3.14.6",
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "source_features": 500,
+      "output_parts": 500,
+      "elapsed_s": 0.42766029201447964,
+      "peak_rss_bytes": 164986880,
+      "fixture": "500 identical ordinary WGS84 polygons; no network"
+    }
+  ],
+  "queries": {
+    "python": "3.14.6",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "query_bbox": [
+      -151.0,
+      59.0,
+      -150.98,
+      59.02
+    ],
+    "provider": "ADF&G Groundfish MapServer/3",
+    "source_rights": "Local query only; no redistribution",
+    "records": [
+      {
+        "stage": "cold_native",
+        "elapsed_s": 2.642221208079718,
+        "peak_rss_bytes": 165707776,
+        "native_parts": 2,
+        "h3_cells": null,
+        "membership_rows": null,
+        "decoded_bytes": 24904,
+        "timings": {
+          "sources": [
+            {
+              "source_id": "adfg_groundfish_statistical_areas",
+              "acquisition_or_cache_s": 2.5328746249433607,
+              "normalize_select_s": 0.033300000010058284,
+              "source_rows": 2,
+              "native_parts": 2
+            }
+          ],
+          "h3_s": 2.0915991626679897e-05,
+          "total_s": 2.641597125097178
+        },
+        "source_rows": 2
+      },
+      {
+        "stage": "warm_native",
+        "elapsed_s": 0.09914250008296221,
+        "peak_rss_bytes": 166264832,
+        "native_parts": 2,
+        "h3_cells": null,
+        "membership_rows": null,
+        "decoded_bytes": 0,
+        "timings": {
+          "sources": [
+            {
+              "source_id": "adfg_groundfish_statistical_areas",
+              "acquisition_or_cache_s": 0.0028806249611079693,
+              "normalize_select_s": 0.025984250009059906,
+              "source_rows": 2,
+              "native_parts": 2
+            }
+          ],
+          "h3_s": 1.4874967746436596e-05,
+          "total_s": 0.09849391703028232
+        },
+        "source_rows": 2
+      },
+      {
+        "stage": "cold_h3",
+        "elapsed_s": 2.7842094579245895,
+        "peak_rss_bytes": 171917312,
+        "native_parts": 4,
+        "h3_cells": 3,
+        "membership_rows": 8,
+        "decoded_bytes": 37106,
+        "timings": {
+          "sources": [
+            {
+              "source_id": "adfg_groundfish_statistical_areas",
+              "acquisition_or_cache_s": 2.6025249999947846,
+              "normalize_select_s": 0.03795983304735273,
+              "source_rows": 4,
+              "native_parts": 4
+            }
+          ],
+          "h3_s": 0.006168291089124978,
+          "total_s": 2.7834250420564786
+        },
+        "source_rows": 4
+      },
+      {
+        "stage": "warm_h3",
+        "elapsed_s": 0.12025658297352493,
+        "peak_rss_bytes": 171917312,
+        "native_parts": 4,
+        "h3_cells": 3,
+        "membership_rows": 8,
+        "decoded_bytes": 0,
+        "timings": {
+          "sources": [
+            {
+              "source_id": "adfg_groundfish_statistical_areas",
+              "acquisition_or_cache_s": 0.0028409159276634455,
+              "normalize_select_s": 0.03839170909486711,
+              "source_rows": 4,
+              "native_parts": 4
+            }
+          ],
+          "h3_s": 0.005760833970271051,
+          "total_s": 0.11957362503744662
+        },
+        "source_rows": 4
+      }
+    ]
+  },
+  "limitations": "Single bounded samples, not regional forecasts. Per-stage peak memory is not isolated; query RSS is the cumulative process peak. No baseline acquisition/API comparison exists."
+}

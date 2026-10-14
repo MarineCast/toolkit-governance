@@ -1,0 +1,13 @@
+{
+  "fixture_kind": "synthetic_geometry_regressions_not_provider_coverage",
+  "regions": {
+    "central_oregon": [-124.2, 44.2, -124.1, 44.3],
+    "washington": [-123.1, 48.4, -123.0, 48.5],
+    "southern_bc": [-126.1, 49.4, -126.0, 49.5],
+    "northern_bc": [-131.1, 54.1, -131.0, 54.2],
+    "southeast_alaska": [-135.1, 58.1, -135.0, 58.2],
+    "gulf_alaska": [-151.1, 59.1, -151.0, 59.2],
+    "aleutians_dateline": [179.9, 51.1, -179.9, 51.2],
+    "arctic_alaska": [-156.1, 71.1, -156.0, 71.2]
+  }
+}

@@ -33,7 +33,7 @@ envelope verifies exact membership and checksums and atomically switches `curren
 prepared immutable multi-artifact generation. Readers resolve that pointer once per operation;
 per-family writes must never target a published generation. See [workflows](WORKFLOWS.md).
 
-The catalog has 24 entries and fifteen implemented map families. `catalog --verify-artifacts` verifies
+The catalog has 24 entries and seventeen implemented map families. `catalog --verify-artifacts` verifies
 present configured primary artifacts; missing artifacts are skipped, not certified as complete.
 Secondary products and legal/source completeness require their own checks. The inspector reports
 unavailable/planned layers separately. Native manifests are not the proposed MarineCast H3
@@ -41,3 +41,12 @@ manifest v0.1. The optional `export-shared-manifest` command validates a deliver
 against a caller-supplied, pinned schema admitting `reference_geometry`; it requires the
 `contract` extra. This explicit adopter mapping does not change native manifests, establish
 organization-wide adoption or supply a schema automatically. See [CLI reference](cli.md).
+
+Version 0.2 rebuilds use `native-reference-2.0`: establishment years no longer fabricate exact dates, marine zero area is preserved separately from total-site area, and point/geodesic-line/unwrapped-equal-area measures have distinct definitions. Valid empty products retain canonical schema; unavailable input remains a failure/status. See [query contracts](query-api.md).
+
+Version 0.2.1 rebuilds use `native-reference-2.1`: repaired source and retained measures
+include only the original dimension, and geodesic denominators use canonical dateline-split
+support. Query method `native-reference-query-2.1` retains same-dimensional fragments from
+nested intersection collections without duplicating native-part memberships. Finite/range
+checks precede roundoff snapping. Schema shapes and legacy products remain readable; no
+historical artifact is relabeled. See the [correction handoff](hardening-corrections.md).

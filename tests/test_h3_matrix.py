@@ -33,6 +33,12 @@ def native_frame(geometries, feature_ids=None):
             SOURCE_COVERAGE_STATUS="partial",
             FEATURE_NAME=f"Name {i}",
             SOURCE_DATASET_ID="test-source",
+            SOURCE_FEATURE_ID=f"source-record-{i}",
+            FEATURE_TYPE="fixture_reference",
+            LEGAL_BINDING_STATUS="reference_geometry",
+            CLIPPED_TO_FULL_AREA=False,
+            RETAINED_GEOMETRY_TYPE=geometry.geom_type,
+            RETAINED_MEASURE_FRACTION=1.0,
             geometry=geometry,
         )
         rows.append(row)

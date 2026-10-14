@@ -3,7 +3,11 @@
 from __future__ import annotations
 
 import hashlib
-from dataclasses import asdict, dataclass
+import math
+import numpy as np
+import shapely
+from pyproj import Transformer, Geod
+from dataclasses import asdict, dataclass, field
 from typing import Iterable
 
 import geopandas as gpd
@@ -33,14 +37,33 @@ class ClipDiagnostics:
     excluded_rows: int
     output_parts: int
     clipped_source_rows: int
+    repair_dimension_remnant_rows: int = 0
+    repair_measure_delta_by_family: dict[str, float] = field(default_factory=dict)
 
-    def to_dict(self) -> dict[str, int]:
+    def to_dict(self) -> dict[str, object]:
         return asdict(self)
 
 
-def full_area_polygon(config: GovernanceConfig) -> Polygon:
-    west, south, east, north = config.bbox_tuple
-    return box(west, south, east, north)
+def validate_bbox(bbox) -> tuple[float, float, float, float]:
+    if isinstance(bbox, (str, bytes)) or len(bbox) != 4 or any(isinstance(v, bool) for v in bbox):
+        raise ValueError("bounding_box must contain four numeric bounds")
+    west, south, east, north = map(float, bbox)
+    if not all(math.isfinite(v) for v in (west, south, east, north)):
+        raise ValueError("bounding_box bounds must be finite")
+    if not (-180 <= west <= 180 and -180 <= east <= 180 and west != east and -90 <= south < north <= 90):
+        raise ValueError("Invalid bounding_box; west > east denotes dateline wrapping")
+    return west, south, east, north
+
+
+def bbox_parts(bbox):
+    west, south, east, north = validate_bbox(bbox)
+    if west < east:
+        return [box(west, south, east, north)]
+    return [box(west, south, 180, north), box(-180, south, east, north)]
+
+
+def full_area_polygon(config: GovernanceConfig) -> BaseGeometry:
+    return unary_union(bbox_parts(config.bbox_tuple))
 
 
 def _unwrap_coordinates(coordinates: Iterable[tuple[float, ...]]) -> list[tuple[float, ...]]:
@@ -67,7 +90,12 @@ def _unwrap_geometry(geometry: BaseGeometry) -> BaseGeometry:
         return LineString(_unwrap_coordinates(geometry.coords))
     if isinstance(geometry, Polygon):
         exterior = _unwrap_coordinates(geometry.exterior.coords)
-        interiors = [_unwrap_coordinates(ring.coords) for ring in geometry.interiors]
+        center = Polygon(exterior).centroid.x
+        interiors = []
+        for ring in geometry.interiors:
+            hole = _unwrap_coordinates(ring.coords)
+            shift = 360 * round((center - Polygon(hole).centroid.x) / 360)
+            interiors.append([(x + shift, *rest) for x, *rest in hole])
         return Polygon(exterior, interiors)
     if isinstance(geometry, MultiPoint):
         return MultiPoint([_unwrap_geometry(item) for item in geometry.geoms])
@@ -115,16 +143,32 @@ def _antimeridian_intersection(geometry: BaseGeometry, aoi: Polygon) -> BaseGeom
     return unary_union(intersections) if intersections else GeometryCollection()
 
 
-def _measure(geometry: BaseGeometry) -> float:
+# Reused across rows. force_over preserves narrow unwrapped dateline polygons.
+_AREA_TRANSFORM = Transformer.from_crs(4326, 6933, always_xy=True, force_over=True).transform
+_GEOD = Geod(ellps="WGS84")
+
+
+def _area_coordinates(coordinates):
+    return np.column_stack(_AREA_TRANSFORM(coordinates[:, 0], coordinates[:, 1]))
+
+
+def _measure(geometry: BaseGeometry, *, family: str | None = None) -> float:
+    """Measure one dimension only; mixed collections require an explicit family."""
     if geometry.is_empty:
         return 0.0
+    if family is not None:
+        if family not in {"polygon", "line", "point"}:
+            raise ValueError(f"Unsupported measurement family: {family}")
+        return sum(_measure(part) for part in _parts(geometry, family))
     family = _dimension_family(geometry)
-    series = gpd.GeoSeries([geometry], crs="EPSG:4326").to_crs("EPSG:6933")
+    unwrapped = _unwrap_geometry(geometry)
     if family == "polygon":
-        return float(series.area.iloc[0])
+        return float(shapely.transform(unwrapped, _area_coordinates).area)
     if family == "line":
-        return float(series.length.iloc[0])
-    return 1.0
+        return float(_GEOD.geometry_length(unwrapped))
+    if family == "point":
+        return float(len(geometry.geoms) if isinstance(geometry, MultiPoint) else 1)
+    raise ValueError("Collection measurement requires an explicit geometry family")
 
 
 def _stable_part_sort_key(geometry: BaseGeometry) -> tuple[str, str]:
@@ -154,14 +198,28 @@ def clip_to_full_area(
     repaired_rows = 0
     intersecting_rows = 0
     clipped_source_rows = 0
+    repair_dimension_remnant_rows = 0
+    repair_measure_delta_by_family = {}
 
     for _, row in work.iterrows():
         original = row.geometry
         if original is None or original.is_empty:
             continue
         family = _dimension_family(original)
-        repaired = original if original.is_valid else make_valid(original)
-        repaired_rows += int(not original.is_valid)
+        unwrapped = _unwrap_geometry(original)
+        repaired = unwrapped if unwrapped.is_valid else make_valid(unwrapped)
+        repaired_rows += int(not unwrapped.is_valid)
+        repair_delta = None
+        repair_status = 'not_required'
+        if not unwrapped.is_valid:
+            if not _parts(repaired, family):
+                raise ValueError(f'Geometry repair loses source dimension for {row[source_id_column]!r}')
+            remnants = any(_parts(repaired, other) for other in {"polygon", "line", "point"} - {family})
+            repair_dimension_remnant_rows += int(remnants)
+            repair_status = 'repaired_lower_dimension_remnants_reported' if remnants else 'repaired_preserving_dimension'
+            # Invalid pre-repair measure is diagnostic only; never a certified area/length.
+            repair_delta = sum(_measure(part) for part in _parts(repaired, family)) - _measure(unwrapped)
+            repair_measure_delta_by_family[family] = repair_measure_delta_by_family.get(family, 0.0) + repair_delta
         if family == "collection":
             raise ValueError(
                 f"Unsupported mixed source geometry for {row[source_id_column]!r}: "
@@ -172,11 +230,20 @@ def clip_to_full_area(
         if not parts:
             continue
         intersecting_rows += 1
-        source_measure = _measure(repaired)
+        # Measure canonical dateline-split source support using the original dimension.
+        # This also keeps geodesic segment vertices consistent across the denominator
+        # and a fully retained numerator; repair remnants never enter either measure.
+        source_support = _antimeridian_intersection(repaired, box(-180, -90, 180, 90))
+        source_measure = _measure(source_support, family=family)
         retained_measure = sum(_measure(part) for part in parts)
-        retained_fraction = (
-            min(1.0, max(0.0, retained_measure / source_measure)) if source_measure > 0 else None
-        )
+        if not math.isfinite(source_measure) or not math.isfinite(retained_measure) or source_measure < 0 or retained_measure < 0:
+            raise ValueError(f"Non-finite or negative geometry measure for {row[source_id_column]!r}")
+        retained_fraction = retained_measure / source_measure if source_measure > 0 else None
+        if retained_fraction is not None:
+            if not -1e-10 <= retained_fraction <= 1 + 1e-8:
+                raise ValueError(f"Retained fraction exceeds source support for {row[source_id_column]!r}")
+            # Snap only bounded floating-point roundoff after validating the ratio.
+            retained_fraction = min(1.0, max(0.0, retained_fraction))
         clipped_flag = retained_fraction is not None and retained_fraction < 1.0 - 1.0e-12
         clipped_source_rows += int(clipped_flag)
         min_x, min_y, max_x, max_y = original.bounds
@@ -192,6 +259,9 @@ def clip_to_full_area(
                 SOURCE_MAX_LON=float(max_x),
                 SOURCE_MAX_LAT=float(max_y),
                 RETAINED_GEOMETRY_TYPE=part.geom_type,
+                GEOMETRY_REPAIR_STATUS=repair_status,
+                REPAIR_MEASURE_DELTA=repair_delta,
+                REPAIR_MEASURE_UNIT={"polygon":"square_metres", "line":"metres", "point":"points"}[family],
                 RETAINED_MEASURE_FRACTION=retained_fraction,
                 geometry=part,
             )
@@ -201,7 +271,7 @@ def clip_to_full_area(
         gpd.GeoDataFrame(rows, geometry="geometry", crs=config.clip_crs)
         if rows
         else gpd.GeoDataFrame(
-            columns=[*work.columns, "GEOMETRY_PART_ID"], geometry="geometry", crs=config.clip_crs
+            columns=list(dict.fromkeys([*work.columns, "GEOMETRY_PART_ID", "CLIPPED_TO_FULL_AREA", "SOURCE_MIN_LON", "SOURCE_MIN_LAT", "SOURCE_MAX_LON", "SOURCE_MAX_LAT", "RETAINED_GEOMETRY_TYPE", "RETAINED_MEASURE_FRACTION"])), geometry="geometry", crs=config.clip_crs
         )
     )
     if not output_frame.empty:
@@ -223,12 +293,14 @@ def clip_to_full_area(
         excluded_rows=int(len(work) - intersecting_rows),
         output_parts=int(len(output_frame)),
         clipped_source_rows=clipped_source_rows,
+        repair_dimension_remnant_rows=repair_dimension_remnant_rows,
+        repair_measure_delta_by_family=repair_measure_delta_by_family,
     )
     return output_frame, diagnostics
 
 
 def concatenate_clipped_frames(frames: Iterable[gpd.GeoDataFrame]) -> gpd.GeoDataFrame:
-    values = [frame for frame in frames if not frame.empty]
+    values = list(frames)
     if not values:
         return gpd.GeoDataFrame(columns=["geometry"], geometry="geometry", crs="EPSG:4326")
     return gpd.GeoDataFrame(

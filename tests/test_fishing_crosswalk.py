@@ -24,13 +24,13 @@ def test_native_requires_original_ids_and_retains_provider_attributes():
         with pytest.raises(ValueError,match='identifiers required'):normalize(raw.drop(columns=field),source)
 
 
-def test_crosswalk_preserves_nonadditive_system_relations_and_full_area_denominator(tmp_path,monkeypatch):
+def test_crosswalk_preserves_nonadditive_system_relations_and_full_area_denominator(tmp_path,monkeypatch,snapshot_fixture):
     initialize_workspace(tmp_path);monkeypatch.setenv('GOVERNANCE_WORKSPACE',str(tmp_path))
     import yaml
     p=tmp_path/'config/data/governance/governance.yaml';cfg=yaml.safe_load(p.read_text());cfg['collections']={'management_areas':cfg['collections']['management_areas']};p.write_text(yaml.safe_dump(cfg))
     source=load_governance_config().sources['wdfw_recreational_marine_areas'];source.snapshot_path.parent.mkdir(parents=True)
     raw=gpd.GeoDataFrame({'OBJECTID':[1,2],'AreaName':['7','8'],'geometry':[box(-123.2,48.3,-122.8,48.7)]*2},crs=4326)
-    source.snapshot_path.write_text(json.dumps({'snapshot_schema_version':1,'pages':[{'response':json.loads(raw.to_json())}]}))
+    source.snapshot_path.write_text(json.dumps(snapshot_fixture(source,raw)))
     from governance.fisheries_management.management_areas.build import build
     path=build(allow_partial=True);native=gpd.read_parquet(path)
     # Same provider area code in a distinct commercial system remains a separate relation.

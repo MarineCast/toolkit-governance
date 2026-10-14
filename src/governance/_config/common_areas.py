@@ -7,8 +7,8 @@ from collections.abc import Mapping
 from .document import ConfigDocument
 
 
-def bbox_for_area(area_name_value: str, *, common_config_path: str | Path) -> dict[str, float]:
-    raw = ConfigDocument.load(common_config_path).data
+def bbox_for_area(area_name_value: str, *, common_config_path: str | Path, workspace: str | Path | None = None) -> dict[str, float]:
+    raw = ConfigDocument.load(common_config_path, workspace=workspace).data
     areas = raw.get('areas')
     if not isinstance(areas, Mapping):
         raise ValueError('Common configuration must define areas.')
@@ -19,6 +19,8 @@ def bbox_for_area(area_name_value: str, *, common_config_path: str | Path) -> di
     required = ('min_lon', 'min_lat', 'max_lon', 'max_lat')
     if not isinstance(bbox, Mapping) or not set(required) <= bbox.keys():
         raise ValueError('Common area must define all four bbox_wgs84 bounds.')
+    if set(bbox) != set(required) or any(isinstance(bbox[key], bool) for key in required):
+        raise ValueError('Bounding box keys must be exact and values numeric, never booleans.')
     out = {key: float(bbox[key]) for key in required}
     if not all(math.isfinite(v) for v in out.values()):
         raise ValueError('Bounds must be finite.')

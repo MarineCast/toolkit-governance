@@ -73,3 +73,13 @@ other collections retain their established columns. Empty role
 subsets retain the native schema and produce nulls. Delivery1.1.0 includes only dimensionally
 applicable routing metrics and retains source-specific coverage and overlap policy. Full native
 record relationships remain the companion authority for chart/attribute inspection.
+
+The [generic getter H3 output](query-api.md#h3-and-spatial-semantics) is a separate single-resolution API with relational memberships, geodesic length and wrapped-cell support. The study matrix above retains its historical definitions and explicit grid/CRS contract.
+
+Getter method `native-reference-query-2.1` extracts polygon/line/point components
+recursively from intersections, ignores boundary remnants for area/length and emits one
+membership per native part even when several fragments survive. Offline comparisons assert
+polygon union area and distinct feature counts only for identical full-cell support and
+EPSG:6933 calculations (relative tolerance 1e-8). Point-feature versus coordinate counts,
+projected versus geodesic line length and legacy dateline limitations are intentional
+separate contracts; no artificial parity is asserted.

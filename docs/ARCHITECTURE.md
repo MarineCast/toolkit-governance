@@ -12,7 +12,7 @@ application runtime dependency, sibling-path import, shared core package or impl
 | `governance.__init__` | Public configuration and workspace initializer |
 | `governance.cli` / `python -m governance` | CLI routing and explicit workspace selection |
 | `governance.h3_matrix` | Optional explicit H3 overlay export; see [contract](h3-matrix.md) |
-| `protected_areas/*`, `jurisdiction/*`, `fisheries_management/*`, `administrative_context/*`, `vessel_management/*` | Fifteen family-owned source, build and inspection workflows |
+| `protected_areas/*`, `jurisdiction/*`, `fisheries_management/*`, `administrative_context/*`, `vessel_management/*` | Seventeen family-owned source, build and inspection workflows |
 | `preflight` | Read-only source and catalog readiness inventory |
 | `delivery` | Verified overlay projection into one wide table per supplied resolution |
 | `releases` | Immutable local generation envelope, verified activation and rollback |
@@ -32,8 +32,7 @@ inspector forwards its selected configuration to catalog validation.
 Configuration composition retains mapping deep-merges, list replacement, references, environment
 values, include-cycle checks and redacted configuration hashes. Paths resolve under the selected
 workspace. Defaults require initialization; there is no silent fallback to an application checkout.
-The inherited dataclass loader does not enforce a complete strict unknown-key schema; do not
-claim that it does. The named `full_area` restriction remains an explicit current limitation.
+The shared loader rejects unknown root/source/collection/clipping/path/inspection keys, malformed booleans and reference cycles. The named `full_area` restriction remains an explicit current limitation.
 
 ## Graphify
 
@@ -59,3 +58,5 @@ other toolkits. See [migration validation](MIGRATION.md) for the observed run.
 `preflight` inventories every source and catalog family; `delivery` projects single-resolution
 wide snapshot tables; `releases` provides immutable local multi-artifact generations and verified
 activation/rollback. See [production readiness](production-readiness.md) for operational boundaries.
+
+The single-layer [query engine](query-api.md) uses explicit config/workspace objects, a source-normalizer registry and supported `shared.grid` helpers. It never initializes study releases or mutates the process workspace environment.

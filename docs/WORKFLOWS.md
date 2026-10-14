@@ -6,8 +6,7 @@ workspace. Never use the original application as a runtime root.
 1. Run `governance --workspace /path/to/workspace init`. It copies missing YAML defaults/catalog
    and preserves edits. Review extent, source pins, rights and all configured input/output paths.
 2. Request `download <collection>` explicitly. Archive/ArcGIS acquisition writes configured raw
-   snapshots and metadata; downloads are not part of `build` or `init`. Existing snapshots are
-   reused unless `--overwrite` is supplied. Pinned archives verify SHA-256.
+   snapshots and metadata; downloads are not part of `build` or `init`. Existing snapshots are reused only after request-scope, identity, checksum and completeness validation; `--overwrite` stages a replacement. Pinned archives verify SHA-256.
 3. Build one collection from local inputs. The default rejects incomplete full-area support;
    `--allow-partial` permits explicit research/context products. Each family normalizes, clips,
    validates and writes its products/manifests. `--overwrite` allows replacement. Inspect family
@@ -53,7 +52,7 @@ git diff --check
 ```
 
 Verify a regular wheel installation from outside the checkout, initialize a fresh external
-workspace, validate its catalog and import all fifteen families without application imports. Keep
+workspace, validate its catalog and import all seventeen families without application imports. Keep
 `config/` and `src/governance/resources/config/` byte-identical. Regenerate the editable catalog
 with `python -m governance.maintenance.catalog`, then synchronize its packaged resource.
 
@@ -85,3 +84,10 @@ Byte and membership verification does not certify scientific completeness. The
 [study workflow](study-guide.md) supplies additional semantic gates for
 study-contract bundles, including validation from the permanent generation path.
 For interrupted staging, stale locks and validation failures see [troubleshooting](troubleshooting.md).
+
+Direct/vector caches require compatible identity, selector and support receipts by default.
+A receiptless pinned ZIP is usable only through its explicit immutable full-source archive
+contract; arbitrary ZIPs and derived subsets do not qualify. Existing malformed receipts
+fail even for qualified archives. Explicit local acquisition overrides receive the same checks.
+Refresh stages/checks bytes and preserves the previous cache/metadata pair on handled failure.
+See [query cache contracts](query-api.md#cache-and-network-modes).

@@ -6,7 +6,7 @@ roles**, not a new check of provider availability or legal currency.
 
 Exact source URLs, archive pins/members, vintages, citations, and regional coverage
 are maintained in
-[`governance.yaml`](https://github.com/MarineCast/toolkit-governance/blob/main/config/data/governance/governance.yaml).
+[`governance.yaml`](https://github.com/MarineCast/toolkit-governance/blob/fdc32276637117acce2fc0fb9595a12229d8df64/config/data/governance/governance.yaml).
 Built manifests add raw checksums and retrieval information where available.
 
 | Source | Collections | Role and rights considerations |
@@ -22,7 +22,10 @@ Built manifests add raw checksums and retrieval information where available.
 | Provisioned seascape water-support GeoParquet | International boundaries | Derived spatial support; retain upstream rights/provenance, including historical producer labels |
 | BOEM/BSEE Submerged Lands Act boundary service | State/provincial waters | State seaward reference line; controlling official coordinates remain distinct |
 | WDFW Recreational Marine Area Code service | Management areas | One Washington recreational management system; retain source identity and rule reference |
-| DFO Pacific Fishery Management Area references | Management areas | Reference-only configured entry; no pinned machine-readable geometry input |
+| DFO Pacific V3.1 subarea service | Management areas | Bounded original-ID/subarea reference, including qualified zero subareas; blank service licence metadata, no redistribution/current-law clearance |
+| ADF&G groundfish statistical areas | Management areas | Separate reporting system with geometry dates; reproduction/distribution requires ADF&G consent |
+| ODFW published 2016 archive | Marine protected areas | Pinned reserve/MPA/seabird placemarks; current OARs and redistribution qualification remain separate |
+| TC 2026 instrument | Fixed exclusion/speed zones | Closed Saturna/Pender and Swiftsure rings; quantities, units, clause dates and exceptions retained; Nitinat/animal-relative rules unresolved |
 | NOAA NMFS habitat polygon/line snapshots | Critical habitat | Provision bounded receipts; designation/proposal evidence is separate from complete current legal coverage |
 | FWS NWR and selected ECCC CPCAD records | Wildlife refuges | Selected systems only; retain source domain metadata, attribution, and reference limitations |
 | ECCC marine CPCAD class/status records | Conservation designations | Qualified classification views overlap existing evidence; do not sum as incremental protected coverage |
@@ -36,15 +39,15 @@ Built manifests add raw checksums and retrieval information where available.
 
 The repository keeps detailed source and authority notes beside each producer:
 
-- [Marine protected areas](https://github.com/MarineCast/toolkit-governance/blob/main/src/governance/protected_areas/marine_protected_areas/DATA_SOURCES.md)
-- [National marine sanctuaries](https://github.com/MarineCast/toolkit-governance/blob/main/src/governance/protected_areas/national_marine_sanctuaries/DATA_SOURCES.md)
-- [International boundaries](https://github.com/MarineCast/toolkit-governance/blob/main/src/governance/jurisdiction/international_boundaries/DATA_SOURCES.md)
-- [Federal maritime zones](https://github.com/MarineCast/toolkit-governance/blob/main/src/governance/jurisdiction/federal_waters/DATA_SOURCES.md)
-- [State and provincial waters](https://github.com/MarineCast/toolkit-governance/blob/main/src/governance/jurisdiction/state_provincial_waters/DATA_SOURCES.md)
-- [Fisheries management areas](https://github.com/MarineCast/toolkit-governance/blob/main/src/governance/fisheries_management/management_areas/DATA_SOURCES.md)
+- [Marine protected areas](https://github.com/MarineCast/toolkit-governance/blob/fdc32276637117acce2fc0fb9595a12229d8df64/src/governance/protected_areas/marine_protected_areas/DATA_SOURCES.md)
+- [National marine sanctuaries](https://github.com/MarineCast/toolkit-governance/blob/fdc32276637117acce2fc0fb9595a12229d8df64/src/governance/protected_areas/national_marine_sanctuaries/DATA_SOURCES.md)
+- [International boundaries](https://github.com/MarineCast/toolkit-governance/blob/fdc32276637117acce2fc0fb9595a12229d8df64/src/governance/jurisdiction/international_boundaries/DATA_SOURCES.md)
+- [Federal maritime zones](https://github.com/MarineCast/toolkit-governance/blob/fdc32276637117acce2fc0fb9595a12229d8df64/src/governance/jurisdiction/federal_waters/DATA_SOURCES.md)
+- [State and provincial waters](https://github.com/MarineCast/toolkit-governance/blob/fdc32276637117acce2fc0fb9595a12229d8df64/src/governance/jurisdiction/state_provincial_waters/DATA_SOURCES.md)
+- [Fisheries management areas](https://github.com/MarineCast/toolkit-governance/blob/fdc32276637117acce2fc0fb9595a12229d8df64/src/governance/fisheries_management/management_areas/DATA_SOURCES.md)
 
 Additional implemented family notes are linked from [layers](../layers.md).
-The [source quality index](../sources.md) retains its pinned baseline;
+The [source quality index](../sources.md) distinguishes current adapters from its pinned study baseline;
 [source acceptance](../source-acceptance.md) records retained study evidence and
 remaining qualifications. Source configurations and built manifests govern the
 inputs used by a selected workspace.

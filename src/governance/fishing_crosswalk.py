@@ -7,7 +7,7 @@ import numpy as np
 import pyarrow as pa
 import pyarrow.parquet as pq
 import shapely
-from .h3_matrix import _grid
+from .shared.grid import read_grid
 from .shared.artifacts import atomic_write_json, sha256_file
 from .shared.schema import validate_governance_geometry
 
@@ -46,7 +46,7 @@ def export_fishing_crosswalk(native,native_manifest,grids,output,*,release_id,so
     if sha256_file(native)!=meta['artifact']['sha256']:raise ValueError('Native checksum mismatch')
     areas=list(_areas(gpd.read_parquet(native)));written=[];seen=set()
     for path in grids:
-        grid=_grid(path);resolutions=set(grid.H3_RESOLUTION)
+        grid=read_grid(path);resolutions=set(grid.H3_RESOLUTION)
         if len(resolutions)!=1:raise ValueError('One resolution per crosswalk table required')
         resolution=int(next(iter(resolutions)))
         if resolution in seen:raise ValueError('Duplicate resolution')
@@ -86,7 +86,7 @@ def validate_fishing_crosswalk(artifact,companion,*,map_path=Path):
     native=map_path(meta['native']['artifact']);manifest=map_path(meta['native']['manifest']);grid_path=map_path(meta['grid']['path'])
     if sha256_file(native)!=meta['native']['sha256'] or sha256_file(manifest)!=meta['native']['manifest_sha256'] or sha256_file(grid_path)!=meta['grid']['sha256']:
         raise ValueError('Crosswalk lineage mismatch')
-    frame=pq.read_table(artifact).to_pandas();grid=_grid(grid_path).to_crs(6933)
+    frame=pq.read_table(artifact).to_pandas();grid=read_grid(grid_path).to_crs(6933)
     if len(frame)!=meta['artifact']['rows'] or frame.duplicated(KEY).any():raise ValueError('Crosswalk cardinality mismatch')
     if set(frame.h3_resolution)!={meta['grid']['resolution']} or not set(frame.h3_index)<=set(grid.H3_INDEX) or frame.model_eligible.any():raise ValueError('Crosswalk membership/policy mismatch')
     for name in meta['units']:

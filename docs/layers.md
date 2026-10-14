@@ -1,17 +1,17 @@
 # Layers, inputs, and outputs
 
-Fifteen implemented collections have normalization, build, and inspection modules.
+Seventeen implemented collections have normalization, build, and inspection modules.
 Acquisition is explicit; some families require provisioned bounded snapshots. The table below summarizes the configured inputs and primary
 outputs; the sections that follow describe secondary products and coverage.
 
 | Collection ID | Source inputs | Native geometry | Primary output |
 | --- | --- | --- | --- |
-| `marine_protected_areas` | NOAA 2023 MPA Inventory; DFO Oceans Act MPAs and Areas of Interest | Polygons and separate interest points | `marine_protected_areas.parquet` |
+| `marine_protected_areas` | NOAA 2023 MPA Inventory; DFO Oceans Act MPAs/optional Areas of Interest; ODFW 2016 archive | Polygons and separate interest points | `marine_protected_areas.parquet` |
 | `national_marine_sanctuaries` | Six pinned NOAA ONMS boundary archives | Polygons, retaining parts and overlaps | `national_marine_sanctuaries.parquet` |
 | `international_boundaries` | IBC, NOAA, NRCan CGB, DFO bioregions, and supplied seascape water support | Reference lines and derived support polygons | `international_boundaries.parquet` |
 | `federal_waters` | NOAA territorial-sea, contiguous-zone, and EEZ services; archived NRCan CGB | Source-native limit lines | `federal_maritime_limits.parquet` |
 | `state_provincial_waters` | BOEM Submerged Lands Act boundary service | State seaward boundary lines | `state_seaward_boundaries.parquet` |
-| `management_areas` | WDFW Recreational Marine Area Code service | Polygons | `management_areas.parquet` |
+| `management_areas` | WDFW recreational areas; DFO Pacific V3.1 subareas; ADF&G groundfish statistical areas | Separate system-specific polygons | `management_areas.parquet` |
 | `critical_habitat` | Provisioned NOAA NMFS polygon/line snapshots | Polygons and lines | `critical_habitat.parquet` |
 | `wildlife_refuges` | Selected FWS and ECCC inventories | Polygons | `wildlife_refuges.parquet` |
 | `conservation_designations` | Qualified ECCC marine CPCAD classifications | Polygons with separate reported roles | `conservation_designations.parquet` |
@@ -21,6 +21,8 @@ outputs; the sections that follow describe secondary products and coverage.
 | `traffic_separation_schemes` | Provisioned CHS and NOAA2026 TSS references | Source-native role-specific geometry | `traffic_separation_schemes.parquet` |
 | `ports` | Provisioned NGA World Port Index | Physical points | `ports.parquet` |
 | `coast_guard_sectors` | Provisioned USCG sectors and CCG Western-region references | Distinct agency polygons | `coast_guard_sectors.parquet` |
+| `exclusion_zones` | Pinned TC 2026 instrument, Saturna/Pender closed rings | Fixed vessel-zone polygons | `zones.parquet` |
+| `speed_restriction_zones` | Same TC instrument, Swiftsure closed ring | Fixed speed-zone polygon | `zones.parquet` |
 
 **Paths below are workspace-relative defaults**, controlled by
 `config/data/governance/governance.yaml`. Every collection directory also contains
@@ -61,6 +63,10 @@ See [product contracts](CONTRACTS.md) for validation semantics.
   geometry and regulation citations.
 - **DFO Areas of Interest:** native points represent interest sites. They are
   retained separately; the toolkit does not invent proposed boundaries.
+
+- **ODFW 2016 archive:** published Oregon reserve/MPA/seabird placemarks retain
+  provider identity, holes and multipart geometry; current designation instruments
+  and legal applicability remain separate.
 
 Normalization preserves designation identity, management authority, source-native
 activity classifications, governing-rule gaps, and IUCN reporting values where
@@ -222,10 +228,11 @@ equivalent to U.S. state waters. This collection is `implemented_partial`.
 
 ### Inputs and processing
 
-WDFW Recreational Marine Area Code polygons provide one explicit Washington
-management system. DFO Pacific Fishery Management Area references are recorded
-as `reference_only`; no approved machine-readable source is pinned in the
-configuration. Area systems are not merged into a universal zoning scheme.
+Current adapters preserve WDFW recreational marine areas, DFO Pacific V3.1 subareas
+and ADF&G groundfish statistical reporting polygons as three distinct systems. DFO
+zero-subarea identifiers are qualified explicitly in the source notes; Alaska geometry
+dates remain separate from legal effective dates. Their area codes are never merged
+into a universal zoning scheme.
 
 ### Outputs
 
@@ -233,13 +240,14 @@ Directory: `data/processed/domain/governance/fisheries_management/management_are
 
 | File | Contents |
 | --- | --- |
-| `management_areas.parquet` | Canonical WDFW recreational marine-area polygons |
+| `management_areas.parquet` | Canonical source-specific WDFW, DFO and ADF&G polygons |
 | `manifest.json` | Source checksums, clipping, coverage, and limitations |
 
 ### Coverage and interpretation
 
-California, Oregon, Alaska, federal/council, and Canadian support remain
-unavailable in the configured Phase 1 coverage matrix. Polygon membership alone
+Bounded DFO/ADF&G reference queries are implemented. Oregon fisheries, other Alaskan/
+Canadian systems and federal/council support remain unqualified. The historical Phase 1
+inventory described only WDFW support. Polygon membership alone
 does not establish current season, gear, harvest, or species rules.
 This collection is `implemented_partial`.
 
@@ -479,13 +487,30 @@ The H3 overlay retains input cell identity and native attribute sets, with nulls
 for unsupported empty intersections. It is model-ineligible and does not change
 canonical native geometry. See the [full overlay contract](h3-matrix.md).
 
+## Fixed vessel and speed references
+
+The pinned TC 2026 instrument supplies two closed Saturna/Pender vessel-zone rings
+and one closed Swiftsure speed ring. Native records retain instrument version, clause,
+original quantity/unit, inclusive day-precision interval and exception references.
+
+| Directory under `data/processed/domain/governance/vessel_management/` | Files |
+| --- | --- |
+| `exclusion_zones/` | `zones.parquet`, `manifest.json` |
+| `speed_restriction_zones/` | `zones.parquet`, `manifest.json` |
+
+Nitinat follows an unqualified coastline/border segment and remains excluded. Moving-animal
+approach rules need animal/vessel context and remain outside these fixed polygons. Neither
+inventory reconstructs all rules or establishes current legal applicability. See
+[regional/source qualification](coverage.md), [single-layer API](query-api.md) and
+[TC source notes](https://github.com/MarineCast/toolkit-governance/blob/fdc32276637117acce2fc0fb9595a12229d8df64/src/governance/vessel_management/exclusion_zones/DATA_SOURCES.md).
+
 ## Planned families
 
-These nine catalog entries have no implemented collection pipeline. Their presence
+These seven catalog entries have no implemented collection pipeline. Their presence
 supports planning and inspection status; it does not make them downloadable.
 
 | Category | Planned collection IDs |
 | --- | --- |
 | Fisheries management | `seasonal_closures`, `gear_restrictions`, `harvest_regulations`, `salmon_management_zones` |
-| Vessel management | `exclusion_zones`, `speed_restriction_zones`, `whale_approach_regulation_zones` |
+| Vessel management | `whale_approach_regulation_zones` |
 | Administrative context | `management_regions`, `reporting_areas` |

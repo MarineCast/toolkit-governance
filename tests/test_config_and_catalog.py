@@ -20,6 +20,8 @@ def test_governance_config_uses_shared_full_area_without_h3_products() -> None:
         "federal_waters",
         "state_provincial_waters",
         "management_areas",
+        "exclusion_zones",
+        "speed_restriction_zones",
         "ports",
         "critical_habitat",
         "county_regional_boundaries",
@@ -50,6 +52,7 @@ def test_governance_config_uses_shared_full_area_without_h3_products() -> None:
         "noaa_mpa_inventory_2023",
         "dfo_oceans_act_marine_protected_areas",
         "dfo_oceans_act_areas_of_interest",
+        "odfw_marine_reserves_2016",
     )
     noaa_mpa = config.sources["noaa_mpa_inventory_2023"]
     assert noaa_mpa.acquisition_type == "direct_archive"
@@ -76,6 +79,7 @@ def test_governance_root_is_public_surface_and_shared_code_is_packaged() -> None
     governance_root = project_root() / "src/governance"
     assert {path.name for path in governance_root.glob("*.py")} == {
         "__init__.py",
+        "query.py",
         "inspect.py",
         "__main__.py",
         "cli.py",
@@ -110,7 +114,7 @@ def test_governance_catalog_is_generated_and_model_safe() -> None:
     )
     assert catalog == generated
     assert len(catalog["collections"]) == 24
-    assert sum(value["map_layer"] for value in catalog["collections"].values()) == 15
+    assert sum(value["map_layer"] for value in catalog["collections"].values()) == 17
     assert catalog["canonical_storage"] == "native_geometry"
     assert catalog["h3_products"] is False
     for collection in catalog["collections"].values():

@@ -13,6 +13,7 @@ from governance.shared.normalization import (
     clean,
     column,
     date_value,
+    source_date,
     records_frame,
 )
 
@@ -54,8 +55,8 @@ def _noaa(frame: gpd.GeoDataFrame, source: GovernanceSource) -> gpd.GeoDataFrame
             COUNTRY_CODE=None,
             SECTION_NUMBER=None,
             SECTION_NAME=None,
-            PUBLICATION_DATE=date_value(row.get("PUB_DATE")),
-            APPROVAL_DATE=date_value(row.get("APPRV_DATE")),
+            PUBLICATION_DATE=source_date(frame, "PUB_DATE", row.get("PUB_DATE"), arcgis_date=True),
+            APPROVAL_DATE=source_date(frame, "APPRV_DATE", row.get("APPRV_DATE"), arcgis_date=True),
             UNILATERAL_CLAIM=clean(row.get("UNILATERAL")),
             SOURCE_ROLE="agency_boundary_reference",
             SOURCE_SCALE=None,

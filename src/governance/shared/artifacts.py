@@ -5,6 +5,8 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import tempfile
+import shutil
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Mapping, Sequence
@@ -32,7 +34,10 @@ def sha256_dataset(path: str | Path) -> str:
     if source.is_file() and source.suffix.lower() != ".shp":
         return sha256_file(source)
     if source.suffix.lower() == ".shp":
-        candidates = sorted(source.parent.glob(f"{source.stem}.*"))
+        # Acquisition receipts are provenance companions, not vector components;
+        # including their own checksum field would create a circular hash.
+        candidates = sorted(candidate for candidate in source.parent.glob(f"{source.stem}.*")
+                            if not candidate.name.endswith(('.metadata.json', '.part', '.lock')))
     elif source.is_dir():
         candidates = sorted(item for item in source.rglob("*") if item.is_file())
     else:
@@ -49,12 +54,14 @@ def atomic_write_json(path: str | Path, payload: Any, *, overwrite: bool = False
     if destination.exists() and not overwrite:
         raise FileExistsError(f"Output already exists: {destination}")
     destination.parent.mkdir(parents=True, exist_ok=True)
-    temporary = destination.with_name(f".{destination.name}.{os.getpid()}.part")
-    temporary.write_text(
-        json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n",
-        encoding="utf-8",
-    )
-    os.replace(temporary, destination)
+    fd, name = tempfile.mkstemp(dir=destination.parent, prefix="." + destination.name, suffix=".part")
+    temporary = Path(name)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as stream:
+            stream.write(json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n")
+        os.replace(temporary, destination)
+    finally:
+        temporary.unlink(missing_ok=True)
     return destination
 
 
@@ -68,7 +75,9 @@ def atomic_write_geoparquet(
     if destination.exists() and not overwrite:
         raise FileExistsError(f"Output already exists: {destination}")
     destination.parent.mkdir(parents=True, exist_ok=True)
-    temporary = destination.with_name(f".{destination.name}.{os.getpid()}.part")
+    fd, name = tempfile.mkstemp(dir=destination.parent, prefix="." + destination.name, suffix=".part")
+    os.close(fd)
+    temporary = Path(name)
     try:
         frame.to_parquet(temporary, index=False, compression="zstd")
         os.replace(temporary, destination)
@@ -82,7 +91,7 @@ def source_record(source: GovernanceSource, path: Path | None) -> dict[str, Any]
     runtime_snapshot: dict[str, Any] = {}
     if available and path is not None and path.suffix.lower() == ".json":
         snapshot = json.loads(path.read_text(encoding="utf-8"))
-        if int(snapshot.get("snapshot_schema_version", 0)) == 1:
+        if int(snapshot.get("snapshot_schema_version", 0)) in {1, 2}:
             runtime_snapshot = {
                 "retrieved_at_utc": snapshot.get("retrieved_at_utc"),
                 "server_filtered_runtime": snapshot.get("server_filtered"),
@@ -152,8 +161,11 @@ def manifest_payload(
     validate_governance_geometry(frame)
     return {
         "manifest_schema_version": MANIFEST_SCHEMA_VERSION,
+        "scientific_method_version": "native-reference-2.1",
+        "valid_empty_result": frame.empty,
         "product": f"governance.{collection.category}.{collection.collection_id}",
         "build_time_utc": datetime.now(UTC).replace(microsecond=0).isoformat(),
+        "semantic_sha256": semantic_hash(frame),
         "config_path": str(config.path),
         "config_sha256": sha256_file(config.path),
         "config_hash": config.config_hash,
@@ -217,3 +229,66 @@ def load_manifest(path: str | Path, *, verify_artifact: bool = True) -> dict[str
         if sha256_file(artifact_path) != artifact.get("sha256"):
             raise ValueError(f"Governance artifact checksum mismatch: {artifact_path}")
     return payload
+
+
+def publish_native_pair(frame, artifact_path, manifest_path, payload, *, overwrite=False):
+    """Stage both files; rollback handled exceptions under a per-product writer lock.
+
+    Readers still verify the hash: two file renames are not a crash-atomic transaction.
+    Immutable releases provide the stronger multi-product boundary.
+    """
+    artifact_path, manifest_path = Path(artifact_path), Path(manifest_path)
+    artifact_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    lock = artifact_path.with_suffix(artifact_path.suffix + '.lock')
+    fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+    os.close(fd)
+    try:
+        if not overwrite and (artifact_path.exists() or manifest_path.exists()):
+            raise FileExistsError(f'Native product already exists: {artifact_path}')
+        with tempfile.TemporaryDirectory(dir=artifact_path.parent, prefix='.native-') as directory:
+            stage = Path(directory)
+            staged_artifact = atomic_write_geoparquet(frame, stage / 'data.parquet')
+            content = dict(payload)
+            content['artifact'] = dict(content['artifact'], sha256=sha256_file(staged_artifact), bytes=staged_artifact.stat().st_size)
+            staged_manifest = atomic_write_json(manifest_path.parent / (stage.name + '.manifest.part'), content)
+            backups = {}
+            for index, path in enumerate((artifact_path, manifest_path)):
+                if path.exists():
+                    backup = stage / f'backup-{index}'
+                    shutil.copy2(path, backup)
+                    backups[path] = backup
+            try:
+                os.replace(staged_artifact, artifact_path)
+                os.replace(staged_manifest, manifest_path)
+            except BaseException:
+                for path in (artifact_path, manifest_path):
+                    if path in backups:
+                        os.replace(backups[path], path)
+                    else:
+                        path.unlink(missing_ok=True)
+                raise
+            finally:
+                staged_manifest.unlink(missing_ok=True)
+    finally:
+        lock.unlink(missing_ok=True)
+
+
+def semantic_hash(frame):
+    """Hash native values/geometry independent of Parquet encoding and build metadata."""
+    import pandas as pd
+    import numpy as np
+    def scalar(value):
+        if isinstance(value, dict):
+            return {key: scalar(item) for key, item in value.items()}
+        if isinstance(value, (list, tuple, np.ndarray)):
+            return [scalar(item) for item in value]
+        return None if pd.isna(value) else value
+    columns = sorted(column for column in frame.columns if column != frame.geometry.name)
+    digest = hashlib.sha256()
+    for _, row in frame.sort_values(["SOURCE_DATASET_ID", "SOURCE_FEATURE_ID", "GEOMETRY_PART_ID"], kind="stable").iterrows():
+        values = {column: scalar(row[column]) for column in columns}
+        digest.update(json.dumps(values, sort_keys=True, default=str).encode())
+        digest.update(row.geometry.wkb)
+    digest.update(json.dumps(columns).encode())
+    return digest.hexdigest()
