@@ -1,5 +1,8 @@
 # Governance 0.2 hardening handoff
 
+The [0.2.1 correction handoff](hardening-corrections.md) records subsequent defect fixes,
+DFO zero-subarea evidence and new validation. The results below describe the original commits.
+
 Implemented on `codex/governance-hardening`, starting from fetched default branch
 `074e3ea` and comparing the review baseline `17f4b3b5f91f1126686fbb6fa301137627529ddd`.
 The default-branch delta was documentation-only. The first focused commit,

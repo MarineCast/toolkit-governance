@@ -84,3 +84,10 @@ Byte and membership verification does not certify scientific completeness. The
 [study workflow](study-guide.md) supplies additional semantic gates for
 study-contract bundles, including validation from the permanent generation path.
 For interrupted staging, stale locks and validation failures see [troubleshooting](troubleshooting.md).
+
+Direct/vector caches require compatible identity, selector and support receipts by default.
+A receiptless pinned ZIP is usable only through its explicit immutable full-source archive
+contract; arbitrary ZIPs and derived subsets do not qualify. Existing malformed receipts
+fail even for qualified archives. Explicit local acquisition overrides receive the same checks.
+Refresh stages/checks bytes and preserves the previous cache/metadata pair on handled failure.
+See [query cache contracts](query-api.md#cache-and-network-modes).

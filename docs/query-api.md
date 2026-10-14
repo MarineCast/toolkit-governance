@@ -137,4 +137,28 @@ reference, ADF&G groundfish reporting polygons, and closed-ring subsets of the T
 instrument. BC provincial classifications, DFO whole-area/legal applicability, Oregon fisheries, complete
 Alaska fishery systems, universal Indigenous territory/rights and legal history remain gaps.
 
+Version 0.2.1 uses `native-reference-query-2.1` and rebuild method `native-reference-2.1`.
+Intersections recursively retain only components of the original geometry dimension; polygon
+area and line length survive collections with boundary remnants. All fragments from one
+native part yield one membership. Boundary-only polygon/line contacts remain excluded.
+Repair denominators and retained numerators use the same original dimension. Source support
+is split at the dateline before measuring geodesic segments; bounded roundoff is snapped only
+after finite/range checks. Historical products and legacy H3 metric definitions are unchanged.
+
+Query provenance adds `producer.package`, `producer.version`, `producer.code_revision`
+and `producer.code_revision_source`. Revision comes only from matching installed VCS
+metadata; ordinary wheels/editable source runs return null/unavailable without embedded
+revision evidence. Git is not a runtime dependency and cwd is never used to guess a revision.
+Source retrieval timestamps remain separate from query time.
+
+A missing direct-cache receipt fails by default. The legacy ZIP exception additionally requires
+`immutable_full_source_archive: true`, direct-archive acquisition, a configured verified SHA-256,
+an unfiltered `1=1` selector, no mask and no server filtering. This explicitly qualifies the
+configured full archive/member inventory, not geographic/legal completeness. The configured
+Census, IBC, NRCan, NOAA inventory/ONMS and ODFW pinned ZIPs declare that contract; existing pins
+are unchanged. Derived/local vectors and other archives still need compatible receipts.
+Only reviewed source qualification can declare this contract; pinning a user-created subset
+does not establish full-source meaning. Malformed/mismatched existing receipts always fail. A new acquisition receipt cannot be used
+to claim that an unapplied selector/mask was honored.
+
 Geometry repairs report their status, source-dimension remnants and diagnostic measure change. Pre-repair measures of invalid shapes are QC evidence, never certified area/length.

@@ -222,10 +222,11 @@ equivalent to U.S. state waters. This collection is `implemented_partial`.
 
 ### Inputs and processing
 
-WDFW Recreational Marine Area Code polygons provide one explicit Washington
-management system. DFO Pacific Fishery Management Area references are recorded
-as `reference_only`; no approved machine-readable source is pinned in the
-configuration. Area systems are not merged into a universal zoning scheme.
+Current adapters preserve WDFW recreational marine areas, DFO Pacific V3.1 subareas
+and ADF&G groundfish statistical reporting polygons as three distinct systems. DFO
+zero-subarea identifiers are qualified explicitly in the source notes; Alaska geometry
+dates remain separate from legal effective dates. Their area codes are never merged
+into a universal zoning scheme.
 
 ### Outputs
 
@@ -233,13 +234,14 @@ Directory: `data/processed/domain/governance/fisheries_management/management_are
 
 | File | Contents |
 | --- | --- |
-| `management_areas.parquet` | Canonical WDFW recreational marine-area polygons |
+| `management_areas.parquet` | Canonical source-specific WDFW, DFO and ADF&G polygons |
 | `manifest.json` | Source checksums, clipping, coverage, and limitations |
 
 ### Coverage and interpretation
 
-California, Oregon, Alaska, federal/council, and Canadian support remain
-unavailable in the configured Phase 1 coverage matrix. Polygon membership alone
+Bounded DFO/ADF&G reference queries are implemented. Oregon fisheries, other Alaskan/
+Canadian systems and federal/council support remain unqualified. The historical Phase 1
+inventory described only WDFW support. Polygon membership alone
 does not establish current season, gear, harvest, or species rules.
 This collection is `implemented_partial`.
 

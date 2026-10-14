@@ -1,8 +1,9 @@
 # Governance production readiness
 
-Fifteen native reference collection pipelines are implemented, with nine catalog families still
-planned and unavailable. The latest bounded batch adds source-specific BIA land-area and NRCan Indian Reserve
-administrative references. Every current collection is research-only.
+Seventeen native reference collection pipelines are implemented, with seven catalog families
+still planned and unavailable. Current fisheries adapters distinguish WDFW recreational
+marine areas, DFO Pacific V3.1 subareas and ADF&G groundfish statistical reporting.
+Version 0.2 also adds qualified Oregon MPA references and closed TC instrument rings. Every current collection is research-only.
 No collection establishes legal applicability, current
 regulatory compliance, historical effective dates or model eligibility. Retained acquisition dates
 are not a freshness guarantee. The configured native extent is [-180, 32, -109, 72] EPSG:4326.
@@ -11,7 +12,7 @@ The historical application delivery grid contained 1,263 R6 cells and 43,393 R8 
 [-125.887, 46.793, -122.097, 50.056]. These historical products were separate delivery variants, preserving supplied
 membership; neither is an exhaustive grid over the native Northeast Pacific extent. The grid
 falls within UTM zone 10N, so EPSG:32610 is retained for line lengths; EPSG:6933 measures areas.
-Antimeridian H3 cells remain explicitly unsupported. Native companions preserve feature/part
+The legacy study matrix still rejects antimeridian grids; the generic getter supports wrapped cells. Native companions preserve feature/part
 relations and all source attributes. Static snapshots have no fabricated daily or effective date.
 
 ## Current frozen study checkpoint (2026-10-09)
@@ -96,12 +97,13 @@ all designation-specific planned products.
 
 ## Current source limitations
 
-Canadian Pacific fishery-management areas are configured reference-only, with no pinned approved
-machine-readable geometry or normalizer. An official DFO public ArcGIS open-data directory was
-successfully inspected on 2026-10-04; it exposed Atlantic fisheries and NAFO areas but no matching
-Pacific-area service under those names. The configured Pacific maps web host failed DNS during
-this run. This is a bounded access/discovery limitation, not proof no source exists. Do not
-substitute OSM or Atlantic geometry. Preserve this source as unavailable pending qualification.
+Current DFO Pacific V3.1 subareas have a bounded ArcGIS adapter, including six
+explicitly qualified zero-subarea codes. Source licence fields remain blank; whole-area
+geometry, current legal applicability and redistribution remain unqualified. WDFW
+recreational and ADF&G groundfish reporting are distinct reference systems. See
+[fisheries source notes](https://github.com/MarineCast/toolkit-governance/blob/main/src/governance/fisheries_management/management_areas/DATA_SOURCES.md).
+The earlier 2026-10-04 discovery limitation and reference-only Phase 1 entry are historical;
+they do not describe current adapter support.
 
 NOAA/BOEM GIS references carry legal-use disclaimers. IBC's map line is not controlling boundary
 evidence. Archived NRCan cartography and seascape-derived country-water support cannot establish
@@ -143,7 +145,7 @@ Only local data retention is in scope; no data publication is authorized.
 | dfo_oceans_act_areas_of_interest | available | dynamic_at_retrieval | Open Government Licence - Canada; The source publishes point locations, not proposed legal boundaries; Areas of Interest remain separate from active designations. |
 | boem_submerged_lands_boundary | available | unknown | U.S. Government work; BOEM source terms apply; GIS line is approximate and is not the controlling official boundary record. |
 | wdfw_recreational_marine_areas | available | unknown | Washington State public data terms apply; One Washington recreational area system; not complete fisheries-management coverage. |
-| dfo_pacific_fishery_management_areas | unavailable | unknown | Open Government Licence - Canada where applicable; Official maps and legal descriptions are known, but no approved machine-readable geometry snapshot is configured. |
+| dfo_pacific_fishery_management_areas | bounded adapter; cache depends on workspace | V3.1 / 50K service reference | Blank service licence metadata; local reference inspection only; no redistribution or current-law qualification. |
 
 ## Explicit shared-schema mapping
 

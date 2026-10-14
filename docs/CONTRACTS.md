@@ -43,3 +43,10 @@ against a caller-supplied, pinned schema admitting `reference_geometry`; it requ
 organization-wide adoption or supply a schema automatically. See [CLI reference](cli.md).
 
 Version 0.2 rebuilds use `native-reference-2.0`: establishment years no longer fabricate exact dates, marine zero area is preserved separately from total-site area, and point/geodesic-line/unwrapped-equal-area measures have distinct definitions. Valid empty products retain canonical schema; unavailable input remains a failure/status. See [query contracts](query-api.md).
+
+Version 0.2.1 rebuilds use `native-reference-2.1`: repaired source and retained measures
+include only the original dimension, and geodesic denominators use canonical dateline-split
+support. Query method `native-reference-query-2.1` retains same-dimensional fragments from
+nested intersection collections without duplicating native-part memberships. Finite/range
+checks precede roundoff snapping. Schema shapes and legacy products remain readable; no
+historical artifact is relabeled. See the [correction handoff](hardening-corrections.md).

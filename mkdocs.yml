@@ -71,6 +71,7 @@ nav:
       - Workflows and checks: WORKFLOWS.md
       - Architecture: ARCHITECTURE.md
       - Hardening handoff: hardening-report.md
+      - Hardening corrections: hardening-corrections.md
       - Conditional agent checks: agent-checks.md
       - Documentation site: documentation-site.md
       - Migration history: MIGRATION.md
