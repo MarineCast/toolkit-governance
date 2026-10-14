@@ -92,7 +92,7 @@ Official source candidates remain qualified separately:
 - WDFW catch record card areas: <https://geodataservices.wdfw.wa.gov/arcgis/rest/services/FP_Projects/CatchRecordCardArea/MapServer/1>. Hydrological feed relations are not implicitly management parents.
 - WDFW Salish commercial salmon reference: <https://geodataservices.wdfw.wa.gov/arcgis/rest/services/FP_Projects/WDFWFishProgramWACs/MapServer/8>. Provider notes describe approximations, missing markers and historical coordinate discrepancies; not controlling current legal geometry.
 - WA Ecology commercial fish/shellfish reference: <https://gis.ecology.wa.gov/serverext/rest/services/GIS/CoastalAtlas/MapServer/1091>. The historical reference vintage is distinct from current instruments.
-- DFO Pacific area/subarea maps: <https://www.pac.dfo-mpo.gc.ca/fm-gp/maps-cartes/areas-secteurs/index-eng.html>. Approved vector access/redistribution remains unresolved; regulations and geometry are separate evidence.
+- DFO Pacific whole-area/legal map references: <https://www.pac.dfo-mpo.gc.ca/fm-gp/maps-cartes/areas-secteurs/index-eng.html>. The implemented subarea GIS adapter is described above; whole-area boundaries, current legal applicability and redistribution remain unqualified.
 - ODFW nearshore commercial logbook grids: <https://www.dfw.state.or.us/fish/commercial/docs/marine_reserves/logbook_grid_charts.asp>. PDF/chart blocks require qualified source geometry and identifiers before a vector crosswalk; port sampling/landings do not establish catch coordinates.
 
 These candidates are not completed native adapters or a complete source-system roster.

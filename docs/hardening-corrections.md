@@ -4,7 +4,7 @@ Work started from fetched `codex/governance-hardening` at
 `091396409a03b8f8b5f7eac9c7f1a7d53b41d471`; local and remote tips matched and the
 working tree was clean. The changes affect toolkit-governance only.
 Implementation commit: `46fd5c5de99e3ea0e086f822401509bab901d7f1`; the subsequent
-documentation commit contains this validation handoff.
+documentation commits contain this validation handoff.
 
 ## Finding dispositions
 
@@ -118,8 +118,10 @@ CartoDB key warnings. Python 3.11 reports 2 upstream CartoDB warnings. Dependenc
 3.14 include GeoPandas 1.2.0, pandas 3.0.6, Shapely 2.2.0 and H3 4.5.0; 3.11 uses Shapely 2.1.2.
 Other operating systems/interpreters were not tested.
 
-Final wheel: `toolkit_governance-0.2.1-py3-none-any.whl`, 258,782 bytes, SHA-256
-`7fb4e6205dee6781f0035fbb3db4ec1d12eee21b20a04c51ef9f56d99509ec7b`.
+Final wheel: `toolkit_governance-0.2.1-py3-none-any.whl`, 258,786 bytes, SHA-256
+`49018ca65e4eea65c3d106b276c05faa50f26ddb2b62e5d01db8f566c304bedd`.
+After the full suites, only a source-notes sentence was clarified; package code is unchanged.
+The wheel was rebuilt and all three outside-checkout acceptance/pip checks were repeated.
 An initial no-isolation build in the lean 3.14 runtime lacked setuptools; rebuilding with
 already provisioned Python 3.11 setuptools succeeded. No runtime dependency or source pin
 was changed to overcome that tooling limitation.
@@ -138,17 +140,17 @@ PYTHONPATH=src /tmp/governance-hardening-h3/bin/python -m pytest -q
 /tmp/governance-corrections-311-env/bin/python -m pip install --no-deps --force-reinstall /tmp/governance-corrections-dist/toolkit_governance-0.2.1-py3-none-any.whl
 
 cd /tmp
-/tmp/governance-hardening-native/bin/python /Users/tylerstevenson/Documents/Code_Repos/MarineCast/Toolkits/toolkit-governance/scripts/accept_corrections_wheel.py /tmp/governance-corrections-native-final
-/tmp/governance-hardening-h3/bin/python /Users/tylerstevenson/Documents/Code_Repos/MarineCast/Toolkits/toolkit-governance/scripts/accept_corrections_wheel.py /tmp/governance-corrections-h3-final --h3
-/tmp/governance-corrections-311-env/bin/python /Users/tylerstevenson/Documents/Code_Repos/MarineCast/Toolkits/toolkit-governance/scripts/accept_corrections_wheel.py /tmp/governance-corrections-311-final --h3
+/tmp/governance-hardening-native/bin/python /Users/tylerstevenson/Documents/Code_Repos/MarineCast/Toolkits/toolkit-governance/scripts/accept_corrections_wheel.py /tmp/governance-corrections-native-review
+/tmp/governance-hardening-h3/bin/python /Users/tylerstevenson/Documents/Code_Repos/MarineCast/Toolkits/toolkit-governance/scripts/accept_corrections_wheel.py /tmp/governance-corrections-h3-review --h3
+/tmp/governance-corrections-311-env/bin/python /Users/tylerstevenson/Documents/Code_Repos/MarineCast/Toolkits/toolkit-governance/scripts/accept_corrections_wheel.py /tmp/governance-corrections-311-review --h3
 /tmp/governance-hardening-native/bin/python -m pip check
 /tmp/governance-hardening-h3/bin/python -m pip check
 /tmp/governance-corrections-311-env/bin/python -m pip check
 /tmp/governance-hardening-native/bin/governance --help
-/tmp/governance-hardening-native/bin/governance --workspace /tmp/governance-corrections-native-final catalog
-/tmp/governance-hardening-native/bin/governance --workspace /tmp/governance-corrections-native-final preflight
-/tmp/governance-hardening-native/bin/governance --workspace /tmp/governance-corrections-native-final availability
-/tmp/governance-hardening-native/bin/governance --workspace /tmp/governance-corrections-native-final get fishery-management-areas --bbox -123.01 48.49 -122.99 48.51 --source wdfw_recreational_marine_areas --mode offline --allow-partial
+/tmp/governance-hardening-native/bin/governance --workspace /tmp/governance-corrections-native-review catalog
+/tmp/governance-hardening-native/bin/governance --workspace /tmp/governance-corrections-native-review preflight
+/tmp/governance-hardening-native/bin/governance --workspace /tmp/governance-corrections-native-review availability
+/tmp/governance-hardening-native/bin/governance --workspace /tmp/governance-corrections-native-review get fishery-management-areas --bbox -123.01 48.49 -122.99 48.51 --source wdfw_recreational_marine_areas --mode offline --allow-partial
 
 cd /Users/tylerstevenson/Documents/Code_Repos/MarineCast/Toolkits/toolkit-governance
 /tmp/governance-hardening-native/bin/python -m mkdocs build --strict --site-dir /tmp/governance-corrections-site
@@ -172,7 +174,7 @@ new = yaml.safe_load((repo / "config/data/governance/governance.yaml").read_text
 assert {k: v.get("expected_sha256") for k, v in old.items()} == {k: v.get("expected_sha256") for k, v in new.items()}
 ```
 
-The bounded offline R7 multipart smoke recorded 0.1005 s (3.14) and 0.1201 s (3.11),
+The bounded offline R7 multipart smoke recorded 0.1069 s (3.14) and 0.1023 s (3.11),
 with 3 cells / 1 logical feature / 2 native parts / 4 memberships and zero network bytes.
 These are single small engineering samples, not regional speedup claims.
 
