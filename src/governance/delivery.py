@@ -14,6 +14,7 @@ import pyarrow as pa
 import pyarrow.compute as pc
 import pyarrow.parquet as pq
 
+from . import __version__
 from .shared.artifacts import sha256_file
 
 METHOD_VERSION = 'native-inventory-overlay-1.3.0'
@@ -107,7 +108,7 @@ def export_delivery(matrix_path: str | Path, output_directory: str | Path, *,
             'governance_delivery_schema_version': 1,
             'shared_contract_conformance': {'status': 'not_claimed_by_local_envelope', 'reason': 'v0.1 has no reference_geometry category. An optional separately validated shared manifest can declare adoption of an explicitly supplied approved extension.'},
             'product_id': f'governance.inventory_geometry_r{resolution}', 'semantic_product_version': '1.3.0',
-            'scientific_method_version': METHOD_VERSION, 'software': {'package': 'toolkit-governance', 'version': '0.1.0', 'git_sha': software_revision},
+            'scientific_method_version': METHOD_VERSION, 'software': {'package': 'toolkit-governance', 'version': __version__, 'git_sha': software_revision},
             'data_release_id': release_id, 'created_at_utc': datetime.now(UTC).isoformat(),
             'identity': {'primary_key': ['h3_index'], 'grain': 'One row per supplied cell, static inventory snapshot'},
             'spatial': {'h3_resolution': int(resolution), 'support': 'Full H3 cell', 'grid': metadata['grid'],
