@@ -152,9 +152,14 @@ def _area_coordinates(coordinates):
     return np.column_stack(_AREA_TRANSFORM(coordinates[:, 0], coordinates[:, 1]))
 
 
-def _measure(geometry: BaseGeometry) -> float:
+def _measure(geometry: BaseGeometry, *, family: str | None = None) -> float:
+    """Measure one dimension only; mixed collections require an explicit family."""
     if geometry.is_empty:
         return 0.0
+    if family is not None:
+        if family not in {"polygon", "line", "point"}:
+            raise ValueError(f"Unsupported measurement family: {family}")
+        return sum(_measure(part) for part in _parts(geometry, family))
     family = _dimension_family(geometry)
     unwrapped = _unwrap_geometry(geometry)
     if family == "polygon":
@@ -163,7 +168,7 @@ def _measure(geometry: BaseGeometry) -> float:
         return float(_GEOD.geometry_length(unwrapped))
     if family == "point":
         return float(len(geometry.geoms) if isinstance(geometry, MultiPoint) else 1)
-    return sum(_measure(part) for part in geometry.geoms)
+    raise ValueError("Collection measurement requires an explicit geometry family")
 
 
 def _stable_part_sort_key(geometry: BaseGeometry) -> tuple[str, str]:
@@ -209,7 +214,7 @@ def clip_to_full_area(
         if not unwrapped.is_valid:
             if not _parts(repaired, family):
                 raise ValueError(f'Geometry repair loses source dimension for {row[source_id_column]!r}')
-            remnants = any(_dimension_family(part) != family and not part.is_empty for part in getattr(repaired, 'geoms', [repaired]))
+            remnants = any(_parts(repaired, other) for other in {"polygon", "line", "point"} - {family})
             repair_dimension_remnant_rows += int(remnants)
             repair_status = 'repaired_lower_dimension_remnants_reported' if remnants else 'repaired_preserving_dimension'
             # Invalid pre-repair measure is diagnostic only; never a certified area/length.
@@ -225,11 +230,20 @@ def clip_to_full_area(
         if not parts:
             continue
         intersecting_rows += 1
-        source_measure = _measure(repaired)
+        # Measure canonical dateline-split source support using the original dimension.
+        # This also keeps geodesic segment vertices consistent across the denominator
+        # and a fully retained numerator; repair remnants never enter either measure.
+        source_support = _antimeridian_intersection(repaired, box(-180, -90, 180, 90))
+        source_measure = _measure(source_support, family=family)
         retained_measure = sum(_measure(part) for part in parts)
-        retained_fraction = (
-            min(1.0, max(0.0, retained_measure / source_measure)) if source_measure > 0 else None
-        )
+        if not math.isfinite(source_measure) or not math.isfinite(retained_measure) or source_measure < 0 or retained_measure < 0:
+            raise ValueError(f"Non-finite or negative geometry measure for {row[source_id_column]!r}")
+        retained_fraction = retained_measure / source_measure if source_measure > 0 else None
+        if retained_fraction is not None:
+            if not -1e-10 <= retained_fraction <= 1 + 1e-8:
+                raise ValueError(f"Retained fraction exceeds source support for {row[source_id_column]!r}")
+            # Snap only bounded floating-point roundoff after validating the ratio.
+            retained_fraction = min(1.0, max(0.0, retained_fraction))
         clipped_flag = retained_fraction is not None and retained_fraction < 1.0 - 1.0e-12
         clipped_source_rows += int(clipped_flag)
         min_x, min_y, max_x, max_y = original.bounds

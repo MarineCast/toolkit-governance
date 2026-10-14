@@ -107,7 +107,7 @@ def test_pacific_subarea_hierarchy_native_identity_and_cross_system_codes(tmp_pa
     source.snapshot_path.write_text(json.dumps(snapshot_fixture(source,raw)))
     result=get_fishery_management_areas((-123.6,48.3,-123.3,48.6),config=cfg,systems='dfo.pacific.pfma.subareas',mode='offline',allow_partial=True)
     assert len(result.features)==1 and result.features.AREA_SYSTEM_ID.tolist()==['dfo.pacific.pfma.subareas']
-    for field,value in [('MGNT_AREA',None),('SUBAREA_',0),('GLOBALID','bad')]:
+    for field,value in [('MGNT_AREA',None),('SUBAREA_',-1),('GLOBALID','bad')]:
         changed=raw.copy();changed[field]=value
         with pytest.raises(ValueError):normalize(changed,source)
 

@@ -1,16 +1,22 @@
 """DFO Pacific V3.1 subarea reference; hierarchy is not WDFW reporting equivalence."""
 from uuid import UUID
+import numpy as np
 from governance.shared.normalization import base_record, clean, records_frame
 
 
-def positive_integer(value,field):
+# Qualified from V3.1 layer 0 identifiers/labels on 2026-10-13; no geometry copied.
+ZERO_SUBAREA_AREAS = frozenset({'21', '22', '103', '109', '110', '111'})
+
+
+def positive_integer(value,field, *, minimum=1):
     try:
-        if isinstance(value, bool):raise ValueError()
+        if isinstance(value, (bool, np.bool_)):raise ValueError()
         number=int(value)
-        if float(value)!=number or number<=0:raise ValueError()
+        if float(value)!=number or number<minimum:raise ValueError()
         return str(number)
     except (TypeError,ValueError,OverflowError):
-        raise ValueError(f'DFO PFMA {field} must be a positive integer') from None
+        qualifier = 'positive' if minimum == 1 else 'nonnegative'
+        raise ValueError(f'DFO PFMA {field} must be a {qualifier} integer') from None
 
 
 def normalize(frame,source):
@@ -21,7 +27,9 @@ def normalize(frame,source):
     for _,row in frame.iterrows():
         oid=clean(row.get('OBJECTID'));globalid=clean(row.get('GLOBALID'))
         area=positive_integer(row.get('MGNT_AREA'),'MGNT_AREA')
-        subarea=positive_integer(row.get('SUBAREA_'),'SUBAREA_')
+        subarea=positive_integer(row.get('SUBAREA_'),'SUBAREA_',minimum=0)
+        if subarea == '0' and area not in ZERO_SUBAREA_AREAS:
+            raise ValueError(f'DFO PFMA unqualified zero subarea for management area {area}')
         if oid is None or globalid is None or oid in seen:
             raise ValueError('DFO PFMA requires unique original OBJECTID and GLOBALID')
         try:UUID(globalid.strip('{}'))

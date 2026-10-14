@@ -2,7 +2,7 @@
 from .shared.config import GovernanceConfig, load_governance_config
 from .workspace import initialize_workspace
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 __all__ = ['GovernanceConfig', 'load_governance_config', 'initialize_workspace']
 
 from .query import GovernanceResult, get_layer, LayerNotImplementedError

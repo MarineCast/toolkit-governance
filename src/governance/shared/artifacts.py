@@ -161,7 +161,7 @@ def manifest_payload(
     validate_governance_geometry(frame)
     return {
         "manifest_schema_version": MANIFEST_SCHEMA_VERSION,
-        "scientific_method_version": "native-reference-2.0",
+        "scientific_method_version": "native-reference-2.1",
         "valid_empty_result": frame.empty,
         "product": f"governance.{collection.category}.{collection.collection_id}",
         "build_time_utc": datetime.now(UTC).replace(microsecond=0).isoformat(),

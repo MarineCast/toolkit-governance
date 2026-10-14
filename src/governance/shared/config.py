@@ -73,6 +73,7 @@ class GovernanceSource:
     selection_where: str = "1=1"
     requested_grid_mask_sha256: str | None = None
     retrieved_at_utc: str | None = None
+    immutable_full_source_archive: bool = False
 
 
 @dataclass(frozen=True)
@@ -177,7 +178,7 @@ def load_governance_config(path: str | Path = DEFAULT_CONFIG_PATH, *, workspace:
     sources: dict[str, GovernanceSource] = {}
     for source_id, value in source_values.items():
         values = _mapping(value, f"sources.{source_id}")
-        _keys(values, {"provider", "acquisition_type", "url", "local_path", "snapshot_path", "archive_member", "archive_layer", "expected_sha256", "source_as_of", "license", "attribution", "legal_citation", "redistribution", "authority_scope", "source_status", "server_filter", "page_size", "source_limitation", "coverage", "selection_where", "requested_grid_mask_sha256"}, f"sources.{source_id}")
+        _keys(values, {"provider", "acquisition_type", "url", "local_path", "snapshot_path", "archive_member", "archive_layer", "expected_sha256", "source_as_of", "license", "attribution", "legal_citation", "redistribution", "authority_scope", "source_status", "server_filter", "page_size", "source_limitation", "coverage", "selection_where", "requested_grid_mask_sha256", "immutable_full_source_archive"}, f"sources.{source_id}")
         coverage = _mapping(values.get("coverage"), f"sources.{source_id}.coverage")
         if set(coverage) != set(regions):
             missing = sorted(set(regions).difference(coverage))
@@ -234,7 +235,16 @@ def load_governance_config(path: str | Path = DEFAULT_CONFIG_PATH, *, workspace:
             coverage={str(key): str(status) for key, status in coverage.items()},
             selection_where=str(values.get("selection_where", "1=1")),
             requested_grid_mask_sha256=values.get("requested_grid_mask_sha256"),
+            immutable_full_source_archive=strict_bool(values.get("immutable_full_source_archive", False), f"sources.{source_id}.immutable_full_source_archive"),
         )
+        source = sources[str(source_id)]
+        if source.immutable_full_source_archive and (
+            source.acquisition_type != "direct_archive" or source.expected_sha256 is None
+            or snapshot is None or Path(snapshot).suffix.lower() != ".zip"
+            or source.server_filter or source.selection_where != "1=1"
+            or source.requested_grid_mask_sha256 is not None
+        ):
+            raise ValueError(f"Source {source_id!r} immutable full-source archive requires a pinned unfiltered direct ZIP contract")
         if sources[str(source_id)].page_size is not None and sources[str(source_id)].page_size <= 0:
             raise ValueError(f"Source {source_id!r} page_size must be positive.")
 

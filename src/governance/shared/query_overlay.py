@@ -2,7 +2,7 @@
 from __future__ import annotations
 import pandas as pd
 from shapely.ops import unary_union
-from .spatial import _measure, _dimension_family
+from .spatial import _measure, _dimension_family, _parts
 
 MEMBERSHIP_FIELDS = ('H3_INDEX', 'H3_RESOLUTION', 'SOURCE_DATASET_ID', 'GOVERNANCE_FEATURE_ID', 'SOURCE_FEATURE_ID', 'GEOMETRY_PART_ID', 'GEOMETRY_FAMILY', 'INTERSECTION_AREA_M2', 'INTERSECTION_LENGTH_M', 'POINT_COUNT')
 
@@ -20,8 +20,11 @@ def overlay(grid, native, *, source_ids, coverage, max_memberships):
             feature = native.iloc[index]
             intersection = cell.geometry.intersection(feature.geometry)
             family = _dimension_family(feature.geometry)
-            measure = _measure(intersection)
-            if intersection.is_empty or (family != 'point' and measure <= 0) or _dimension_family(intersection) != family:
+            # GEOS may return positive same-dimensional fragments plus boundary
+            # remnants. Union fragments once per native part, retaining its grain.
+            intersection = unary_union(_parts(intersection, family))
+            measure = _measure(intersection, family=family)
+            if intersection.is_empty or measure <= 0:
                 continue
             hits.setdefault(feature.SOURCE_DATASET_ID, []).append((feature, intersection, family))
             relations.append(dict(zip(MEMBERSHIP_FIELDS, (cell.H3_INDEX, int(cell.H3_RESOLUTION), feature.SOURCE_DATASET_ID, feature.GOVERNANCE_FEATURE_ID, feature.SOURCE_FEATURE_ID, feature.GEOMETRY_PART_ID, family, measure if family == 'polygon' else None, measure if family == 'line' else None, int(measure) if family == 'point' else None))))

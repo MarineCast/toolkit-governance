@@ -356,6 +356,7 @@ sources:
     snapshot_path: data/raw/governance/census_counties_2025/tl_2025_us_county.zip
     archive_member: tl_2025_us_county.shp
     expected_sha256: 9c6e9d9076abce2670d1de255de3710c35ecca00a7005d88e012dec52d95f763
+    immutable_full_source_archive: true
     source_as_of: '2025-01-01'
     license: U.S. Census Bureau public data; retain source metadata and attribution
     attribution: U.S. Census Bureau, 2025 TIGER/Line Shapefiles, counties and equivalents
@@ -452,6 +453,7 @@ sources:
     snapshot_path: data/raw/governance/international_boundary_commission/us-canada-boundary-v1-3.zip
     archive_member: US-Canada_Boundary_v1.3.shp
     expected_sha256: eb327459528b87cbc27e55ccc6bfd6982562c75559823a00b6dc50c04abcaab1
+    immutable_full_source_archive: true
     source_as_of: '2018-04-19'
     license: International Boundary Commission terms and source disclaimer apply
     attribution: International Boundary Commission, Canada and United States
@@ -575,6 +577,7 @@ sources:
     snapshot_path: data/raw/governance/nrcan_canadian_geopolitical_boundaries/cgb_lgc_canada_shp_en.zip
     archive_member: can_ab_l_geo83_e.shp
     expected_sha256: 305bfb2445fdf408922b320740e66c79786fb35e81116dd21ca0c9a43f968381
+    immutable_full_source_archive: true
     source_as_of: '2013-12-17'
     license: Open Government Licence - Canada; archived GeoBase product terms apply
     attribution: Natural Resources Canada; source agencies retained per feature
@@ -601,6 +604,7 @@ sources:
     snapshot_path: data/raw/governance/nrcan_canadian_geopolitical_boundaries/cgb_lgc_canada_shp_en.zip
     archive_member: can_ab_p_geo83_e.shp
     expected_sha256: 305bfb2445fdf408922b320740e66c79786fb35e81116dd21ca0c9a43f968381
+    immutable_full_source_archive: true
     source_as_of: '2013-12-17'
     license: Open Government Licence - Canada; archived GeoBase product terms apply
     attribution: Natural Resources Canada
@@ -800,6 +804,7 @@ sources:
     snapshot_path: data/raw/governance/noaa_onms_national_marine_sanctuaries/cinms_py2.zip
     archive_member: cinms_py.shp
     expected_sha256: 9c4162b0ec8d95b5872e4548ab0f4d804a06485ec8cdb4e9def21266b6f657ee
+    immutable_full_source_archive: true
     source_as_of: '2008-06-18'
     license: U.S. Government work; NOAA source terms and disclaimers apply
     attribution: NOAA Office of National Marine Sanctuaries
@@ -826,6 +831,7 @@ sources:
     snapshot_path: data/raw/governance/noaa_onms_national_marine_sanctuaries/chnms_py.zip
     archive_member: CHNMS_py.shp
     expected_sha256: b15ad1f67af16972cb491cbfdf242bc9213c6b793c6876e22223350279bcc7bf
+    immutable_full_source_archive: true
     source_as_of: '2024-12-02'
     license: U.S. Government work; NOAA source terms and disclaimers apply
     attribution: NOAA Office of National Marine Sanctuaries
@@ -852,6 +858,7 @@ sources:
     snapshot_path: data/raw/governance/noaa_onms_national_marine_sanctuaries/cbnms_py2.zip
     archive_member: CBNMS_py.shp
     expected_sha256: 41ba549976c5860085f9996727c86c9bcbac0eccd6fbfd80026a2f42db63b612
+    immutable_full_source_archive: true
     source_as_of: '2015-06-10'
     license: U.S. Government work; NOAA source terms and disclaimers apply
     attribution: NOAA Office of National Marine Sanctuaries
@@ -878,6 +885,7 @@ sources:
     snapshot_path: data/raw/governance/noaa_onms_national_marine_sanctuaries/gfnms_py2.zip
     archive_member: GFNMS_py.shp
     expected_sha256: 838f4b901c0dea98d37027dad87260855112a3654623e690bbdd376ac45b4e47
+    immutable_full_source_archive: true
     source_as_of: '2015-06-10'
     license: U.S. Government work; NOAA source terms and disclaimers apply
     attribution: NOAA Office of National Marine Sanctuaries
@@ -904,6 +912,7 @@ sources:
     snapshot_path: data/raw/governance/noaa_onms_national_marine_sanctuaries/mbnms_py2.zip
     archive_member: mbnms_py.shp
     expected_sha256: 83338c1bce533a4280629c36e6c505776087830678aef2ba980068ef3c7c922d
+    immutable_full_source_archive: true
     source_as_of: '2014-09-12'
     license: U.S. Government work; NOAA source terms and disclaimers apply
     attribution: NOAA Office of National Marine Sanctuaries
@@ -930,6 +939,7 @@ sources:
     snapshot_path: data/raw/governance/noaa_onms_national_marine_sanctuaries/ocnms_py2.zip
     archive_member: ocnms_py.shp
     expected_sha256: 5fdc270b972ddd53f2be767ee561c62bf892630d85cb7510b4c2583112e69673
+    immutable_full_source_archive: true
     source_as_of: '2004-12-01'
     license: U.S. Government work; NOAA source terms and disclaimers apply
     attribution: NOAA Office of National Marine Sanctuaries
@@ -1032,6 +1042,7 @@ sources:
     archive_member: NOAA_Marine_Protected_Areas_Inventory_2023/NOAA_MPAI_2023.gdb
     archive_layer: NOAA_MPA_Inventory
     expected_sha256: 2774f66f11dec5a65d9fe163a77b241306a63abda6a1e38881b3e175ee8d512d
+    immutable_full_source_archive: true
     source_as_of: '2023'
     license: U.S. Government public-domain data; not for navigation
     attribution: NOAA National MPA Center and U.S. Department of the Interior; contributing management agencies retained per feature
@@ -1274,6 +1285,7 @@ sources:
     url: https://oregonmarinereserves.com/content/uploads/2016/02/OregonMarineReserves_KMZ_GoogleEarth.zip
     snapshot_path: data/raw/governance/odfw_marine_reserves_2016/oregon.zip
     expected_sha256: 29d3d8c9f1fec34bad77d16d7999cee2c601636c5bb54f73e7a21eee83c50d8f
+    immutable_full_source_archive: true
     source_as_of: Published 2016-02 archive; source geometry date and current legal
       validity unverified
     license: ODFW public download; publication does not independently clear redistribution

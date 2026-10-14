@@ -26,6 +26,26 @@ from .shared.spatial import bbox_parts, clip_to_full_area, concatenate_clipped_f
 from .workspace import initialize_workspace
 
 
+def _producer():
+    """Use package/VCS installation metadata; never probe cwd or require Git."""
+    from importlib.metadata import distribution, PackageNotFoundError
+    from . import __version__
+    revision = None
+    try:
+        installed = distribution('toolkit-governance')
+        direct = json.loads(installed.read_text('direct_url.json') or '{}')
+        candidate = direct.get('vcs_info', {}).get('commit_id')
+        if (Path(installed.locate_file('governance/__init__.py')).resolve() == Path(__file__).with_name('__init__.py').resolve()
+            and installed.version == __version__ and direct.get('vcs_info', {}).get('vcs') == 'git'
+            and isinstance(candidate, str) and len(candidate) == 40
+            and all(character in '0123456789abcdef' for character in candidate)):
+            revision = candidate
+    except (PackageNotFoundError, ValueError, TypeError, AttributeError, OSError):
+        pass
+    return {'package': 'toolkit-governance', 'version': __version__, 'code_revision': revision,
+            'code_revision_source': 'installed_vcs_metadata' if revision else 'unavailable'}
+
+
 class LayerNotImplementedError(NotImplementedError):
     """Planned layer has no qualified geometry implementation."""
 
@@ -199,7 +219,7 @@ def get_layer(collection_id: str, bounding_box, *, make_h3: bool = False, h3_res
     if grid is not None:
         from .shared.query_overlay import overlay
         metrics, memberships = overlay(grid, features, source_ids=source_ids, coverage=coverage, max_memberships=max_memberships)
-    provenance = {'result_schema_version': 1, 'scientific_method_version': 'native-reference-query-2.0',
+    provenance = {'result_schema_version': 1, 'scientific_method_version': 'native-reference-query-2.1', 'producer': _producer(),
         'collection': collection_id, 'request': {'bounding_box': list(bbox), 'make_h3': make_h3, 'h3_res': h3_res if make_h3 else None, 'source_ids': list(source_ids), 'include_proposed': include_proposed, 'mode': mode},
         'sources': receipts, 'config_hash': config.config_hash,
         'query_time_utc': datetime.now(UTC).isoformat(), 'time_semantics': 'Knowledge timestamps retain source receipts; query/build time is separate. No historical legal inference.',

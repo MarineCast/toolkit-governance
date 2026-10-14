@@ -317,6 +317,8 @@ def download_direct_snapshot(source, *, overwrite=False, max_bytes=64_000_000, t
         _validate_expected_checksum(source, destination)
         _validate_direct_receipt(source, destination, bbox=None)
         return destination
+    if source.selection_where != '1=1' or source.requested_grid_mask_sha256 is not None:
+        raise CacheScopeError(f'{source.source_id}: direct download cannot apply selector/mask')
     destination.parent.mkdir(parents=True, exist_ok=True)
     fd, name = tempfile.mkstemp(dir=destination.parent, prefix='.' + destination.name, suffix='.part')
     temporary = Path(name)
@@ -371,6 +373,10 @@ def acquire_source(config: GovernanceConfig, source_id: str, *, overwrite=False)
     source = config.sources[source_id]
     if source.local_path is not None and source.local_path.exists():
         _validate_expected_checksum(source, source.local_path)
+        if source.local_path.suffix.lower() == '.json':
+            validate_snapshot(source, json.loads(source.local_path.read_text()), bbox=config.bbox_tuple)
+        else:
+            _validate_direct_receipt(source, source.local_path, bbox=config.bbox_tuple)
         return source.local_path
     if source.acquisition_type == 'direct_archive':
         return download_direct_snapshot(source, overwrite=overwrite)
@@ -387,22 +393,36 @@ def acquire_collection_sources(config, collection_id, *, overwrite=False):
 
 def _validate_direct_receipt(source, path, *, bbox):
     receipt_path = path.with_suffix(path.suffix + '.metadata.json')
+    if not receipt_path.exists() and not receipt_path.is_symlink():
+        if (source.immutable_full_source_archive is True and source.acquisition_type == 'direct_archive'
+            and path.suffix.lower() == '.zip' and source.expected_sha256 is not None
+            and source.selection_where == '1=1' and source.requested_grid_mask_sha256 is None
+            and source.server_filter is False):
+            # Verify here as well as in callers: a qualification flag alone is insufficient.
+            _validate_expected_checksum(source, path)
+            return {}  # Missing retrieval evidence remains unknown; no receipt fabricated.
+        raise CacheScopeError(f'{source.source_id}: vector/archive cache lacks a provider/scope/completeness receipt')
     if not receipt_path.is_file():
-        # A pinned official archive identifies full immutable source bytes. Derived/local
-        # vectors need their own declared support; a bare hash does not establish selectors.
-        if bbox is not None and path.suffix.lower() != '.zip':
-            raise CacheScopeError(f'{source.source_id}: vector cache lacks a provider/scope/completeness receipt')
-        return {}
-    receipt = json.loads(receipt_path.read_text())
+        raise CacheScopeError(f'{source.source_id}: malformed direct/vector cache receipt')
+    try:
+        receipt = json.loads(receipt_path.read_text())
+    except (ValueError, UnicodeError) as error:
+        raise CacheScopeError(f'{source.source_id}: malformed direct/vector cache receipt') from error
+    if not isinstance(receipt, dict):
+        raise CacheScopeError(f'{source.source_id}: malformed direct/vector cache receipt')
     if receipt.get('sha256') != sha256_dataset(path) or receipt.get('source_id') != source.source_id or receipt.get('source_url') != source.url:
         raise CacheScopeError(f'{source.source_id}: direct/vector cache receipt mismatch')
     if receipt.get('provider', source.provider) != source.provider or receipt.get('source_as_of', source.source_as_of) != source.source_as_of:
         raise CacheScopeError(f'{source.source_id}: direct/vector source/version mismatch')
     if receipt.get('selection_where', '1=1') != source.selection_where or receipt.get('requested_grid_mask_sha256') != source.requested_grid_mask_sha256:
         raise CacheScopeError(f'{source.source_id}: direct/vector selector/mask mismatch')
-    if bbox is not None and receipt.get('full_source_dataset') is not True:
+    if receipt.get('archive_member', source.archive_member) != source.archive_member or receipt.get('archive_layer', source.archive_layer) != source.archive_layer:
+        raise CacheScopeError(f'{source.source_id}: direct archive member/layer mismatch')
+    if receipt.get('full_source_dataset') is not True:
         if receipt.get('geometry_roster_complete') is not True or receipt.get('requested_bbox_wgs84') is None:
             raise CacheScopeError(f'{source.source_id}: vector support/completeness is unverified')
+        if bbox is None:
+            raise CacheScopeError(f'{source.source_id}: bounded receipt cannot establish full-source support')
         from shapely.ops import unary_union
         if not unary_union(bbox_parts(receipt['requested_bbox_wgs84'])).covers(unary_union(bbox_parts(bbox))):
             raise CacheScopeError(f'{source.source_id}: vector cache scope is smaller than request')
@@ -424,6 +444,7 @@ def read_source_frame(source: GovernanceSource, *, bbox=None) -> gpd.GeoDataFram
         frame.attrs['retrieved_at_utc'] = receipt.get('retrieved_at_utc')
         return frame
     if path.suffix.lower() != '.json':
+        receipt = _validate_direct_receipt(source, path, bbox=bbox)
         if path.suffix.lower() == '.zip' and source.archive_member and source.archive_layer:
             frame = gpd.read_file(f'/vsizip/{path.resolve()}/{source.archive_member}', layer=source.archive_layer)
         elif path.suffix.lower() == '.zip' and source.archive_member:
@@ -434,7 +455,6 @@ def read_source_frame(source: GovernanceSource, *, bbox=None) -> gpd.GeoDataFram
             frame = gpd.read_file(path)
         if frame.crs is None:
             raise ValueError(f'Governance source has no CRS: {path}')
-        receipt = _validate_direct_receipt(source, path, bbox=bbox)
         frame.attrs['retrieved_at_utc'] = receipt.get('retrieved_at_utc')
         return frame.to_crs(4326)
     snapshot = json.loads(path.read_text())
