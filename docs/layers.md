@@ -6,12 +6,12 @@ outputs; the sections that follow describe secondary products and coverage.
 
 | Collection ID | Source inputs | Native geometry | Primary output |
 | --- | --- | --- | --- |
-| `marine_protected_areas` | NOAA 2023 MPA Inventory; DFO Oceans Act MPAs and Areas of Interest | Polygons and separate interest points | `marine_protected_areas.parquet` |
+| `marine_protected_areas` | NOAA 2023 MPA Inventory; DFO Oceans Act MPAs/optional Areas of Interest; ODFW 2016 archive | Polygons and separate interest points | `marine_protected_areas.parquet` |
 | `national_marine_sanctuaries` | Six pinned NOAA ONMS boundary archives | Polygons, retaining parts and overlaps | `national_marine_sanctuaries.parquet` |
 | `international_boundaries` | IBC, NOAA, NRCan CGB, DFO bioregions, and supplied seascape water support | Reference lines and derived support polygons | `international_boundaries.parquet` |
 | `federal_waters` | NOAA territorial-sea, contiguous-zone, and EEZ services; archived NRCan CGB | Source-native limit lines | `federal_maritime_limits.parquet` |
 | `state_provincial_waters` | BOEM Submerged Lands Act boundary service | State seaward boundary lines | `state_seaward_boundaries.parquet` |
-| `management_areas` | WDFW Recreational Marine Area Code service | Polygons | `management_areas.parquet` |
+| `management_areas` | WDFW recreational areas; DFO Pacific V3.1 subareas; ADF&G groundfish statistical areas | Separate system-specific polygons | `management_areas.parquet` |
 | `critical_habitat` | Provisioned NOAA NMFS polygon/line snapshots | Polygons and lines | `critical_habitat.parquet` |
 | `wildlife_refuges` | Selected FWS and ECCC inventories | Polygons | `wildlife_refuges.parquet` |
 | `conservation_designations` | Qualified ECCC marine CPCAD classifications | Polygons with separate reported roles | `conservation_designations.parquet` |
@@ -21,6 +21,8 @@ outputs; the sections that follow describe secondary products and coverage.
 | `traffic_separation_schemes` | Provisioned CHS and NOAA2026 TSS references | Source-native role-specific geometry | `traffic_separation_schemes.parquet` |
 | `ports` | Provisioned NGA World Port Index | Physical points | `ports.parquet` |
 | `coast_guard_sectors` | Provisioned USCG sectors and CCG Western-region references | Distinct agency polygons | `coast_guard_sectors.parquet` |
+| `exclusion_zones` | Pinned TC 2026 instrument, Saturna/Pender closed rings | Fixed vessel-zone polygons | `zones.parquet` |
+| `speed_restriction_zones` | Same TC instrument, Swiftsure closed ring | Fixed speed-zone polygon | `zones.parquet` |
 
 **Paths below are workspace-relative defaults**, controlled by
 `config/data/governance/governance.yaml`. Every collection directory also contains
@@ -61,6 +63,10 @@ See [product contracts](CONTRACTS.md) for validation semantics.
   geometry and regulation citations.
 - **DFO Areas of Interest:** native points represent interest sites. They are
   retained separately; the toolkit does not invent proposed boundaries.
+
+- **ODFW 2016 archive:** published Oregon reserve/MPA/seabird placemarks retain
+  provider identity, holes and multipart geometry; current designation instruments
+  and legal applicability remain separate.
 
 Normalization preserves designation identity, management authority, source-native
 activity classifications, governing-rule gaps, and IUCN reporting values where
@@ -483,11 +489,20 @@ canonical native geometry. See the [full overlay contract](h3-matrix.md).
 
 ## Fixed vessel and speed references
 
-`exclusion_zones` and `speed_restriction_zones` now have bounded TC 2026 adapters.
-See [regional/source qualification](coverage.md) and the [single-layer API](query-api.md)
-for exact instrument/coordinate-ring scope, retained quantities/units/dates/exceptions,
-and unresolved coastline/moving-animal support. The new ODFW and ADF&G providers retain
-distinct native identities and provider systems; they do not redefine historical study outputs.
+The pinned TC 2026 instrument supplies two closed Saturna/Pender vessel-zone rings
+and one closed Swiftsure speed ring. Native records retain instrument version, clause,
+original quantity/unit, inclusive day-precision interval and exception references.
+
+| Directory under `data/processed/domain/governance/vessel_management/` | Files |
+| --- | --- |
+| `exclusion_zones/` | `zones.parquet`, `manifest.json` |
+| `speed_restriction_zones/` | `zones.parquet`, `manifest.json` |
+
+Nitinat follows an unqualified coastline/border segment and remains excluded. Moving-animal
+approach rules need animal/vessel context and remain outside these fixed polygons. Neither
+inventory reconstructs all rules or establishes current legal applicability. See
+[regional/source qualification](coverage.md), [single-layer API](query-api.md) and
+[TC source notes](https://github.com/MarineCast/toolkit-governance/blob/fdc32276637117acce2fc0fb9595a12229d8df64/src/governance/vessel_management/exclusion_zones/DATA_SOURCES.md).
 
 ## Planned families
 

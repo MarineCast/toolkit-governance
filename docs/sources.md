@@ -1,5 +1,26 @@
 # Source and quality index
 
+## Current toolkit 0.2.1
+
+Seventeen reference collections are implemented; seven remain planned. The [query API](query-api.md),
+[regional matrix](coverage.md) and [correction handoff](hardening-corrections.md) describe current
+software support and qualification. Current source notes are pinned to hardening revision
+`fdc32276637117acce2fc0fb9595a12229d8df64`:
+
+| System | Current source notes |
+| --- | --- |
+| WDFW recreation, DFO Pacific subareas, ADF&G groundfish reporting | [Separate fisheries systems and DFO zero identifiers](https://github.com/MarineCast/toolkit-governance/blob/fdc32276637117acce2fc0fb9595a12229d8df64/src/governance/fisheries_management/management_areas/DATA_SOURCES.md) |
+| NOAA/DFO inventories and ODFW 2016 references | [Protected-area source roles](https://github.com/MarineCast/toolkit-governance/blob/fdc32276637117acce2fc0fb9595a12229d8df64/src/governance/protected_areas/marine_protected_areas/DATA_SOURCES.md) |
+| TC 2026 closed vessel-zone rings | [Fixed exclusions](https://github.com/MarineCast/toolkit-governance/blob/fdc32276637117acce2fc0fb9595a12229d8df64/src/governance/vessel_management/exclusion_zones/DATA_SOURCES.md) |
+| TC 2026 Swiftsure speed ring | [Fixed speed reference](https://github.com/MarineCast/toolkit-governance/blob/fdc32276637117acce2fc0fb9595a12229d8df64/src/governance/vessel_management/speed_restriction_zones/DATA_SOURCES.md) |
+
+Native rebuilds use `native-reference-2.1` and getters use `native-reference-query-2.1`.
+Source-query receipts qualify acquisition support, not geographic completeness or current law.
+All outputs remain model-ineligible. None of these additions rebuilds or recertifies the local
+study bundles below.
+
+## Historical study documentation baseline
+
 The links below pin the documentation baseline to main
 `65fbebb3416673fbd147f4a4d634fa34b8df7679`. Read the notes together with effective
 workspace source configuration and retained source receipts. Notes describe source
@@ -14,7 +35,7 @@ a successful site build does not qualify source coverage. Local study bundles re
 `source-evidence-index.json`, `preflight.json`, metric/native/delivery companions,
 `validation.json` and study contracts. They are not publicly hosted by this site.
 
-## Implemented family notes
+## Historical implemented family notes
 
 | Family | Pinned source notes |
 | --- | --- |
@@ -43,7 +64,7 @@ for snapshot paths, authority scope, rights, query support and missingness.
 The critical-habitat study checkpoint retains an old line-query footprint; ports
 are point references. Neither constitutes complete designation or port-footprint coverage.
 
-## Unavailable families and acceptance
+## Historical unavailable families and acceptance
 
 The nine catalog families still unavailable at this checkpoint are seasonal closures,
 gear restrictions, harvest regulations, salmon management zones, exclusion zones,

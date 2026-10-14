@@ -77,9 +77,16 @@ does not automatically make its geographic coverage complete. An unavailable or
 reference-only source must remain explicitly qualified.
 
 YAML composition supports mapping deep-merges, list replacement, references,
-environment values, and include-cycle checks. The inherited loader does not
-enforce a complete strict unknown-key schema. Read the resolved configuration
-and product manifest after changing it.
+environment values and cycle checks. The loader rejects unknown root/source/collection/
+clipping/path/inspection keys, malformed booleans, invalid bounds and invalid source references.
+Read the resolved configuration and product manifest after changing it.
+
+Direct/vector caches require compatible identity, selector and support receipts. Only a
+reviewed immutable full-source ZIP contract may declare `immutable_full_source_archive: true`;
+it also requires a configured verified SHA-256, direct-archive acquisition, an unfiltered
+`1=1` selector, no mask and no server filtering. Pinning a local subset alone is insufficient.
+Older strict loaders reject this new key; configurations using it require 0.2.1. Existing
+source pins are never replaced automatically. See [cache contracts](query-api.md#cache-and-network-modes).
 
 ## Output and presentation settings
 

@@ -44,14 +44,14 @@ coordinates remain the controlling authorities.
 | --- | --- | --- |
 | Protected areas | MPAs; sanctuaries; critical habitat; selected refuges; reported marine classifications | Native reference geometry, separate interest points, authority records, and qualified classification views |
 | Jurisdiction | International boundaries; federal waters; state/provincial waters; counties; BIA/NRCan administrative references | Source-preserving boundaries, derived support, availability, reconciliation, and distinct provider systems |
-| Fisheries management | Management areas | WDFW recreational marine-area polygons and optional study crosswalks; quantity systems remain qualified separately |
-| Vessel management | Shipping references; traffic-separation components | Typed CHS/NOAA source and component roles, without pooled route claims |
+| Fisheries management | Management areas | Separate WDFW recreational, DFO Pacific subarea and ADF&G groundfish reporting systems; quantities remain qualified separately |
+| Vessel management | Shipping references; traffic-separation components; fixed vessel/speed zones | Typed CHS/NOAA routing roles and closed-ring TC 2026 instrument references |
 | Administrative context | Ports; Coast Guard references | Physical port points and separate USCG/CCG administrative inventories |
 
 The catalog contains **24 entries: seventeen implemented collections and seven planned
 families**. Implementation does not imply complete regional coverage. The default
 processing extent is the Northeast Pacific, from 180°W to 109°W and 32°N to 72°N.
-See [layers](layers.md) for collection-specific support.
+See [layers](layers.md) for collection-specific support and the [0.2.1 correction handoff](hardening-corrections.md) for current methods, source evidence and validation.
 
 ## Start with an empty workspace
 
