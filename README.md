@@ -25,6 +25,10 @@ governance validate-data /path/to/Data/Governance
 Read the [Parquet output guide](docs/parquet-products.md) for updates from retained
 originals, Python usage, exact filenames, embedded provenance, source rights and
 validation. Builds use temporary intermediates and do not download implicitly.
+After successful output validation, builds remove disposable source-workspace
+`data/` caches and old processed files whose sources are retained in `OriginalData`.
+Use `--keep-workspace-data` to retain them. Failed builds preserve source caches;
+shared/unrecognized data, symlinks and protected inputs prevent cleanup.
 Source workspace precedence is `--workspace`, `GOVERNANCE_WORKSPACE`, then cwd;
 package resources are read-only defaults. Partial coverage, nulls and observed zeros
 remain distinct. Original geometry and source dates do not certify current law.

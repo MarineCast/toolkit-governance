@@ -72,6 +72,17 @@ No ZIP archives or JSON page snapshots are duplicated in the public directory.
 Acquisition caches belong in the explicit source workspace, separately from public outputs.
 A verified OriginalData directory is itself sufficient for an offline rebuild.
 
+Successful `build` operations validate the installed output, then remove the source
+workspace's lowercase `data/` folder when it contains only retained source caches,
+their acquisition metadata, old configured processed intermediates and Finder metadata.
+Every cached source must match the checksum retained in `OriginalData`; a partial
+or subset build cannot discard unretained sources. Unknown files, symlinks, or
+output/configuration/protected build inputs within `data/` keep the whole folder intact.
+Caches outside this folder are untouched. A failed build leaves source caches intact.
+Use `--keep-workspace-data` when caches should survive successful builds. Subsequent
+offline builds can use `--original-data` as shown below; acquiring fresh inputs
+recreates the required cache directories.
+
 ## Build and update
 
 ```sh
@@ -84,6 +95,12 @@ governance --workspace /path/to/source-workspace build \
   --grid /path/to/grid-r6.parquet --grid /path/to/grid-r8.parquet \
   --output-directory /path/to/Data/Governance --allow-partial
 governance validate-data /path/to/Data/Governance
+```
+
+To clean a completed source workspace separately, with the same retention checks:
+
+```sh
+governance --workspace /path/to/source-workspace clean-workspace /path/to/Data/Governance
 ```
 
 `--grid` accepts explicit `H3_INDEX`/`H3_RESOLUTION` grid Parquets, or the static

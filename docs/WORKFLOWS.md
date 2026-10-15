@@ -3,6 +3,12 @@
 The normal workflow is the [flat Parquet build](parquet-products.md): initialize
 an explicit source workspace, review configuration and source rights, acquire
 inputs explicitly, build supplied H3 grids, and validate `Data/Governance`.
+After installation and validation, `build` removes disposable source-workspace
+`data/` when cached sources match retained originals and the folder contains no
+unrelated files, symlinks or protected inputs. Use `--keep-workspace-data` to retain
+caches. A failed build keeps source data. `clean-workspace Data/Governance` applies
+the same checks to an already completed workspace. Rebuild from `OriginalData` or
+explicitly acquire fresh inputs after cleanup.
 
 Acquisition writes qualified raw caches in the source workspace. Builds never
 download implicitly. Public outputs contain only resolution-specific static/optional
