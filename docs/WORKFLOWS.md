@@ -1,93 +1,41 @@
 # Workflows and operational boundaries
 
-Run commands from the owning checkout after installation, or use an installed CLI with an explicit
-workspace. Never use the original application as a runtime root.
+The normal workflow is the [flat Parquet build](parquet-products.md): initialize
+an explicit source workspace, review configuration and source rights, acquire
+inputs explicitly, build supplied H3 grids, and validate `Data/Governance`.
 
-1. Run `governance --workspace /path/to/workspace init`. It copies missing YAML defaults/catalog
-   and preserves edits. Review extent, source pins, rights and all configured input/output paths.
-2. Request `download <collection>` explicitly. Archive/ArcGIS acquisition writes configured raw
-   snapshots and metadata; downloads are not part of `build` or `init`. Existing snapshots are reused only after request-scope, identity, checksum and completeness validation; `--overwrite` stages a replacement. Pinned archives verify SHA-256.
-3. Build one collection from local inputs. The default rejects incomplete full-area support;
-   `--allow-partial` permits explicit research/context products. Each family normalizes, clips,
-   validates and writes its products/manifests. `--overwrite` allows replacement. Inspect family
-   code before execution because secondary publication can write several files after the primary.
-4. Use `catalog` for metadata validation and `catalog --verify-artifacts` to check present primary
-   artifacts. Missing artifacts are skipped by the inherited catalog validator. This is not a
-   whole-release acceptance gate.
-5. Render `inspect --as-of YYYY-MM-DD` into the configured output directory. It writes HTML and
-   a map manifest, replacing these inspection outputs. It does not promote a scientific release.
-   Basemap assets require a browser/network when viewing the HTML.
+Acquisition writes qualified raw caches in the source workspace. Builds never
+download implicitly. Public outputs contain only resolution-specific static/optional
+dynamic metric Parquets, `catalog.json`, and `OriginalData/<dataset>/geometry.parquet`.
+Native family products, manifests and reconciliation diagnostics are temporary
+implementation intermediates. No release, publication, activation or rollback
+command is required for governance data.
 
-The download, build, inspect, catalog and H3-overlay commands accept `--config`; collection-specific defaults also remain available through
-`python -m governance.<category>.<collection>.build` and `.download`. Set `GOVERNANCE_WORKSPACE`
-for direct Python/module usage. A CLI `--output` path is interpreted relative to the process cwd;
-configured output paths resolve relative to the workspace.
-
-See [installation/configuration](getting-started.md) and [CLI reference](cli.md) for
-required arguments and path rules. `preflight`, delivery and generation commands
-do not accept `--config`; they use default workspace configuration where needed.
+An existing flat output requires `--overwrite`; it is checked before replacement.
+A verified OriginalData directory can supply future offline builds, and the static
+metric files themselves can supply the grid. Provider/version/selector/support
+receipts must still agree with configuration. Last-update timestamps do not refresh
+source vintage or establish present legal applicability.
 
 ## External local inputs
 
-The inherited international-boundary reconciliation can use these separately provisioned inputs:
-
-- NOAA U.S. maritime limits shapefile at the configured `data/raw/gis/marine/...` path (or its
-  configured snapshot where the source reader supports it).
-- DFO Federal Marine Bioregions shapefile, with its complete shapefile sidecars.
-- A seascape territorial-water support GeoParquet, with upstream provenance and source rights.
-
-These are inputs, not Python imports. Supply them in the workspace or set explicit paths. The
-extraction moved governance-owned files only; it did not move shared seascape inputs or require
-an application/sibling checkout. Historical OrcaCast labels on a derived support source describe
-its original provenance, not a runtime dependency. Do not relabel historical source attribution.
-Reconciliation may still require these inputs even with `--allow-partial`.
+International-boundary reconciliation still requires configured NOAA maritime,
+DFO bioregion and seascape water support. They are data inputs, not sibling Python
+imports. Their original source attribution and unknown retrieval times are retained.
+No sibling checkout is searched implicitly.
 
 ## Development checks
 
 ```sh
-python -m pip install -e '.[test]'
+python -m pip install -e '.[test,docs]'
 python -m pytest -q
 python -m pip wheel --no-deps --wheel-dir dist .
+mkdocs build --strict
 git diff --check
 ```
 
-Verify a regular wheel installation from outside the checkout, initialize a fresh external
-workspace, validate its catalog and import all seventeen families without application imports. Keep
-`config/` and `src/governance/resources/config/` byte-identical. Regenerate the editable catalog
-with `python -m governance.maintenance.catalog`, then synchronize its packaged resource.
-
-Moved local historical products retain their original bytes, manifests and absolute provenance
-paths. They are evidence of the prior build, not freshly validated toolkit releases. Use a new
-workspace for rebuilds; do not reuse an old manifest as proof that new configuration was run.
-See [migration](MIGRATION.md) for the local transfer/cleanup boundary and unrun checks.
-
-## Coherent local releases
-
-Use the separate [production release workflow](production-readiness.md) to stage all native
-products, companions and evidence before an atomic generation-pointer switch. Per-family build
-commands still write per-file and must not target an already published generation.
-
-For a cache-only regional build on explicit frozen shared-study grids, use `study-preflight`,
-`run-study` and `validate-study-release`; see [production readiness](production-readiness.md#explicit-shared-study-build).
-The study generation guard repeats scientific checks before activation or rollback.
-
-Resolve the immutable generation once for each reader operation:
-
-```python
-from governance.releases import resolve_current
-
-generation = resolve_current('/path/to/releases')
-# Read every required companion/table beneath this retained generation path.
-```
-
-Byte and membership verification does not certify scientific completeness. The
-[study workflow](study-guide.md) supplies additional semantic gates for
-study-contract bundles, including validation from the permanent generation path.
-For interrupted staging, stale locks and validation failures see [troubleshooting](troubleshooting.md).
-
-Direct/vector caches require compatible identity, selector and support receipts by default.
-A receiptless pinned ZIP is usable only through its explicit immutable full-source archive
-contract; arbitrary ZIPs and derived subsets do not qualify. Existing malformed receipts
-fail even for qualified archives. Explicit local acquisition overrides receive the same checks.
-Refresh stages/checks bytes and preserves the previous cache/metadata pair on handled failure.
-See [query cache contracts](query-api.md#cache-and-network-modes).
+Validate a regular wheel from outside the checkout with application imports blocked.
+Keep checkout and packaged configuration byte-identical. Synthetic/offline tests do
+not establish live source availability, legal currency or scientific accuracy.
+Old study/generation helpers and their regression tests concern historical artifacts;
+their CLI and public output workflow are retired. See [migration](MIGRATION.md).

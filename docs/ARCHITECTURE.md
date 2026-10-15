@@ -1,23 +1,22 @@
 # Architecture and navigation
 
-`governance` owns acquisition, source normalization, native-geometry publication and inspection.
-Applications own ecological interpretation, grid selection and temporal eligibility. The optional
-`h3_matrix` module performs a species-neutral geometric overlay only on an explicit consumer grid;
-it produces a separate model-ineligible context product, retaining canonical native products.
-There is no
-application runtime dependency, sibling-path import, shared core package or implicit source download.
+`governance` owns acquisition, source normalization and geometric metrics on explicit H3 grids.
+The public `products` API writes [flat Parquets](parquet-products.md), an update catalog and
+original dataset extents. Applications own ecological interpretation, grid selection and
+temporal eligibility. Native GeoParquet and manifests exist only as temporary implementation
+intermediates during a normal build. There is no application runtime dependency, sibling-path
+import, shared core package or implicit source download.
 
 | Surface | Ownership |
 | --- | --- |
 | `governance.__init__` | Public configuration and workspace initializer |
 | `governance.cli` / `python -m governance` | CLI routing and explicit workspace selection |
-| `governance.h3_matrix` | Optional explicit H3 overlay export; see [contract](h3-matrix.md) |
+| `governance.h3_matrix` | Internal explicit H3 overlay; see [contract](h3-matrix.md) |
 | `protected_areas/*`, `jurisdiction/*`, `fisheries_management/*`, `administrative_context/*`, `vessel_management/*` | Seventeen family-owned source, build and inspection workflows |
 | `preflight` | Read-only source and catalog readiness inventory |
 | `delivery` | Verified overlay projection into one wide table per supplied resolution |
-| `releases` | Immutable local generation envelope, verified activation and rollback |
-| `shared_contract` | Explicit delivery mapping to a caller-supplied pinned `reference_geometry` schema |
-| `study` (PR7) | Frozen input bindings, offline rebuild and semantic validation; see [study guide](study-guide.md) |
+| `products` | Public offline build, flat output replacement and catalog/Parquet validation |
+| `releases`, `study`, `shared_contract` | Historical artifact compatibility/regression utilities; retired CLI |
 | `shared/` | Native schema, acquisition, clipping, coverage, manifests, catalog and map descriptors |
 | `_config/` | Private composed YAML, redaction, path and presentation support |
 | `maintenance/catalog.py` | Explicit 24-collection registry and deterministic catalog generator |
@@ -25,7 +24,7 @@ application runtime dependency, sibling-path import, shared core package or impl
 | `config/` | Editable checkout defaults; keep synchronized with packaged resources |
 
 Preserve the per-family public entry points (`download`, `build`, `inspect`) and shared contracts.
-The CLI dispatches through configured collections to those modules. Catalog validation uses the
+The flat builder runs configured native modules in temporary storage. Catalog validation uses the
 explicit registry, not empty source directories that disappear during wheel packaging. The map
 inspector forwards its selected configuration to catalog validation.
 
@@ -55,8 +54,7 @@ runtime dynamic-import relationships. Source/tests are authoritative.
 implicitly or build a MarineCast-wide graph. This repository owns its graph independently of
 other toolkits. See [migration validation](MIGRATION.md) for the observed run.
 
-`preflight` inventories every source and catalog family; `delivery` projects single-resolution
-wide snapshot tables; `releases` provides immutable local multi-artifact generations and verified
-activation/rollback. See [production readiness](production-readiness.md) for operational boundaries.
-
-The single-layer [query engine](query-api.md) uses explicit config/workspace objects, a source-normalizer registry and supported `shared.grid` helpers. It never initializes study releases or mutates the process workspace environment.
+`preflight` inventories source and catalog readiness. `products.build_products` stages
+normalization, a metrics-only overlay and original extents, then replaces a validated flat
+directory. `products.export_products` projects a verified internal matrix without releases.
+The single-layer [query engine](query-api.md) remains an in-memory scientific API.

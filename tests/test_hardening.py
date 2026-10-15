@@ -49,6 +49,20 @@ def test_date_parser_declared_ms_ambiguous_and_schema_drift():
     with pytest.raises(ValueError,match='schema drift'):source_date(frame,'date',1590969600000,arcgis_date=True)
 
 
+def test_native_repeated_dates_still_reject_late_invalid_values(tmp_path,snapshot_fixture):
+    cfg=configured(tmp_path);source,_,_=cached_area(cfg,snapshot_fixture)
+    native=get_fishery_management_areas((-124,47,-122,49),config=cfg,sources=source.source_id,mode='offline',allow_partial=True).features
+    frame=gpd.GeoDataFrame(pd.concat([native]*3,ignore_index=True),crs=native.crs)
+    frame['GEOMETRY_PART_ID']=['part0','part1','part2']
+    frame['EFFECTIVE_START']=['2020-06-01']*3
+    frame['SYSTEM_LEARNED_AT']=['2026-10-14T00:00:00Z']*3
+    validate_governance_geometry(frame)
+    for field,bad in [('EFFECTIVE_START','2020-02-30'),('EFFECTIVE_START',1590969600000),
+                      ('SYSTEM_LEARNED_AT','badZ'),('SYSTEM_LEARNED_AT','2026-10-14T00:00:00+01:00')]:
+        changed=frame.copy();changed[field]=changed[field].astype(object);changed.loc[2,field]=bad
+        with pytest.raises(ValueError):validate_governance_geometry(changed)
+
+
 def test_dateline_half_line_and_multipart_points():
     config=load_governance_config()
     raw=gpd.GeoDataFrame({'SOURCE_FEATURE_ID':['dateline','points']},geometry=[LineString([(179,50),(-179,50)]),MultiPoint([(-123,48),(0,0)])],crs=4326)

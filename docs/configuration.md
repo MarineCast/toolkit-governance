@@ -1,3 +1,7 @@
+> Version 0.3 public output uses the [flat Parquet workflow](parquet-products.md).
+> Native artifacts and release/study commands below describe historical or internal workflows;
+> they are not the current public data layout.
+
 # Configuration
 
 The selected workspace contains editable YAML, raw snapshots, processed products,

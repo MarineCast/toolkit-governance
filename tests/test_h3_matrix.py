@@ -231,6 +231,8 @@ def test_delivery_splits_resolutions_and_preserves_partial_nulls(workspace, grid
     assert table['management_areas__recorded_feature_count_status'].to_pylist() == ['partial','partial']
     assert table['management_areas__recorded_feature_count'].to_pylist() == [1,None]
     info=json.loads(manifest.read_text())
+    from governance import __version__
+    assert info['software']['version']==__version__
     assert info['coverage']['management_areas']['geographic_inventory_coverage']['denominator'] is None
     assert info['shared_contract_conformance']['status']=='not_claimed_by_local_envelope'
     with pytest.raises(FileExistsError):

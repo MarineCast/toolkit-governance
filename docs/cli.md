@@ -1,37 +1,25 @@
-# Delivery and local publication CLI
+# CLI reference
 
-These commands operate on retained inventory products and local releases. See
-the [basic CLI reference](reference/cli.md) for workspace, acquisition, build,
-inspection, and overlay commands, and the [study guide](study-guide.md) for
-frozen-study inputs and semantic validation. Run command help from the installed
-revision before operational use.
+Use `governance --help` and command help from the installed revision. Global
+`--workspace` precedes the command; output and grid paths are explicit process paths.
+Configuration-relative source paths resolve against the selected source workspace.
 
-| Command | Required inputs and effects |
+| Command | Effect |
 | --- | --- |
-| `export-delivery --matrix FILE --output-directory DIR --release-id ID --software-revision SHA` | Projects verified overlay into separate wide tables and companions per resolution |
-| `export-shared-manifest --artifact FILE --local-manifest FILE --schema FILE --schema-reference REF` | Requires `contract` extra; validates against caller-supplied pinned schema admitting `reference_geometry`; writes new shared companion |
-| `publish-generation --source DIR --release-root DIR --release-id ID --scientific-method-version VERSION --software-revision SHA` | Copies quiescent prepared inputs, hashes/verifies members and atomically activates local generation |
-| `verify-generation PATH` | Reads generation membership and hashes; baseline does not establish scientific completeness |
-| `activate-generation --release-root DIR --release-id ID` | Verifies and selects an existing immutable generation; no data rewrite |
+| `init` | Copy missing defaults; no acquisition |
+| `download COLLECTION --config FILE [--overwrite]` | Explicit qualified source acquisition into the source workspace |
+| `build --grid FILE [--grid FILE] --output-directory DIR [--original-data DIR] [--length-crs CRS] [--allow-partial] [--overwrite]` | Offline normalization and overlay; write flat Parquets, OriginalData and update catalog |
+| `export-data --matrix FILE --output-directory DIR [--overwrite]` | Project an existing internal overlay and retain original datasets |
+| `validate-data DIR` | Read-only flat membership, checksum, grain and value/status validation |
+| `catalog [--config FILE] [--verify-artifacts]` | Configured collections; optional retained internal-artifact checks |
+| `availability`, `preflight` | Read source/collection readiness; no acquisition |
+| `get COLLECTION --bbox WEST SOUTH EAST NORTH` | In-memory single-layer query; see query API for bounded acquisition and offline mode |
 
-`SHA` is a full 40-character lowercase Git SHA, not a branch name. Choose a new
-release ID using letters, digits, underscore, dot or hyphen, starting with a letter
-or digit and at most 128 characters. Generations cannot be overwritten. Source and
-release root must be separate, non-nested directories; symlinks are forbidden.
-The baseline publisher checks bytes and membership. Scientific acceptance is a
-separate requirement; the publisher includes a semantic activation gate for study-contract bundles.
+`build` and `export-data` accept `--config` and optional `--software-revision` for
+software provenance. There is no release ID. Existing flat output needs explicit
+`--overwrite`; partial source coverage needs `--allow-partial` for builds.
 
-```sh
-governance --workspace /path/to/workspace export-delivery \
-  --matrix /path/to/governance-h3-metrics.parquet \
-  --output-directory /path/to/new-delivery \
-  --release-id research-v1 --software-revision FULL_40_CHARACTER_GIT_SHA
-governance export-shared-manifest \
-  --artifact /path/to/new-delivery/governance-inventory-r6.parquet \
-  --local-manifest /path/to/new-delivery/governance-inventory-r6.manifest.json \
-  --schema /path/to/approved-schema.json --schema-reference PINNED_SCHEMA_REFERENCE
-```
-
-Confirm the delivery paths printed by `export-delivery` in your installed revision. A schema reference must identify the reviewed
-schema revision; schemas are never fetched implicitly. Export does not authorize
-redistributing datasets. See [contracts](CONTRACTS.md) for native/shared distinctions.
+The old `run-study`, generation publication/activation/verification, manifest export,
+per-collection CLI build, `inspect`, and query multi-file export commands are retired.
+Native normalization, reconciliation and historical validators remain Python
+implementation utilities. Public data writes use the [flat Parquet contract](parquet-products.md).

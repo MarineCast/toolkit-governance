@@ -93,18 +93,29 @@ def validate_governance_geometry(
         raise ValueError("RETAINED_MEASURE_FRACTION must lie in [0, 1]")
     from .normalization import date_value
     for field in ("EFFECTIVE_START", "EFFECTIVE_END"):
+        validated = set()
         for value in frame[field].dropna():
-            if not isinstance(value, str) or date_value(value) != value:
+            if not isinstance(value, str):
                 raise ValueError(f"{field} must be exact ISO dates or null")
+            if value not in validated:
+                if date_value(value) != value:
+                    raise ValueError(f"{field} must be exact ISO dates or null")
+                validated.add(value)
     intervals = frame.loc[frame.EFFECTIVE_START.notna() & frame.EFFECTIVE_END.notna()]
     if (intervals.EFFECTIVE_START > intervals.EFFECTIVE_END).any():
         raise ValueError("Effective interval start exceeds end")
     if not np.isfinite(frame.total_bounds).all() or frame.total_bounds[0] < -180 or frame.total_bounds[2] > 180 or frame.total_bounds[1] < -90 or frame.total_bounds[3] > 90:
         raise ValueError("Geometry bounds must be finite and within WGS84 support")
+    validated = set()
     for value in frame.SYSTEM_LEARNED_AT.dropna():
-        parsed = pd.to_datetime(value, errors="coerce", utc=True)
-        if not isinstance(value, str) or pd.isna(parsed) or not (value.endswith('Z') or value.endswith('+00:00')):
+        if not isinstance(value, str):
             raise ValueError('SYSTEM_LEARNED_AT must be an ISO UTC timestamp or null')
+        if value in validated:
+            continue
+        parsed = pd.to_datetime(value, errors="coerce", utc=True)
+        if pd.isna(parsed) or not (value.endswith('Z') or value.endswith('+00:00')):
+            raise ValueError('SYSTEM_LEARNED_AT must be an ISO UTC timestamp or null')
+        validated.add(value)
     if 'ESTABLISHMENT_DATE_PRECISION' in frame and not set(frame.ESTABLISHMENT_DATE_PRECISION.dropna()).issubset({'year', 'day', 'unknown'}):
         raise ValueError('Invalid establishment date precision')
     if 'SOURCE_ROLE' in frame:

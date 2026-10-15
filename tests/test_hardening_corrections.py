@@ -243,7 +243,8 @@ def test_public_getter_actual_h3_collection_intersection(tmp_path,snapshot_fixtu
     assert result.memberships.INTERSECTION_AREA_M2.iloc[0]==pytest.approx(area(half),rel=1e-8)
     assert result.h3[source.source_id+'__polygon_coverage_full_cell_fraction'].iloc[0]==pytest.approx(area(half)/area(cell),rel=1e-8)
     assert h3.get_resolution(result.h3.H3_INDEX.iloc[0])==7
-    assert result.provenance['producer']['version']=='0.2.1'
+    from governance import __version__
+    assert result.provenance['producer']['version']==__version__
     assert result.features.SYSTEM_LEARNED_AT.tolist()==['2026-10-01T00:00:00Z']
     assert result.provenance['query_time_utc']!='2026-10-01T00:00:00Z'
 
@@ -306,7 +307,7 @@ def test_producer_revision_uses_only_reliable_install_metadata(monkeypatch):
     import importlib.metadata
     from governance.query import _producer
     class Distribution:
-        version='0.2.1'
+        from governance import __version__ as version
         def read_text(self,name):return json.dumps(dict(vcs_info=dict(vcs='git',commit_id='a'*40)))
         def locate_file(self,name):
             from pathlib import Path

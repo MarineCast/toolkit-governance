@@ -434,6 +434,11 @@ def read_source_frame(source: GovernanceSource, *, bbox=None) -> gpd.GeoDataFram
     if path is None:
         raise SourceUnavailableError(f'No runtime snapshot is available for {source.source_id}')
     _validate_expected_checksum(source, path)
+    if path.suffix.lower() in {'.parquet', '.geoparquet'}:
+        import pyarrow.parquet as pq
+        metadata = pq.read_schema(path).metadata or {}
+        if b'governance_original' in metadata:
+            return _read_original_frame(source, path, metadata, bbox=bbox)
     if source.source_id in {'odfw_marine_reserves_2016', 'tc_srkw_interim_order_2026'}:
         receipt = _validate_direct_receipt(source, path, bbox=bbox)
         if source.source_id == 'odfw_marine_reserves_2016':
@@ -476,3 +481,38 @@ def read_source_frame(source: GovernanceSource, *, bbox=None) -> gpd.GeoDataFram
         str(next((v for k, v in feature.get('properties', {}).items() if k.casefold() == str(snapshot.get('object_id_field', 'OBJECTID')).casefold()), '')): page.get('retrieved_at_utc', snapshot.get('retrieved_at_utc'))
         for page in snapshot.get('pages', []) for feature in page.get('response', {}).get('features', [])}
     return frame
+
+
+def _read_original_frame(source, path, metadata, *, bbox):
+    """Read a checksum-pinned OriginalData dataset with its original scope receipt."""
+    original = json.loads(metadata[b'governance_original'])
+    record, receipt = original['source'], original['receipt']
+    if original.get('schema_version') != 1 or any(record.get(k) != v for k, v in (
+        ('source_id', source.source_id), ('provider', source.provider),
+        ('url', source.url), ('source_as_of', source.source_as_of))):
+        raise CacheScopeError('OriginalData provider/version mismatch')
+    if original.get('selection_where') != source.selection_where or original.get('requested_grid_mask_sha256') != source.requested_grid_mask_sha256:
+        raise CacheScopeError('OriginalData selector/mask mismatch')
+    frame = gpd.read_parquet(path)
+    if len(frame) != original['rows'] or frame.crs is None:
+        raise CacheScopeError('OriginalData row/CRS mismatch')
+    if source.acquisition_type == 'arcgis':
+        field = receipt.get('object_id_field', 'OBJECTID')
+        actual = next((c for c in frame.columns if c.casefold() == field.casefold()), None)
+        if actual is None:
+            raise CacheScopeError('OriginalData lacks source object IDs')
+        # Reconcile the roster without converting large geometries back to JSON.
+        reconstructed = dict(receipt, pages=[{'response': {'features': [
+            {'properties': {field: v}} for v in frame[actual].tolist()]}}])
+        validate_snapshot(source, reconstructed, bbox=bbox)
+    elif receipt.get('full_source_dataset') is not True:
+        if receipt.get('geometry_roster_complete') is not True or bbox is None or receipt.get('requested_bbox_wgs84') is None:
+            raise CacheScopeError('OriginalData lacks full-source or bounded support')
+        from shapely.ops import unary_union
+        if not unary_union(bbox_parts(receipt['requested_bbox_wgs84'])).covers(unary_union(bbox_parts(bbox))):
+            raise CacheScopeError('OriginalData scope is smaller than request')
+    frame.attrs = original['frame_attributes']
+    if source.acquisition_type == 'arcgis':
+        frame.attrs['request_receipt'] = receipt
+        frame.attrs['layer_metadata'] = receipt.get('metadata_response', {})
+    return frame.to_crs(4326)

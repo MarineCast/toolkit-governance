@@ -1,147 +1,45 @@
 # Governance Toolkit
 
-<img src="docs/assets/governance-toolkit-banner.png" alt="Ink coastal chart with islands, navigation markers, and boundary lines" width="100%">
+<img src="docs/assets/governance-toolkit-banner.png" alt="Coastal chart with governance boundaries" width="100%">
 
-Species-neutral, source-backed marine governance geometry: protected areas, sanctuaries,
-jurisdictional reference boundaries and fisheries management areas. The distribution is
-**`toolkit-governance`**; the Python package and command are **`governance`**.
-It installs independently of OrcaCast and sibling toolkits.
+`toolkit-governance` produces marine governance metrics on explicit H3 grids and
+retains original source shapes. It installs independently as the `governance`
+Python package and CLI, with seventeen implemented collections and seven planned families.
 
-## Start with one getter
-
-```python
-from governance import get_marine_protected_areas
-
-result = get_marine_protected_areas(
-    (-125.0, 44.0, -123.0, 46.0),
-    workspace="/path/to/research-workspace",
-    allow_partial=True,
-    make_h3=False,
-)
-```
-
-The getter validates caches and can retrieve missing sources within fixed budgets.
-Use `mode="offline"` for guaranteed local reads. Native-only installation requires no H3;
-install `toolkit-governance[h3]` and set `make_h3=True` for cell metrics and exact memberships.
-Read the [query API](docs/query-api.md) for typed empty results, temporal limits, cache scope,
-source selection, wrapped bounds and full-cell semantics. Advanced release/study workflows
-remain separate explicit operations.
-
-## Implemented scope
-
-Seventeen collections have normalization, build and inspection modules; acquisition is explicit and bounded:
-
-- Marine protected areas (NOAA inventory, DFO designations/optional proposals, and ODFW published reference boundaries).
-- National marine sanctuaries (six NOAA ONMS boundary sources).
-- International boundaries (source-preserving reference geometry and reconciliation).
-- Federal waters (U.S./Canadian maritime limits and derived reference products).
-- State/provincial waters (configured BOEM submerged-lands boundary source).
-- Fisheries management areas (WDFW recreational, DFO Pacific subareas, and ADF&G groundfish statistical systems).
-- Fixed vessel/speed references (qualified closed-ring subsets of TC 2026; unresolved coastline/approach rules excluded).
-- Ports (NGA physical point inventory).
-- Critical habitat (provisioned NOAA NMFS polygon and line references).
-- County/regional boundaries (U.S. Census county equivalents; Canadian regional gap retained).
-- Wildlife refuges (selected FWS and ECCC systems; provisioned reference snapshots).
-- Shipping-lane and TSS reference components (CHS and NOAA2026; distinct per-source/role metrics).
-- Coast Guard administrative references (USCG sectors and CCG Western region, kept distinct).
-- ECCC-reported marine classifications (source-qualified, non-additive views of CPCAD evidence).
-- BIA land-area and NRCan Indian Reserve administrative references (source systems remain distinct; no traditional territories).
-
-The catalog includes 24 collections; 7 remain planned. Collection names do not establish
-complete U.S./Canadian coverage. Read [contracts](docs/CONTRACTS.md) and the per-family
-`DATA_SOURCES.md` files before interpreting outputs. Canonical products use **native geometry**,
-not H3; all fields remain **model-ineligible by default**. Reference maps, legal authority,
-effective time and source vintage are distinct.
-
-## Install and initialize
-
-Python 3.11+ and a compatible geospatial stack are required. Hosted offline package checks run on Python 3.11 and 3.14.
-Real-data validation is separately documented in local release evidence.
+The public output is `Data/Governance`: one static Parquet per resolution, one
+optional dynamic Parquet per resolution, a small `catalog.json` with update times,
+and `OriginalData/<dataset>/geometry.parquet`. There are no data release directories
+or companion manifests. Static rows are H3 cells × metric columns; dynamic rows
+add a typed `date`. Current inventories are static and model-ineligible.
 
 ```sh
-python -m pip install -e '.[test]'
+python -m pip install .
+governance --workspace /path/to/source-workspace init
+# Explicitly acquire/provision qualified local sources after reviewing their configuration.
+governance --workspace /path/to/source-workspace build \
+  --grid /path/to/grid-r6.parquet --grid /path/to/grid-r8.parquet \
+  --output-directory /path/to/Data/Governance --allow-partial
+governance validate-data /path/to/Data/Governance
+```
+
+Read the [Parquet output guide](docs/parquet-products.md) for updates from retained
+originals, Python usage, exact filenames, embedded provenance, source rights and
+validation. Builds use temporary intermediates and do not download implicitly.
+Source workspace precedence is `--workspace`, `GOVERNANCE_WORKSPACE`, then cwd;
+package resources are read-only defaults. Partial coverage, nulls and observed zeros
+remain distinct. Original geometry and source dates do not certify current law.
+
+- [Product contracts](docs/CONTRACTS.md) and [architecture](docs/ARCHITECTURE.md)
+- [Sources and rights](docs/reference/sources.md), [layers](docs/layers.md), and [query API](docs/query-api.md)
+- [CLI](docs/reference/cli.md), [workflows](docs/WORKFLOWS.md), and [documentation site](docs/documentation-site.md)
+
+```sh
+python -m pip install -e '.[test,docs]'
 python -m pytest -q
-governance --help
-governance --workspace /path/to/workspace init
-```
-
-For a regular installation, use `python -m pip install .`. `init` copies missing configuration
-and catalog files only; it preserves edits and downloads nothing. Workspace precedence is CLI
-`--workspace`, then `GOVERNANCE_WORKSPACE`, then the current directory. Package installation
-never makes site-packages a data/output directory. An absolute config path selects that file;
-relative paths inside it still resolve against the workspace.
-
-Edit `config/common.yaml` and `config/data/governance/governance.yaml` in that workspace. The
-inherited `full_area` extent is the Northeast Pacific (-180, 32, -109, 72); the loader currently
-requires that named area. Existing configuration supplies real source URLs and snapshot pins,
-not synthetic source data. Acquisition must be requested explicitly.
-
-```sh
-governance --workspace /path/to/workspace catalog
-governance --workspace /path/to/workspace download marine_protected_areas
-governance --workspace /path/to/workspace build marine_protected_areas --allow-partial
-governance --workspace /path/to/workspace inspect --as-of 2026-09-16
-```
-
-Read [workflows](docs/WORKFLOWS.md) before builds: partial coverage requires explicit acceptance,
-outputs use per-file atomic replacement, and multi-product builds are not whole-workspace
-transactions. `--overwrite` is explicit. Local boundary reconciliation also needs externally
-provisioned seascape support; no sibling checkout is implicitly searched.
-
-## Documentation site
-
-The MkDocs Material site follows the MarineCast meteorology documentation style:
-
-- [Home and overview](docs/index.md)
-- [Layers, inputs, and outputs](docs/layers.md)
-- [How to use](docs/how-to-use.md)
-- [Configuration](docs/configuration.md), [CLI](docs/reference/cli.md), and
-  [sources and rights](docs/reference/sources.md)
-- [Limitations](docs/limitations.md) and [troubleshooting](docs/troubleshooting.md)
-
-From this checkout:
-
-```sh
-python -m pip install -e '.[docs]'
-mkdocs serve
-# Strict static build:
 mkdocs build --strict
+git diff --check
 ```
 
-See [documentation development](docs/documentation-site.md) for preview and the
-GitHub Pages workflow. Documentation builds run automatically; hosted publication
-requires a separate manual workflow run.
-
-## Python API and documentation
-
-The [documentation site guide](docs/documentation-site.md) explains local preview,
-PR build artifacts and manual publication after merge.
-
-```python
-from governance import initialize_workspace, load_governance_config
-from governance.protected_areas.marine_protected_areas.build import build
-
-initialize_workspace('/path/to/workspace')
-# Set GOVERNANCE_WORKSPACE before loading configuration or invoking a producer.
-config = load_governance_config()
-# Acquisition and builds are separate explicit operations.
-```
-
-- [Architecture](docs/ARCHITECTURE.md): ownership, APIs, configuration and developer navigation.
-- [Contracts](docs/CONTRACTS.md): grain, geometry, missingness, time and provenance.
-- [Workflows](docs/WORKFLOWS.md): acquisition, building, inspection and validation.
-- [Explicit H3 matrix](docs/h3-matrix.md): optional consumer-grid overlays with retained native authority and missingness.
-- [Migration and validation](docs/MIGRATION.md): extraction inventory and acceptance limits.
-- [Roadmap](src/governance/TODO.txt): inherited research backlog; current extraction status is in
-  the migration report rather than inferred from historical checkboxes.
-- [Agent guidance](AGENTS.md): repository-specific rules and Graphify commands.
-
-## License and validation boundary
-
-Software retains the source [Apache 2.0 license](LICENSE). Data has separate source-specific
-rights and attribution requirements. Downloaded snapshots, products, local migration evidence
-and Graphify caches are ignored and are not distributed in the wheel.
-
-Offline tests and installed-wheel checks do not establish fresh source availability, legal
-currency, complete regional coverage, production readiness or downstream model integration.
-The proposed MarineCast H3 manifest v0.1 does not cover this native-geometry contract.
+Software uses the [Apache-2.0 license](LICENSE). Data rights remain source-specific.
+The wheel contains no acquired datasets. Offline tests are software validation;
+live source availability and scientific/legal qualification require separate evidence.
