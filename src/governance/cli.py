@@ -36,10 +36,15 @@ def main(argv: Sequence[str] | None = None) -> int:
             sub.add_argument('--original-data', type=Path, help='Reuse a verified flat data directory offline.')
             sub.add_argument('--length-crs', default='EPSG:32610')
             sub.add_argument('--allow-partial', action='store_true')
+            sub.add_argument('--keep-workspace-data', action='store_true',
+                             help='Retain disposable source caches and old processed data after a successful build.')
         else:
             sub.add_argument('--matrix', required=True, type=Path)
     sub = commands.add_parser('validate-data', help='Check the flat catalog, checksums, and embedded contracts.')
     sub.add_argument('directory', type=Path)
+    sub = commands.add_parser('clean-workspace', help='Remove disposable workspace data after verifying saved outputs and originals.')
+    sub.add_argument('directory', type=Path, help='Verified flat governance output to retain.')
+    sub.add_argument('--config', default=DEFAULT_CONFIG_PATH)
     sub = commands.add_parser('get', help='Query one layer in memory with bounded acquisition.')
     sub.add_argument('collection')
     sub.add_argument('--bbox', nargs=4, type=float, required=True)
@@ -59,7 +64,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             from .products import build_products
             print(build_products(args.grid, args.output_directory, config_path=args.config,
                   original_data=args.original_data, length_crs=args.length_crs,
-                  allow_partial=args.allow_partial, software_revision=args.software_revision, overwrite=args.overwrite))
+                  allow_partial=args.allow_partial, software_revision=args.software_revision, overwrite=args.overwrite,
+                  keep_workspace_data=args.keep_workspace_data))
         elif args.command == 'export-data':
             from .products import export_products
             print(export_products(args.matrix, args.output_directory, config_path=args.config,
@@ -67,6 +73,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         elif args.command == 'validate-data':
             from .products import validate_products
             print(json.dumps(validate_products(args.directory), indent=2))
+        elif args.command == 'clean-workspace':
+            from .products import cleanup_workspace_data
+            cleanup_workspace_data(args.directory, config_path=args.config)
         elif args.command == 'download':
             from .shared.pipeline import download_collection
             for path in download_collection(args.collection, args.config, overwrite=args.overwrite):

@@ -169,6 +169,68 @@ def _write_originals(config, output):
     return bindings, sources
 
 
+def cleanup_workspace_data(output_directory, *, config_path=DEFAULT_CONFIG_PATH, protected_paths=()):
+    """Remove disposable workspace data only after verifying retained originals.
+
+    A shared workspace, symlink, unretained source or protected input keeps the
+    entire directory intact. Custom caches outside workspace/data are untouched.
+    """
+    config = load_governance_config(config_path)
+    root = config.document.workspace / 'data'
+    output = Path(output_directory).resolve()
+    validate_products(output)
+    if not root.exists() and not root.is_symlink():
+        return False
+
+    def keep(reason):
+        print(f'Kept workspace data {root}: {reason}', flush=True)
+        return False
+
+    if root.is_symlink():
+        return keep('contains a symbolic link')
+    entries = list(root.rglob('*'))
+    if any(p.is_symlink() for p in entries):
+        return keep('contains a symbolic link')
+    protected = [output, *config.document.include_chain, config.common_config_path,
+                 config.catalog_path, config.presentation_config_path, *protected_paths]
+    if any(Path(p).resolve().is_relative_to(root) for p in protected):
+        return keep('contains output, configuration or a protected build input')
+    catalog = json.loads((output / 'catalog.json').read_text())
+    retained = {}
+    for source_id, binding in catalog['original_data'].items():
+        metadata = pq.read_schema(_member(output, binding['path'])).metadata
+        retained[source_id] = json.loads(metadata[ORIGINAL_KEY])
+    allowed = set()
+    for source_id, source in config.sources.items():
+        for candidate in (source.local_path, source.snapshot_path):
+            if candidate is None or not candidate.exists() or not candidate.is_relative_to(root):
+                continue
+            original = retained.get(source_id, {})
+            if original.get('source', {}).get('snapshot_sha256') != sha256_dataset(candidate):
+                return keep(f'source {source_id} is not retained in the validated output')
+            receipt = candidate.with_suffix(candidate.suffix + '.metadata.json')
+            if receipt.exists():
+                if candidate.suffix.lower() == '.json' or json.loads(receipt.read_text()) != original.get('receipt'):
+                    return keep(f'acquisition metadata for {source_id} is not retained in the validated output')
+                allowed.add(receipt)
+            if candidate.is_dir():
+                allowed.update(p for p in candidate.rglob('*') if p.is_file())
+            elif candidate.suffix.lower() == '.shp':
+                allowed.update(candidate.parent.glob(f'{candidate.stem}.*'))
+            else:
+                allowed.add(candidate)
+    for path in entries:
+        if path.is_file() and path.name != '.DS_Store' and path not in allowed:
+            if not (config.processed_root == root / 'processed/domain/governance'
+                    and path.is_relative_to(config.processed_root)):
+                return keep(f'unrecognized file {path.relative_to(root)}')
+        elif not path.is_file() and not path.is_dir():
+            return keep(f'unrecognized entry {path.relative_to(root)}')
+    shutil.rmtree(root)
+    print(f'Removed workspace data {root}; originals are retained in {output}', flush=True)
+    return True
+
+
 def export_products(matrix_path, output_directory, *, config_path=DEFAULT_CONFIG_PATH,
                     software_revision=None, overwrite=False):
     """Write one static metric Parquet per supplied resolution and original shapes.
@@ -263,14 +325,17 @@ def export_products(matrix_path, output_directory, *, config_path=DEFAULT_CONFIG
 
 def build_products(grid_paths, output_directory, *, config_path=DEFAULT_CONFIG_PATH,
                    original_data=None, length_crs='EPSG:32610', allow_partial=False,
-                   software_revision=None, overwrite=False):
-    """Build flat data offline, deleting native/overlay intermediates on exit.
+                   software_revision=None, overwrite=False, keep_workspace_data=False):
+    """Build flat data offline, cleaning disposable workspace data after success.
 
     Inputs are explicit H3 grids and qualified local agency snapshots, or a prior
     flat OriginalData catalog. Acquisition remains a separate explicit operation.
+    Failed builds preserve source caches. Set keep_workspace_data to retain them
+    after success as well; temporary native/overlay files are always removed.
     """
     from .h3_matrix import export_h3_matrix
     from .shared.grid import read_grid
+    grid_paths = list(grid_paths)
     config = load_governance_config(config_path)
     output = Path(output_directory).resolve()
     if output.exists() and not overwrite:
@@ -314,5 +379,9 @@ def build_products(grid_paths, output_directory, *, config_path=DEFAULT_CONFIG_P
         matrix = work / 'metrics.parquet'
         export_h3_matrix(grid, matrix, config_path=staged_config, length_crs=length_crs,
                          allow_partial=allow_partial, include_attributes=False)
-        return export_products(matrix, output, config_path=staged_config,
-                               software_revision=software_revision, overwrite=overwrite)
+        result = export_products(matrix, output, config_path=staged_config,
+                                 software_revision=software_revision, overwrite=overwrite)
+    if not keep_workspace_data:
+        protected = [*grid_paths, *([original_root] if original_root else [])]
+        cleanup_workspace_data(result, config_path=config.path, protected_paths=protected)
+    return result

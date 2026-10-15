@@ -11,7 +11,7 @@ import yaml
 from shapely.geometry import box
 
 from governance.cli import main
-from governance.products import build_products, validate_products, validate_metric_table
+from governance.products import build_products, cleanup_workspace_data, validate_products, validate_metric_table
 from governance.shared.config import load_governance_config
 from governance.workspace import initialize_workspace
 
@@ -40,6 +40,7 @@ def flat_inputs(tmp_path, monkeypatch, snapshot_fixture):
 def test_build_has_only_resolution_parquets_catalog_and_originals(flat_inputs, tmp_path):
     config, grid, raw = flat_inputs
     output = build_products([grid], tmp_path / 'Governance', config_path=config, allow_partial=True)
+    assert not (config.parents[3] / 'data').exists()
     assert validate_products(output) == {'status': 'passed', 'tables': 2, 'original_datasets': 1}
     assert {p.name for p in output.iterdir()} == {'governance-r6-static.parquet', 'governance-r8-static.parquet', 'catalog.json', 'OriginalData'}
     original = gpd.read_parquet(output / 'OriginalData/wdfw_recreational_marine_areas/geometry.parquet')
@@ -82,7 +83,10 @@ def test_unsupported_release_commands_are_not_public():
 
 def test_failed_replacement_restores_previous_data(flat_inputs, tmp_path, monkeypatch):
     config, grid, _ = flat_inputs
-    output = build_products([grid], tmp_path / 'Governance', config_path=config, allow_partial=True)
+    output = build_products([grid], tmp_path / 'Governance', config_path=config, allow_partial=True,
+                            keep_workspace_data=True)
+    source = load_governance_config(config).sources['wdfw_recreational_marine_areas'].snapshot_path
+    previous_source = source.read_bytes()
     previous = (output / 'catalog.json').read_bytes()
     rename = Path.rename
     def interrupted(path, target):
@@ -95,6 +99,99 @@ def test_failed_replacement_restores_previous_data(flat_inputs, tmp_path, monkey
     assert (output / 'catalog.json').read_bytes() == previous
     assert validate_products(output)['status'] == 'passed'
     assert not list(tmp_path.glob('.Governance*'))
+    assert source.read_bytes() == previous_source
+
+
+def test_success_removes_old_processed_files_and_finder_metadata(flat_inputs, tmp_path):
+    config, grid, _ = flat_inputs
+    settings = load_governance_config(config)
+    root = settings.document.workspace / 'data'
+    settings.processed_root.mkdir(parents=True)
+    (settings.processed_root / 'old.parquet').write_bytes(b'old intermediate')
+    (root / '.DS_Store').write_bytes(b'Finder metadata')
+    build_products([grid], tmp_path / 'Governance', config_path=config, allow_partial=True)
+    assert not root.exists()
+    assert config.is_file()
+    assert grid.is_file()
+
+
+def test_failed_build_keeps_source_cache(flat_inputs, tmp_path):
+    config, grid, _ = flat_inputs
+    source = load_governance_config(config).sources['wdfw_recreational_marine_areas'].snapshot_path
+    previous = source.read_bytes()
+    grid.write_bytes(b'invalid grid')
+    with pytest.raises(pa.ArrowInvalid):
+        build_products([grid], tmp_path / 'Governance', config_path=config, allow_partial=True)
+    assert source.read_bytes() == previous
+    assert not (tmp_path / 'Governance').exists()
+
+
+@pytest.mark.parametrize('reason', ['unrelated', 'unretained', 'receipt', 'symlink', 'protected'])
+def test_cleanup_preserves_data_when_it_cannot_prove_it_is_disposable(flat_inputs, tmp_path, reason):
+    config, grid, _ = flat_inputs
+    settings = load_governance_config(config)
+    source = settings.sources['wdfw_recreational_marine_areas'].snapshot_path
+    root = settings.document.workspace / 'data'
+    output = build_products([grid], tmp_path / 'Governance', config_path=config,
+                            allow_partial=True, keep_workspace_data=True)
+    protected = []
+    if reason == 'unrelated':
+        (root / 'other-toolkit.txt').write_text('keep')
+    elif reason == 'unretained':
+        source.write_bytes(source.read_bytes() + b' ')
+    elif reason == 'receipt':
+        source.with_suffix(source.suffix + '.metadata.json').write_text('{"new_receipt": true}')
+    elif reason == 'symlink':
+        (root / 'external').symlink_to(grid)
+    else:
+        protected = [source]
+    previous = source.read_bytes()
+    assert cleanup_workspace_data(output, config_path=config, protected_paths=protected) is False
+    assert source.read_bytes() == previous
+    assert validate_products(output)['status'] == 'passed'
+
+
+def test_cleanup_preserves_symlinked_data_root(flat_inputs, tmp_path):
+    config, grid, _ = flat_inputs
+    root = load_governance_config(config).document.workspace / 'data'
+    output = build_products([grid], tmp_path / 'Governance', config_path=config,
+                            allow_partial=True, keep_workspace_data=True)
+    external = tmp_path / 'external-data'
+    root.rename(external)
+    root.symlink_to(external, target_is_directory=True)
+    assert cleanup_workspace_data(output, config_path=config) is False
+    assert root.is_symlink()
+    assert external.is_dir()
+
+
+def test_output_inside_workspace_data_is_preserved(flat_inputs, tmp_path):
+    config, grid, _ = flat_inputs
+    root = load_governance_config(config).document.workspace / 'data'
+    output = build_products([grid], root / 'Governance', config_path=config, allow_partial=True)
+    assert validate_products(output)['status'] == 'passed'
+    assert root.exists()
+
+
+def test_invalid_installed_output_prevents_cleanup(flat_inputs, tmp_path):
+    config, grid, _ = flat_inputs
+    root = load_governance_config(config).document.workspace / 'data'
+    output = build_products([grid], tmp_path / 'Governance', config_path=config,
+                            allow_partial=True, keep_workspace_data=True)
+    (output / 'governance-r6-static.parquet').write_bytes(b'corrupt')
+    with pytest.raises(ValueError, match='checksum'):
+        cleanup_workspace_data(output, config_path=config)
+    assert root.exists()
+
+
+def test_cli_can_keep_then_clean_workspace_data(flat_inputs, tmp_path):
+    config, grid, _ = flat_inputs
+    root = load_governance_config(config).document.workspace / 'data'
+    output = tmp_path / 'Governance'
+    assert main(['build', '--config', str(config), '--grid', str(grid),
+                 '--output-directory', str(output), '--allow-partial', '--keep-workspace-data']) == 0
+    assert root.exists()
+    assert main(['clean-workspace', str(output), '--config', str(config)]) == 0
+    assert not root.exists()
 
 
 def test_dynamic_grain_requires_typed_dates_and_unique_cell_date():
