@@ -22,7 +22,6 @@ def test_governance_config_uses_shared_full_area_without_h3_products() -> None:
         "management_areas",
         "exclusion_zones",
         "speed_restriction_zones",
-        "ports",
         "critical_habitat",
         "county_regional_boundaries",
         "wildlife_refuges",
@@ -79,19 +78,16 @@ def test_governance_root_is_public_surface_and_shared_code_is_packaged() -> None
     governance_root = project_root() / "src/governance"
     assert {path.name for path in governance_root.glob("*.py")} == {
         "__init__.py",
-        "query.py",
-        "inspect.py",
         "__main__.py",
         "cli.py",
         "workspace.py",
         "h3_matrix.py",
         "delivery.py",
-        "shared_contract.py",
         "preflight.py",
-        "releases.py",
-        "study.py",
-        "fishing_crosswalk.py",
         "products.py",
+        "app_contract.py",
+        "run_settings.py",
+        "memberships.py",
     }
     assert {
         "acquisition.py",
@@ -99,7 +95,6 @@ def test_governance_root_is_public_surface_and_shared_code_is_packaged() -> None
         "catalog.py",
         "config.py",
         "coverage.py",
-        "layers.py",
         "normalization.py",
         "pipeline.py",
         "schema.py",
@@ -114,10 +109,22 @@ def test_governance_catalog_is_generated_and_model_safe() -> None:
         (root / "config/data/governance/feature_catalog.yaml").read_text(encoding="utf-8")
     )
     assert catalog == generated
-    assert len(catalog["collections"]) == 24
-    assert sum(value["map_layer"] for value in catalog["collections"].values()) == 17
+    assert len(catalog["collections"]) == 16
+    assert sum(value["map_layer"] for value in catalog["collections"].values()) == 16
     assert catalog["canonical_storage"] == "native_geometry"
     assert catalog["h3_products"] is False
     for collection in catalog["collections"].values():
         assert all(feature["model_eligible"] is False for feature in collection["features"])
     assert validate_catalog(verify_artifacts=False) == catalog
+
+
+def test_physical_ports_are_retired_from_governance_defaults():
+    config = load_governance_config()
+    assert 'ports' not in config.collections
+    assert 'nga_world_port_index' not in config.sources
+    catalog = build_catalog()
+    assert 'ports' not in catalog['collections']
+    assert catalog['retired_collections']['ports']['owner'] == 'toolkit-human'
+    assert set(catalog['feature_families']['marine_conservation_areas']['scientific_features']) == {
+        'marine_conservation_areas__feature_memberships_v1', 'marine_conservation_areas__recorded_feature_count',
+        'marine_conservation_areas__recorded_polygon_union_area_fraction'}

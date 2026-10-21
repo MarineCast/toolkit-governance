@@ -10,7 +10,6 @@ import geopandas as gpd
 import pandas as pd
 import pytest
 from shapely.geometry import Polygon, box
-from governance import get_fishery_management_areas, get_layer, get_marine_protected_areas, get_gear_restrictions, LayerNotImplementedError
 from governance.shared.acquisition import AcquisitionBudget
 from governance.shared.config import load_governance_config
 from governance.shared.registry import normalize_collection
@@ -28,11 +27,12 @@ def test_regional_fixture_native_h3(region,tmp_path,snapshot_fixture):
     raw=gpd.GeoDataFrame({'OBJECTID':[1],'STAT_AREA':[745001],'GEOMETRY_START_DATE':['2001-01-01'],'GEOMETRY_END_DATE':[None]},geometry=[polygon],crs=4326)
     source.snapshot_path.parent.mkdir(parents=True)
     source.snapshot_path.write_text(json.dumps(snapshot_fixture(source,raw,bbox=(-180,-90,180,90))))
-    result=get_fishery_management_areas(REGIONS[region],config=cfg,sources=source.source_id,mode='offline',allow_partial=True,make_h3=True,h3_res=5)
-    assert not result.features.empty and not result.memberships.empty
-    assert result.features.AREA_SYSTEM_ID.tolist()[0]=='adfg.groundfish.statistical'
-    assert result.features.EFFECTIVE_START.isna().all()
-    assert result.coverage.legal_currentness.tolist()==['not_verified']
+    from governance.fisheries_management.management_areas.alaska import normalize
+    native=normalize(raw,source)
+    assert not native.empty
+    assert native.AREA_SYSTEM_ID.tolist()[0]=='adfg.groundfish.statistical'
+    assert native.EFFECTIVE_START.isna().all()
+
 
 
 def kml_archive(tmp_path):
@@ -80,18 +80,8 @@ def test_fixed_instrument_clauses_units_dates_and_unresolved_coastline(tmp_path)
     with pytest.raises(ValueError,match='support contract'):source_frame(path)
 
 
-def test_unsupported_layers_never_return_empty_inventory(tmp_path):
-    with pytest.raises(LayerNotImplementedError):get_gear_restrictions((-125,44,-123,46),workspace=tmp_path,mode='offline',allow_partial=True)
 
 
-@pytest.mark.network
-@pytest.mark.skipif(os.environ.get('GOVERNANCE_LIVE_TESTS')!='1',reason='Opt-in bounded live source smoke; default suite is offline')
-def test_live_alaska_groundfish_small_query(tmp_path):
-    result=get_fishery_management_areas((-151.,59.,-150.98,59.02),workspace=tmp_path,
-        sources='adfg_groundfish_statistical_areas',allow_partial=True,budget=AcquisitionBudget(max_bytes=2_000_000,max_features=20,max_pages=20))
-    assert result.coverage.acquisition_completeness.tolist()==['complete']
-    assert not result.features.empty
-    assert result.provenance['sources'][0]['query_receipt']['geometry_roster_complete']
 
 
 def test_pacific_subarea_hierarchy_native_identity_and_cross_system_codes(tmp_path,snapshot_fixture):
@@ -105,21 +95,12 @@ def test_pacific_subarea_hierarchy_native_identity_and_cross_system_codes(tmp_pa
     assert native.DFO_PFMA_SQ_KM.tolist()==['1.0']
     source.snapshot_path.parent.mkdir(parents=True)
     source.snapshot_path.write_text(json.dumps(snapshot_fixture(source,raw)))
-    result=get_fishery_management_areas((-123.6,48.3,-123.3,48.6),config=cfg,systems='dfo.pacific.pfma.subareas',mode='offline',allow_partial=True)
-    assert len(result.features)==1 and result.features.AREA_SYSTEM_ID.tolist()==['dfo.pacific.pfma.subareas']
+    assert len(native)==1 and native.AREA_SYSTEM_ID.tolist()==['dfo.pacific.pfma.subareas']
     for field,value in [('MGNT_AREA',None),('SUBAREA_',-1),('GLOBALID','bad')]:
         changed=raw.copy();changed[field]=value
         with pytest.raises(ValueError):normalize(changed,source)
 
 
-@pytest.mark.network
-@pytest.mark.skipif(os.environ.get('GOVERNANCE_LIVE_TESTS')!='1',reason='Opt-in bounded live source smoke; default suite is offline')
-def test_live_dfo_pacific_subarea_small_query(tmp_path):
-    result=get_fishery_management_areas((-123.4,48.4,-123.38,48.42),workspace=tmp_path,
-        sources='dfo_pacific_fishery_management_areas',allow_partial=True,budget=AcquisitionBudget(max_bytes=2_000_000,max_features=20,max_pages=20))
-    assert result.coverage.acquisition_completeness.tolist()==['complete']
-    assert not result.features.empty
-    assert result.features.AREA_HIERARCHY_LEVEL.eq('subarea').all()
 
 
 def test_fixed_zone_native_build_handles_relational_coordinate_metadata(tmp_path,monkeypatch):

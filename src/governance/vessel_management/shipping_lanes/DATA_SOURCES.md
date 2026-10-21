@@ -14,7 +14,7 @@ Source definitions and rights:
   source reuse. Government-hosted information is public-domain unless otherwise annotated;
   retain attribution, do not claim ownership/endorsement, and do not present modified content
   as unchanged official information. CHS requires [OGL-Canada](https://open.canada.ca/en/open-government-licence-canada)
-  attribution/license and no endorsement. Current releases are local only.
+  attribution/license and no endorsement. Acquired data remain local only.
 
 `routing.py` explicitly maps provider object types to fifteen separate source/role groups across
 shipping and TSS families. `shipping_lanes` is a catalog family name: navigation lines,
@@ -43,3 +43,35 @@ unique route coverage. All fields are model-ineligible and all products remain r
 The LNAM object-identity interpretation follows IHO S-57 section4.3:
 https://iho.int/uploads/user/pubs/standards/s-57/31Main.pdf . It establishes feature-object identity,
 not independent proof of a unique real-world route or current governing rule.
+
+
+The 2026-10-20 Vessel Routing & Regulations interface keeps every typed identity
+record and exposes one **Routing / regulation recorded** boolean. This combines
+recorded-reference presence, not mandatory legal status or area/length measures.
+True requires a recorded feature; false requires independently evidenced complete
+full-cell inventory coverage for every expected component and observed empty
+memberships. Current no-hit support remains unknown. Existing native roles,
+source attributes/dates and applicability/exceptions remain retained. Unused numeric area/length/point arrays are not computed or exported by the
+production application overlay. Original geometry, roles and source attributes
+remain retained; internal scientific engines can reconstruct qualified measures. See the
+canonical `docs/parquet-products.md` vessel-family contract.
+
+
+The current display combines all eight shipping-role layers and all seven
+traffic-scheme roles as **Shipping Lanes & Traffic Separation Zones**;
+**Speed Restriction Zones** stays separate. All sixteen native components, source
+records, IDs and parts remain exact. The shipping-only view remains hidden
+compatibility support, and saved shipping/TSS selections open the combined view.
+Cell details retain original navigation/advisory/conditional meanings and typed
+line/polygon roles. Counts use source-qualified identities without asserting
+cross-source physical-route equivalence; no corridor widths or mixed area/length
+coverage are invented. This display union adds no source acquisition or geometry.
+
+## Public handoff boundary
+
+Source evidence and native processing described here are distinct from public
+columns. The [flat product contract](../../../../docs/parquet-products.md) and
+[exact physical schema](../../../../docs/reference/columns.md) define delivery.
+OriginalData preserves source geometry/attributes and receipt evidence; native
+manifests, diagnostic products and unused scientific measures are internal build
+support. No source qualification is broadened by the application projection.

@@ -1,160 +1,74 @@
-# Governance Parquet outputs
+# Public product contract
 
-Version 0.3 produces a flat data directory. Each supplied H3 resolution has at most
-one static and one dynamic metric Parquet. There are no data releases, current
-pointers, generation directories, public manifests, crosswalks or duplicated study bundles.
+## Files and row identity
 
-```text
-Data/Governance/
-  governance-r6-static.parquet
-  governance-r8-static.parquet
-  catalog.json
-  OriginalData/
-    wdfw_recreational_marine_areas/geometry.parquet
-    noaa_critical_habitat_polygon/geometry.parquet
-    ...
-```
+The delivery directory contains `catalog.json`, `governance-r<resolution>-static.parquet`, at most one `governance-r<resolution>-dynamic.parquet` per resolution and `OriginalData/<source-id>/geometry.parquet`. No release/generation directories, current pointers, manifest sidecars or duplicated native/study bundles are public outputs.
 
-The current inventories are static. No dynamic file is created from retrieval or
-build timestamps. A future dynamic table must have a non-null, typed `date` column,
-a documented source-backed temporal meaning, and unique `(h3_index, date)` rows.
-It uses `governance-r<resolution>-dynamic.parquet`. Source establishment years,
-legal effective dates, geometry validity and retrieval times remain distinct.
+Static row identity is the unique string `h3_index` at the declared resolution. Dynamic identity adds a non-null Arrow date/timestamp `date` supported by source temporal evidence. Current reference inventories are static. Retrieval/build time, establishment year and unknown effective dates must never be converted into an artificial daily history. Supplied H3 membership and resolution are preserved.
 
-## Read the data
+`catalog.json` binds tables and originals by relative path, SHA-256 and row count, and records collection update information. Each table embeds JSON under Arrow metadata key `governance`; each source GeoParquet embeds `governance_original` and standard GeoParquet metadata. Embedded definitions bind fields, spatial/temporal support, methods, original source lineage and model eligibility. `model_eligible` remains false.
 
-```python
-import json
-from pathlib import Path
-import pyarrow.parquet as pq
+## Application contract
 
-root = Path('Data/Governance')
-catalog = json.loads((root / 'catalog.json').read_text())
-table = pq.read_table(root / catalog['tables']['6']['static']['path'])
-context = json.loads(table.schema.metadata[b'governance'])
-```
+The machine-readable application contract is packaged in `governance/resources/app_contract.json` and embedded as catalog `application_contract`. It fixes the supported application resolutions (R6 and R8), display feature identities/families, required physical columns, derived display/support columns and hidden compatibility fields. The [physical-column reference](reference/columns.md) is the exact handoff schema. Display feature count and physical column count are different: the latter includes identity, support statuses/counts and explicitly hidden compatibility fields.
 
-Static tables contain `h3_index` and metric columns with corresponding `_status`
-columns. One row represents one supplied full H3 cell; the resolution is declared
-in the filename, catalog and Parquet metadata. R6 and R8 are independent grids.
-The producer preserves supplied cells and order, without cross-resolution averaging.
-A metric value of zero, a null value and partial support are different states.
+`marine_conservation_assignment__feature_memberships_v1` is derived for display from designated and proposed/interim physical memberships. Its status/count companions and compact county/management statuses are also declared derived fields. The hidden shipping-lanes quartet remains for consumer compatibility; it is not a separate displayed measurement. Internal normalization can retain additional scientific reconstruction fields without exporting them as public columns.
 
-The embedded `governance` JSON contains field definitions, units, source citations,
-source vintage and receipts, coverage, normalization methods, CRS, geometry support,
-original dataset bindings and `model_eligible=false`. It has no release identity.
-`catalog.json` contains file paths, checksums, row counts, a last-update timestamp
-for every collection/domain area, and original-dataset references. Last update means
-processing time, not source observation time or current legal applicability.
+Catalog `sources` supplies a concise description, URL, qualification and separate `source_updated_at`, `observation_date`, `publication_date`, `retrieved_at_utc` and `source_vintage_note`. Unknown dates are null. ArcGIS `dataLastEditDate` is accepted only as explicit provider data-edit evidence from the retained receipt; general service/schema edits are not substituted. `built_at_utc` is product build time and `last_updated_utc` is its compatibility alias, never source update or legal effective time.
 
-Count metrics retain distinct source-backed feature identities. Polygon fractions
-use unioned intersection area divided by the full cell area in EPSG:6933. Line
-metrics use unioned length in the explicitly supplied metre-based projected CRS.
-Point metrics count source-backed point features. Overlapping source/role groups
-remain separate and must not be added as unique jurisdiction or route totals.
-Empty intersections under incomplete support remain null. Research-only geometry
-is not a compliance, exhaustive jurisdiction, or ecological occurrence product.
+## Fields and units
 
-## Original shapes
+The [family pages](layers.md) enumerate exact displayed columns. Acquisition collections, retained diagnostic support and display features are distinct. A count is an integer count of the documented source-qualified feature/site identity. A coverage fraction is dimensionless (0–1), not percent. The public routing flag and mapped administrative flags are nullable Arrow booleans.
 
-Each source dataset has one GeoParquet under `OriginalData/<source-id>/geometry.parquet`.
-These are original retrieved feature extents before toolkit clipping, including
-original attributes, IDs and date fields. Shared inputs are stored once, even when
-used by several collections. Polygon, line and point sources retain their geometry
-types. CRS is converted to EPSG:4326 without simplifying or clipping the geometry.
-A bounded source query still selects only its received features; retained extents
-do not imply an exhaustive global inventory.
+Marine Conservation Area Coverage is the union of eligible recorded polygons within the **full H3 cell**, divided by full cell area in EPSG:6933. Overlap is not summed and no water-only denominator is substituted. Native line support uses length semantics rather than area. Boundary contact rules are family-specific: counties/districts and international lines include closed-cell edge/corner contact; ordinary polygon/line memberships require positive-dimensional intersection. The flat overlay is regional and rejects antimeridian grids; generic geometry utilities do not establish global product support.
 
-The GeoParquet metadata key `governance_original` retains acquisition scope, exact
-selected-ID receipts, per-record receipt times, source metadata and original input
-checksums. Provider licensing, attribution and redistribution limits remain source-specific.
-No ZIP archives or JSON page snapshots are duplicated in the public directory.
-Acquisition caches belong in the explicit source workspace, separately from public outputs.
-A verified OriginalData directory is itself sufficient for an offline rebuild.
+## Paired membership identity
 
-Successful `build` operations validate the installed output, then remove the source
-workspace's lowercase `data/` folder when it contains only retained source caches,
-their acquisition metadata, old configured processed intermediates and Finder metadata.
-Every cached source must match the checksum retained in `OriginalData`; a partial
-or subset build cannot discard unretained sources. Unknown files, symlinks, or
-output/configuration/protected build inputs within `data/` keep the whole folder intact.
-Caches outside this folder are untouched. A failed build leaves source caches intact.
-Use `--keep-workspace-data` when caches should survive successful builds. Subsequent
-offline builds can use `--original-data` as shown below; acquiring fresh inputs
-recreates the required cache directories.
+`feature_memberships_v1` is a nullable Arrow list of structs. Each item has non-null `feature_id` and `records`. Every record preserves non-null `source_dataset_id`, `source_feature_id`, and a sorted list `geometry_part_ids`, plus nullable `feature_name`, `feature_type`, `authority`, `jurisdiction`, `region`, `area_system_id`, `area_code`, `area_title`, `area_hierarchy_level` and `parent_area_code`.
 
-## Build and update
+Multiple records/parts can support one feature. Parts never inflate feature counts; labels stay paired with IDs and are not deduplicated by name. All overlaps survive; there is no dominant-area choice. Proposed/interim conservation assignments retain status-qualified display identity while designated count/coverage exclude those references. Routing combines typed identities for display without asserting physical-route or legal equivalence.
 
-```sh
-python -m pip install .
-governance --workspace /path/to/source-workspace init
-# Review config and explicitly acquire the needed collections or provision local inputs.
-governance --workspace /path/to/source-workspace download management_areas
-# Builds never download implicitly.
-governance --workspace /path/to/source-workspace build \
-  --grid /path/to/grid-r6.parquet --grid /path/to/grid-r8.parquet \
-  --output-directory /path/to/Data/Governance --allow-partial
-governance validate-data /path/to/Data/Governance
-```
+## Missingness and coverage
 
-To clean a completed source workspace separately, with the same retention checks:
+Unknown, unavailable, partial, observed and not-applicable support are distinct. Preserve each field's declared support metadata and, where present, its status companion. Compact fields declaring `implicit_support: positive_partial_null_unknown_v1` encode nonempty membership/positive count as partial inventory support and null as unknown (or unavailable without original inputs); they do not support zero or an empty list.
 
-```sh
-governance --workspace /path/to/source-workspace clean-workspace /path/to/Data/Governance
-```
+For nullable booleans, true means documented reference evidence exists. False requires verified complete geographic support for every required component and observed empty memberships. Current partial source inventories do not establish false from no match. A null membership list is not an empty list. Query receipt completeness, geographic completeness and current legal applicability are different claims.
 
-`--grid` accepts explicit `H3_INDEX`/`H3_RESOLUTION` grid Parquets, or the static
-metric Parquets themselves. No separate public grid files are needed for updates.
-Only supplied cells are overlaid; the current overlay rejects antimeridian-crossing
-cells. The default line CRS is EPSG:32610; choose a suitable metre-based projected
-CRS explicitly for another grid. Native clipping must cover all supplied cells.
+## OriginalData and time
 
-To rebuild from retained originals using exactly the current grid:
+OriginalData retains retrieved feature extents and attributes before toolkit clipping, original source identities, receipt scope and time evidence. A bounded selection is not a global inventory. Shared source data are stored once. Normalization/repair can create derived native parts while preserving original geometry and transformation evidence.
 
-```sh
-governance --workspace /path/to/source-workspace build \
-  --grid /path/to/Data/Governance/governance-r6-static.parquet \
-  --grid /path/to/Data/Governance/governance-r8-static.parquet \
-  --original-data /path/to/Data/Governance \
-  --output-directory /path/to/Data/Governance --allow-partial --overwrite
-```
+Source vintage, legal effective time, observation time, retrieval time and build time remain separate. Rebuilding from unchanged originals does not make a source newer. Source rights, attribution and redistribution restrictions travel with the original binding; the software license grants no source-data license.
 
-Configuration supplies provider identity, versions, selectors, source systems and
-normalization profiles. OriginalData is checked against that configuration and its
-catalog hashes; changed source versions or selectors require newly qualified inputs.
-`--allow-partial` acknowledges partial research coverage without changing its meaning.
-`--overwrite` replaces an existing verified flat directory. Builds stage native
-geometry, reconciliation and a metrics-only overlay in temporary storage, then
-validate the flat output before replacement. Intermediates are removed on exit.
-There is a single-writer lock; handled installation errors restore the prior directory.
-Readers must check catalog hashes and retry if an update overlaps their read. This
-is local replacement, not a filesystem-wide snapshot guarantee during a crash.
+## Validation and operational use
 
-## Validation and compatibility
+`governance validate-data DIRECTORY` / `validate_products(DIRECTORY)` verifies catalog/file consistency, checksums, original identities, row grain, declared fields, membership structure, nullable state/value rules and model-ineligible metadata. Unexpected/missing files fail validation. Validation establishes structural consistency, not current legal truth or completeness.
 
-`validate-data` checks exact flat file membership, checksums, original dataset
-identity, H3 identity/resolution, unique row keys, units, finite/range checks, and
-metric/status associations. Software checks do not establish legal currency or
-exhaustive regional coverage.
+Build into a review destination and validate before replacing a delivery. Acquisition is explicit; `build_products` is offline. Native normalization and H3 matrices are temporary intermediates. See [quickstart](how-to-use.md), [coverage/refresh](coverage.md) and [source rights](reference/sources.md).
 
-`export-data --matrix FILE --output-directory DIR` projects an existing verified
-internal overlay using the same calculation. It writes the same flat layout and
-also reads the qualified original inputs from the selected workspace. Historical
-study/generation Python helpers remain for old-artifact regression checks; their
-commands and release workflow are retired from the public CLI. Old outputs must
-be migrated and checked before deleting them. Source acquisition and public
-source-data redistribution remain separate operations.
+<!-- Stable targets for authoritative source-note links. -->
+<span id="geographic-water-assignment-interfaces-2026-10-19"></span>
+<span id="international-boundary-under-federal-waters-2026-10-19"></span>
+<span id="management-areas-interface-2026-10-19"></span>
+<span id="regional-boundaries-interface-2026-10-19"></span>
+<span id="tribal-first-nations-interface"></span>
+<span id="unified-marine-conservation-areas-2026-10-19"></span>
+<span id="western-bc-water-assignment-2026-10-19"></span>
+<span id="wildlife-refuges-scientific-interface-2026-10-18"></span>
 
-## Regional migration checked on 2026-10-14
+### Bound replay of exclusion qualifications
 
-The retained Northeast Pacific study grids contain 2,621 R6 cells and 88,243 R8
-cells. Each static table has 94 metric columns and their 94 support-status columns,
-plus `h3_index`. A full offline rebuild from the 40 OriginalData datasets matched
-every existing validated metric value/status and every original attribute/geometry
-byte. The flat dataset uses about 424 MiB, replacing roughly 3.8 GiB of repeated
-builds and releases. The catalog is approximately 11.7 KB.
+The packaged `exclusion_replay_qualification_20261019.json` receipt preserves the
+reviewed TC source-pin qualification and Lockheed datum/reporting-mask facts. Replay
+requires the same source snapshot and exact original geometry WKB; the historical
+mask distance additionally requires the reviewed native H3 key set and resolution.
+The receipt records the checked mask hash, projected distance CRS and retained
+evidence hashes. It does not fetch sources or imply a new mask measurement. Changed
+source, geometry or grid support cannot inherit those numerical mask claims.
+Without matching evidence, the producer uses a generic full-cell support warning.
 
-Validation here covers layout, exact delivery equivalence and offline reproducibility.
-It does not refresh agency observations, certify current law or close partial
-geographic coverage. Historical source-vintage and unknown retrieval evidence remain
-preserved. No dated inventory history was generated.
+Exclusion interpretation text is emitted from canonical qualifications rather than
+reproducing duplicated historical append-only prose. Original source-record popup
+qualifications and support limits remain preserved on matching evidence. Derived
+water and boundary fields receive Administrative Boundaries presentation metadata
+after their construction, with no changes to scientific definitions or values.

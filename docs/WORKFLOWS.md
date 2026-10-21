@@ -1,47 +1,16 @@
-# Workflows and operational boundaries
+# Development and verification
 
-The normal workflow is the [flat Parquet build](parquet-products.md): initialize
-an explicit source workspace, review configuration and source rights, acquire
-inputs explicitly, build supplied H3 grids, and validate `Data/Governance`.
-After installation and validation, `build` removes disposable source-workspace
-`data/` when cached sources match retained originals and the folder contains no
-unrelated files, symlinks or protected inputs. Use `--keep-workspace-data` to retain
-caches. A failed build keeps source data. `clean-workspace Data/Governance` applies
-the same checks to an already completed workspace. Rebuild from `OriginalData` or
-explicitly acquire fresh inputs after cleanup.
-
-Acquisition writes qualified raw caches in the source workspace. Builds never
-download implicitly. Public outputs contain only resolution-specific static/optional
-dynamic metric Parquets, `catalog.json`, and `OriginalData/<dataset>/geometry.parquet`.
-Native family products, manifests and reconciliation diagnostics are temporary
-implementation intermediates. No release, publication, activation or rollback
-command is required for governance data.
-
-An existing flat output requires `--overwrite`; it is checked before replacement.
-A verified OriginalData directory can supply future offline builds, and the static
-metric files themselves can supply the grid. Provider/version/selector/support
-receipts must still agree with configuration. Last-update timestamps do not refresh
-source vintage or establish present legal applicability.
-
-## External local inputs
-
-International-boundary reconciliation still requires configured NOAA maritime,
-DFO bioregion and seascape water support. They are data inputs, not sibling Python
-imports. Their original source attribution and unknown retrieval times are retained.
-No sibling checkout is searched implicitly.
-
-## Development checks
+Work from the owning checkout. Read AGENTS.md, affected source/tests and the relevant DATA_SOURCES.md before changing scientific behavior. Source and tests outrank stale prose. Keep `config/` and packaged `src/governance/resources/config/` defaults byte-identical.
 
 ```sh
 python -m pip install -e '.[test,docs]'
 python -m pytest -q
-python -m pip wheel --no-deps --wheel-dir dist .
 mkdocs build --strict
 git diff --check
 ```
 
-Validate a regular wheel from outside the checkout with application imports blocked.
-Keep checkout and packaged configuration byte-identical. Synthetic/offline tests do
-not establish live source availability, legal currency or scientific accuracy.
-Old study/generation helpers and their regression tests concern historical artifacts;
-their CLI and public output workflow are retired. See [migration](MIGRATION.md).
+For behavior changes, run focused product/scientific tests first, then the full suite. Validate a regular wheel outside the checkout with consumer/sibling imports blocked and run `pip check`. For prose, verify internal links, strict MkDocs and whitespace checks. Offline fixtures validate software behavior; report live-provider, native/regional, scientific and consumer qualification separately rather than treating fixtures as observations.
+
+Use [the public offline build](how-to-use.md) for acceptance against retained originals and explicit grids. Validate output checksums, schema, identities, null support, preserved source records and exact grid membership. Compare semantic arrays when encoded Parquet bytes can change. Do not download new data as a side effect of a documentation or software test.
+
+Keep temporary native and matrix products outside public delivery. Public output contains only the files declared in [the contract](parquet-products.md). Record input/output hashes, source receipts, code/environment versions and any unrun checks in the task evidence. Do not commit acquired datasets, secrets or local machine paths.

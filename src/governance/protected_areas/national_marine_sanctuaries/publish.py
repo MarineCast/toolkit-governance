@@ -11,7 +11,6 @@ import pandas as pd
 
 from governance.shared.artifacts import (
     atomic_write_json,
-    sha256_file,
 )
 from governance.shared.config import load_governance_config
 from governance.shared.schema import validate_governance_geometry
@@ -95,19 +94,6 @@ def publish_sanctuary_products(
         raise ValueError("A sanctuary GIS boundary failed the CFR approximate-area QC check.")
 
     records = authority_records(frame)
-    authority_path = artifact_path.parent / "sanctuary_authority_records.json"
-    atomic_write_json(
-        authority_path,
-        {
-            "schema_version": 1,
-            "record_type": "national_marine_sanctuary_authority",
-            "geometry_is_legal_authority": False,
-            "current_cfr_text_and_coordinates_control": True,
-            "records": records,
-        },
-        overwrite=overwrite,
-    )
-
     config = load_governance_config(config_path)
     manifest_path = config.collections["national_marine_sanctuaries"].manifest_path
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -121,6 +107,7 @@ def publish_sanctuary_products(
         "geometry_parts_preserved": True,
         "model_eligible": False,
     }
+    manifest["sanctuary_authority_records"] = records
     manifest["sanctuary_count"] = int(frame["SANCTUARY_ID"].nunique())
     manifest["geometry_part_count"] = int(len(frame))
     manifest["source_vintages"] = {
@@ -128,14 +115,6 @@ def publish_sanctuary_products(
             source_frame["SOURCE_VINTAGE"].dropna().astype(str).unique().tolist()
         )
         for source_id, source_frame in frame.groupby("SOURCE_DATASET_ID")
-    }
-    manifest["related_artifacts"] = {
-        "sanctuary_authority_records": {
-            "path": str(authority_path),
-            "records": len(records),
-            "sha256": sha256_file(authority_path),
-            "bytes": authority_path.stat().st_size,
-        }
     }
     atomic_write_json(manifest_path, manifest, overwrite=True)
     return artifact_path

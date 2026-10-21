@@ -10,7 +10,6 @@ from governance.jurisdiction.tribal_first_nations_areas.normalize import normali
 from governance.shared.config import load_governance_config
 from governance.workspace import initialize_workspace
 from governance.h3_matrix import export_h3_matrix
-from governance.delivery import export_delivery
 
 
 def frame(**fields):
@@ -49,7 +48,7 @@ def test_invalid_geometry_and_duplicate_source_records_fail_closed():
     with pytest.raises(ValueError,match='Unique'):normalize(raw,source)
 
 
-def test_provider_area_identity_deduplicates_parts_without_pooling_agencies(tmp_path,monkeypatch,snapshot_fixture):
+def test_provider_area_identity_deduplicates_parts_without_pooling_agencies(tmp_path,monkeypatch,snapshot_fixture,projected_matrix):
     initialize_workspace(tmp_path);monkeypatch.setenv('GOVERNANCE_WORKSPACE',str(tmp_path))
     p=tmp_path/'config/data/governance/governance.yaml';cfg=yaml.safe_load(p.read_text())
     cfg['collections']={'tribal_first_nations_areas':cfg['collections']['tribal_first_nations_areas']};p.write_text(yaml.safe_dump(cfg))
@@ -60,13 +59,12 @@ def test_provider_area_identity_deduplicates_parts_without_pooling_agencies(tmp_
     native=gpd.read_parquet(build(allow_partial=True));assert native.SOURCE_FEATURE_ID.nunique()==2;assert native.GOVERNANCE_FEATURE_ID.nunique()==1
     grid=tmp_path/'grid.parquet';pq.write_table(pa.table({'H3_INDEX':[h3.latlng_to_cell(48.5,-123,6)],'H3_RESOLUTION':[6]}),grid)
     matrix=export_h3_matrix(grid,tmp_path/'matrix.parquet',length_crs='EPSG:32610',allow_partial=True)
-    artifact,manifest=export_delivery(matrix,tmp_path/'delivery',release_id='test',software_revision='a'*40)
-    table=pq.read_table(artifact);meta=json.loads(manifest.read_text())
+    table,meta=projected_matrix(matrix)[0]
     prefix='tribal_first_nations_areas__'
-    assert prefix+'recorded_feature_count' not in table.column_names
+    assert table[prefix+'mapped_area'].to_pylist()==[True]
+    assert table[prefix+'recorded_feature_count'].to_pylist()==[1]
+    assert table[prefix+'feature_memberships_v1'][0].as_py()[0]['feature_id']=='bia_administrative_lar:area:same-area'
     assert table[prefix+'bia_land_area_reference__recorded_feature_count'].to_pylist()==[1]
     assert table[prefix+'nrcan_indian_reserve_reference__recorded_feature_count'].to_pylist()==[None]
     assert table[prefix+'nrcan_indian_reserve_reference__recorded_feature_count_status'].to_pylist()==['unavailable']
     assert 'sovereignty' in meta['coverage'][prefix+'bia_land_area_reference']['overlap_policy']
-    from governance.jurisdiction.tribal_first_nations_areas.inspect import layer_descriptors
-    descriptors=layer_descriptors();assert len(descriptors)==2;assert descriptors[0].filters!=descriptors[1].filters

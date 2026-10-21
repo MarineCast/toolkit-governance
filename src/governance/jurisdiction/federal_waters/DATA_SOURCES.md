@@ -47,14 +47,44 @@ internal-water, territorial-sea, and contiguous-zone geometries remain explicit
 unavailable states; they are not generated from the EEZ, shoreline, seascape
 water support, or nominal offsets.
 
-## Outputs
+## Internal normalization outputs
+
+These files are temporary build intermediates, not standalone public deliveries.
+Public output is the flat H3 contract plus retained OriginalData; only fields
+declared by `resources/app_contract.json` reach the application handoff.
 
 - `federal_maritime_limits.parquet`: combined U.S. and Canadian native limit lines
-- `us_maritime_zone_limits.parquet`: U.S. source-native limit lines
-- `canadian_maritime_zone_limits.parquet`: available Canadian EEZ reference lines
-- `zone_availability.json`: explicit country-by-zone availability and source gaps
 - `manifest.json`: source snapshots, vintages, checksums, clipping diagnostics,
-  counts, geometry policy, and related-artifact checksums
+  counts, geometry policy, and explicit country-by-zone availability/source gaps.
+  Country subsets remain identifiable in the canonical native table; no duplicate
+  country geometry or availability sidecar is written.
 
 Every geometry output is clipped deterministically to configured `full_area`
 after acquisition. Raw snapshots remain unchanged.
+
+The public delivery's Country Assignment now displays geographic
+country-water support (United States / Canada) from retained source polygons.
+The family name does not make this a federal-administration or EEZ product.
+NOAA/Canadian limit-line diagnostics remain unchanged. International requires
+separate verified high-seas evidence and is never a no-hit default; current gaps
+stay unknown. See [geographic water assignments](../../../../docs/parquet-products.md#geographic-water-assignment-interfaces-2026-10-19).
+
+
+The second user-facing feature is International Boundary: nullable full-cell
+intersection with actual retained IBC, NOAA international-only (`RULEID` 1/4/5)
+and NRCan `INTERN` lines. Maritime outer limits and country-water polygon outlines
+are excluded. Current no-hit cells remain unknown because geographic inventory
+coverage is partial; complete receipts do not establish absence. Boundary names,
+paired source IDs and original line-part lineage remain in hidden support columns
+and cell popups. The separate explorer International Boundaries family is hidden,
+while its scientific records and country support remain intact. See the
+[boundary contract](../../../../docs/parquet-products.md#international-boundary-under-federal-waters-2026-10-19).
+
+## Public handoff boundary
+
+Source evidence and native processing described here are distinct from public
+columns. The [flat product contract](../../../../docs/parquet-products.md) and
+[exact physical schema](../../../../docs/reference/columns.md) define delivery.
+OriginalData preserves source geometry/attributes and receipt evidence; native
+manifests, diagnostic products and unused scientific measures are internal build
+support. No source qualification is broadened by the application projection.

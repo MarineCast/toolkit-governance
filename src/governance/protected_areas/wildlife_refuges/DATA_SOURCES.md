@@ -29,7 +29,7 @@ used 10 IDs per page, EPSG:4326 output, AOI [-180,32,-109,72], 132 U.S. plus 68 
 query candidates and a 120 MB cap. Exact AOI clipping retained 132 U.S. and 40 Canadian
 features; 28 Canadian server candidates were outside the precise AOI. The native pipeline
 repaired 64 invalid FWS source geometries; immutable raw responses and repair diagnostics are
-retained. Full acquisition evidence is retained in the local release.
+retained. Full acquisition evidence remains with retained originals and source receipts.
 
 The normalizer defensively filters types again. `SOURCE_FEATURE_ID` namespaces the snapshot's
 OBJECTID; source GlobalID, organization codes and Canadian parent/zone IDs remain attributes.
@@ -38,3 +38,20 @@ under `FWS_` or `ECCC_`; canonical effective dates and legal citations remain nu
 is clipped through the shared antimeridian-safe pipeline. All outputs remain research-only and
 model-ineligible. Empty cells are unknown absence, and these selected systems do not establish
 an exhaustive inventory of every feature that might be called a refuge.
+
+
+Qualified marine refuge records contribute to Marine Conservation Area Assignment,
+Count and Coverage; there are no standalone Wildlife Refuge measurement columns
+in the application handoff. Marine eligibility and reviewed site identity are
+required; unmatched FWS marine scope remains unqualified. Coverage unions eligible
+polygons over full H3 cell area without summing overlaps. Original source attributes
+and geometry remain in OriginalData. See the [unified interface](../../../../docs/families/marine-conservation-areas.md).
+
+## Public handoff boundary
+
+Source evidence and native processing described here are distinct from public
+columns. The [flat product contract](../../../../docs/parquet-products.md) and
+[exact physical schema](../../../../docs/reference/columns.md) define delivery.
+OriginalData preserves source geometry/attributes and receipt evidence; native
+manifests, diagnostic products and unused scientific measures are internal build
+support. No source qualification is broadened by the application projection.

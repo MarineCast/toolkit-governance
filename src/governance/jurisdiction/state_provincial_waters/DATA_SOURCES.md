@@ -10,3 +10,20 @@ the national BOEM/BSEE ArcGIS layer and clips it to `full_area`.
 
 British Columbia marine administrative applicability is not assumed equivalent
 to U.S. state waters. Provincial-water geometry remains unavailable.
+
+The public delivery's single State / Province Assignment now uses geographic
+model-water support: retained TIGER/Line county `STATEFP` 53/41 clipped to U.S.
+water support for WA/OR, and the retained water source's explicit
+`AREA=BRITISH_COLUMBIA` region for BC. The source-native BOEM diagnostics remain
+unchanged. This is geographic assignment for modeling, not legal water ownership
+or statutory provincial jurisdiction. Unmatched support stays unknown; counties
+are not extended offshore. See [geographic water assignments](../../../../docs/parquet-products.md#geographic-water-assignment-interfaces-2026-10-19).
+
+## Public handoff boundary
+
+Source evidence and native processing described here are distinct from public
+columns. The [flat product contract](../../../../docs/parquet-products.md) and
+[exact physical schema](../../../../docs/reference/columns.md) define delivery.
+OriginalData preserves source geometry/attributes and receipt evidence; native
+manifests, diagnostic products and unused scientific measures are internal build
+support. No source qualification is broadened by the application projection.

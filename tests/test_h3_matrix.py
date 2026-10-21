@@ -74,6 +74,20 @@ def test_polygon_parts_union_and_partial_missingness(grid_path):
     )
 
 
+def test_count_membership_overlay_skips_geometry_metrics(grid_path, monkeypatch):
+    grid = _grid(grid_path)
+    native = native_frame([grid.geometry.iloc[0]])
+    import shapely
+    def forbidden(*args, **kwargs):
+        raise AssertionError('Removed union metric was calculated')
+    monkeypatch.setattr(shapely, 'union_all', forbidden)
+    result = overlay_collection(grid, native, completeness='partial', length_crs='EPSG:32610',
+                                include_attributes=False, include_geometry_metrics=False)
+    assert set(result) == {'FEATURE_COUNT', 'FEATURE_MEMBERSHIPS_V1', 'INTERSECTION_STATUS', 'SOURCE_COMPLETENESS'}
+    assert result['FEATURE_COUNT'].to_pylist() == [1, None]
+    assert result['FEATURE_MEMBERSHIPS_V1'][0].as_py()[0]['feature_id'] == 'feature-0'
+
+
 def test_line_union_and_point_count(grid_path):
     grid = _grid(grid_path)
     centre = grid.geometry.iloc[0].centroid
@@ -221,52 +235,24 @@ def test_export_detects_effective_config_drift(workspace, grid_path):
         )
 
 
-def test_delivery_splits_resolutions_and_preserves_partial_nulls(workspace, grid_path, tmp_path):
-    from governance.delivery import export_delivery, validate_delivery
+def test_projection_preserves_partial_nulls(workspace, grid_path, tmp_path, projected_matrix):
     matrix = export_h3_matrix(grid_path, tmp_path/'matrix.parquet', length_crs='EPSG:32610', allow_partial=True)
-    outputs = export_delivery(matrix, tmp_path/'delivery', release_id='test-release', software_revision='a'*40)
-    parquet, manifest = outputs
-    assert validate_delivery(parquet, manifest)['rows'] == 2
-    table = pq.read_table(parquet)
-    assert table['management_areas__recorded_feature_count_status'].to_pylist() == ['partial','partial']
+    table,info = projected_matrix(matrix)[0]
+    assert table.num_rows == 2
+    assert set(table.column_names) == {'h3_index', 'management_areas__recorded_feature_count', 'management_areas__feature_memberships_v1'}
     assert table['management_areas__recorded_feature_count'].to_pylist() == [1,None]
-    info=json.loads(manifest.read_text())
+    assert info['fields']['management_areas__recorded_feature_count']['implicit_status'] == 'partial'
+    assert not any(name.endswith(('POLYGON_COVERAGE_FRAC', 'LINE_LENGTH_M', 'POINT_COUNT'))
+                   for name in pq.read_schema(matrix).names if name.startswith('management_areas__'))
     from governance import __version__
     assert info['software']['version']==__version__
     assert info['coverage']['management_areas']['geographic_inventory_coverage']['denominator'] is None
-    assert info['shared_contract_conformance']['status']=='not_claimed_by_local_envelope'
-    with pytest.raises(FileExistsError):
-        export_delivery(matrix,tmp_path/'delivery',release_id='test-release',software_revision='a'*40)
 
 
-def test_delivery_mixed_input_creates_separate_tables(workspace, grid_path, tmp_path):
-    from governance.delivery import export_delivery, validate_delivery
+def test_projection_keeps_resolutions_separate(workspace, grid_path, tmp_path, projected_matrix):
     mixed=tmp_path/'mixed.parquet'
     pq.write_table(pa.table({'H3_INDEX':[h3.latlng_to_cell(48.5,-123,6),h3.latlng_to_cell(48.5,-123,8)],'H3_RESOLUTION':[6,8]}),mixed)
     matrix=export_h3_matrix(mixed,tmp_path/'matrix.parquet',length_crs='EPSG:32610',allow_partial=True)
-    paths=export_delivery(matrix,tmp_path/'delivery',release_id='split',software_revision='b'*40)
-    assert len(paths)==4
-    results=[validate_delivery(paths[i],paths[i+1]) for i in (0,2)]
-    assert [(r['resolution'],r['rows']) for r in results]==[(6,1),(8,1)]
-
-
-def test_shared_reference_geometry_adopter(workspace, grid_path, tmp_path):
-    from pathlib import Path
-    from governance.delivery import export_delivery
-    from governance.shared_contract import export_shared_manifest
-    matrix=export_h3_matrix(grid_path,tmp_path/'matrix.parquet',length_crs='EPSG:32610',allow_partial=True)
-    artifact,local=export_delivery(matrix,tmp_path/'delivery',release_id='shared-test',software_revision='c'*40)
-    schema=Path(__file__).parent/'fixtures/reference-geometry-v0.2.schema.json'
-    shared=export_shared_manifest(artifact,local,schema,schema_reference='test-pinned-schema')
-    manifest=json.loads(shared.read_text())
-    assert manifest['contract_version']=='0.2'
-    assert manifest['product']['quantity_kind']=='reference_geometry'
-    assert 'not' in manifest['product']['description'].lower() or 'no legal' in manifest['product']['description'].lower()
-    assert 'no new provider acquisition' in manifest['provenance']['sources'][0]['temporal_coverage']
-    with pytest.raises(FileExistsError):
-        export_shared_manifest(artifact,local,schema,schema_reference='test-pinned-schema')
-    old=json.loads(schema.read_text())
-    old['properties']['product']['properties']['quantity_kind']['enum'].remove('reference_geometry')
-    invalid=tmp_path/'invalid.json';invalid.write_text(json.dumps(old))
-    with pytest.raises(ValueError,match='does not admit'):
-        export_shared_manifest(artifact,local,invalid,schema_reference='old-schema')
+    results=projected_matrix(matrix)
+    assert len(results)==2
+    assert [(context['spatial']['h3_resolution'], table.num_rows) for table,context in results]==[(6,1),(8,1)]

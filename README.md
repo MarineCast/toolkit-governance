@@ -1,49 +1,22 @@
 # Governance Toolkit
 
-<img src="docs/assets/governance-toolkit-banner.png" alt="Coastal chart with governance boundaries" width="100%">
+`toolkit-governance` builds qualified marine governance reference products on an explicit H3 grid. The independent `governance` Python package and CLI preserve original source geometry, attributes, identity and retrieval evidence alongside cell-level outputs.
 
-`toolkit-governance` produces marine governance metrics on explicit H3 grids and
-retains original source shapes. It installs independently as the `governance`
-Python package and CLI, with seventeen implemented collections and seven planned families.
+The public output contains `governance-r<resolution>-static.parquet`, an optional source-dated dynamic table per resolution, `catalog.json`, and `OriginalData/<source-id>/geometry.parquet`. Current inventories are static, partial and model-ineligible. Recorded geometry does not establish current law or complete jurisdiction.
 
-The public output is `Data/Governance`: one static Parquet per resolution, one
-optional dynamic Parquet per resolution, a small `catalog.json` with update times,
-and `OriginalData/<dataset>/geometry.parquet`. There are no data release directories
-or companion manifests. Static rows are H3 cells × metric columns; dynamic rows
-add a typed `date`. Current inventories are static and model-ineligible.
+Start with the [offline quickstart](docs/how-to-use.md), [configuration](docs/configuration.md) and [product contract](docs/parquet-products.md). The [family guide](docs/layers.md) documents each displayed feature, its source meaning, processing and limitations. [Coverage and refresh](docs/coverage.md) separates source receipt completeness from geographic and legal qualification.
 
 ```sh
 python -m pip install .
-governance --workspace /path/to/source-workspace init
-# Explicitly acquire/provision qualified local sources after reviewing their configuration.
-governance --workspace /path/to/source-workspace build \
+governance --workspace /path/to/workspace init
+governance --workspace /path/to/workspace build \
   --grid /path/to/grid-r6.parquet --grid /path/to/grid-r8.parquet \
-  --output-directory /path/to/Data/Governance --allow-partial
-governance validate-data /path/to/Data/Governance
+  --original-data /path/to/retained/Governance \
+  --output-directory /path/to/new/Governance \
+  --allow-partial --keep-workspace-data
+governance validate-data /path/to/new/Governance
 ```
 
-Read the [Parquet output guide](docs/parquet-products.md) for updates from retained
-originals, Python usage, exact filenames, embedded provenance, source rights and
-validation. Builds use temporary intermediates and do not download implicitly.
-After successful output validation, builds remove disposable source-workspace
-`data/` caches and old processed files whose sources are retained in `OriginalData`.
-Use `--keep-workspace-data` to retain them. Failed builds preserve source caches;
-shared/unrecognized data, symlinks and protected inputs prevent cleanup.
-Source workspace precedence is `--workspace`, `GOVERNANCE_WORKSPACE`, then cwd;
-package resources are read-only defaults. Partial coverage, nulls and observed zeros
-remain distinct. Original geometry and source dates do not certify current law.
+The retained directory must include its catalog and verified originals. Builds never download sources. Without `--keep-workspace-data`, successful builds attempt cleanup of verified disposable workspace caches; failed builds retain them. Installation and initialization acquire no datasets.
 
-- [Product contracts](docs/CONTRACTS.md) and [architecture](docs/ARCHITECTURE.md)
-- [Sources and rights](docs/reference/sources.md), [layers](docs/layers.md), and [query API](docs/query-api.md)
-- [CLI](docs/reference/cli.md), [workflows](docs/WORKFLOWS.md), and [documentation site](docs/documentation-site.md)
-
-```sh
-python -m pip install -e '.[test,docs]'
-python -m pytest -q
-mkdocs build --strict
-git diff --check
-```
-
-Software uses the [Apache-2.0 license](LICENSE). Data rights remain source-specific.
-The wheel contains no acquired datasets. Offline tests are software validation;
-live source availability and scientific/legal qualification require separate evidence.
+See [CLI and Python API](docs/reference/cli.md) and [developer checks](docs/WORKFLOWS.md). Software uses [Apache-2.0](LICENSE); source data rights are provider-specific and are not granted by the software license.

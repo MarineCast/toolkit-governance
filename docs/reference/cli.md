@@ -1,30 +1,35 @@
-# CLI reference
+# CLI and Python API
 
-Use `governance --help` and command help from the installed revision. Global
-`--workspace` precedes the command; output and grid paths are explicit process paths.
-Configuration-relative source paths resolve against the selected source workspace.
+Run `governance --help` and `governance COMMAND --help` for the installed version's options. Put global `--workspace` and optional `--env-file` before the command.
 
-| Command | Effect |
+| Command | Purpose / main options |
 | --- | --- |
-| `init` | Copy missing defaults; no acquisition |
-| `download COLLECTION --config FILE [--overwrite]` | Explicit qualified source acquisition into the source workspace |
-| `build --grid FILE [--grid FILE] --output-directory DIR [--original-data DIR] [--length-crs CRS] [--allow-partial] [--overwrite] [--keep-workspace-data]` | Offline normalization and overlay; write flat data, validate, then clean disposable workspace data |
-| `export-data --matrix FILE --output-directory DIR [--overwrite]` | Project an existing internal overlay and retain original datasets |
-| `validate-data DIR` | Read-only flat membership, checksum, grain and value/status validation |
-| `clean-workspace DIR [--config FILE]` | Verify the saved flat output and retained source checksums, then remove disposable workspace `data/`; preserve the folder if it includes unretained/unrecognized data, symlinks or protected configuration/output |
-| `catalog [--config FILE] [--verify-artifacts]` | Configured collections; optional retained internal-artifact checks |
-| `availability`, `preflight` | Read source/collection readiness; no acquisition |
-| `get COLLECTION --bbox WEST SOUTH EAST NORTH` | In-memory single-layer query; see query API for bounded acquisition and offline mode |
+| `init` | Copy missing configuration; no acquisition |
+| `availability` | Read configured regional source qualifications |
+| `preflight` | Inspect readiness without acquisition |
+| `catalog` | Validate source/collection catalog; `--config`, optional `--verify-artifacts` |
+| `download COLLECTION` | Explicit source acquisition; `--config`, `--overwrite`; source provisioning limits apply |
+| `build` | Offline public build; repeat `--grid`, `--output-directory`, optional `--original-data`, `--config`, `--allow-partial`, `--length-crs`, `--software-revision`, `--overwrite`, `--keep-workspace-data` |
+| `export-data` | Export an already built internal matrix; `--matrix`, `--output-directory`, `--config`, `--software-revision`, `--overwrite` |
+| `validate-data DIRECTORY` | Verify flat outputs and embedded contracts |
+| `clean-workspace DIRECTORY` | Verify retained output/originals before disposable workspace cleanup; `--config` |
 
-`build` and `export-data` accept `--config` and optional `--software-revision` for
-software provenance. There is no release ID. Existing flat output needs explicit
-`--overwrite`; partial source coverage needs `--allow-partial` for builds.
-Successful builds clean disposable workspace `data/` by default; use
-`--keep-workspace-data` to retain caches. Failed builds keep source data. Cleanup
-does not affect external caches or final outputs. Future builds can reuse
-`OriginalData` with `--original-data DIR`, or explicitly acquire fresh inputs.
+Use `build` for ordinary refresh. An internal matrix is not a public output contract. Cleanup can fail closed for shared, protected or unrecognized inputs. Preserve input data until validated replacements exist.
 
-The old `run-study`, generation publication/activation/verification, manifest export,
-per-collection CLI build, `inspect`, and query multi-file export commands are retired.
-Native normalization, reconciliation and historical validators remain Python
-implementation utilities. Public data writes use the [flat Parquet contract](../parquet-products.md).
+## Python product API
+
+```python
+from governance.products import build_products, export_products, validate_products
+
+output = build_products(
+    ['/absolute/grid.parquet'], '/absolute/review/Governance',
+    config_path='/absolute/workspace/config/data/governance/governance.yaml',
+    original_data='/absolute/retained/Governance',
+    allow_partial=True, keep_workspace_data=True,
+)
+validation = validate_products(output)
+```
+
+Both product writers accept `workspace` and `env_file`. Explicit arguments override process environment, selected `.env` settings and configuration defaults. `build_products` accepts `length_crs` (default `EPSG:32610`), `software_revision` and `overwrite` in addition to the arguments above. It performs temporary native normalization/overlay and exports a validated flat product offline. `export_products(matrix, output_directory, ...)` is the lower-level exporter. Neither implicitly acquires sources.
+
+See [configuration](../configuration.md) for workspace/path precedence and optional run settings, [quickstart](../how-to-use.md) for grid schema, and [product contract](../parquet-products.md) for outputs and errors. Retired study/release commands are not production delivery interfaces.

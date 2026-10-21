@@ -13,3 +13,7 @@ dist/
 .DS_Store
 
 /site/
+
+.env
+.env.*
+!.env.example

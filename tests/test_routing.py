@@ -11,7 +11,6 @@ from governance.vessel_management.routing import normalize, noaa_source_frame
 from governance.shared.config import load_governance_config
 from governance.shared.spatial import clip_to_full_area
 from governance.h3_matrix import _grid, overlay_collection, export_h3_matrix
-from governance.delivery import export_delivery
 from governance.workspace import initialize_workspace
 
 
@@ -54,7 +53,7 @@ def test_noaa_archive_preserves_fid_and_filters_nonrouting(tmp_path):
     assert result.LEGAL_AUTHORITY.isna().all()
 
 
-def test_role_delivery_never_pools_components_sources_or_absent_roles(tmp_path,monkeypatch,snapshot_fixture):
+def test_role_delivery_never_pools_components_sources_or_absent_roles(tmp_path,monkeypatch,snapshot_fixture,projected_matrix):
     initialize_workspace(tmp_path);monkeypatch.setenv('GOVERNANCE_WORKSPACE',str(tmp_path))
     p=tmp_path/'config/data/governance/governance.yaml';raw=yaml.safe_load(p.read_text())
     raw['collections']={'traffic_separation_schemes':raw['collections']['traffic_separation_schemes']}
@@ -67,8 +66,7 @@ def test_role_delivery_never_pools_components_sources_or_absent_roles(tmp_path,m
     build(allow_partial=True)
     gp=tmp_path/'grid.parquet';pq.write_table(pa.table({'H3_INDEX':[h3.latlng_to_cell(48.5,-123,6)],'H3_RESOLUTION':[6]}),gp)
     matrix=export_h3_matrix(gp,tmp_path/'matrix.parquet',length_crs='EPSG:32610',allow_partial=True)
-    artifact,manifest=export_delivery(matrix,tmp_path/'delivery',release_id='test',software_revision='a'*40)
-    table=pq.read_table(artifact);d=json.loads(manifest.read_text())
+    table,d=projected_matrix(matrix)[0]
     assert 'traffic_separation_schemes__recorded_feature_count' not in table.column_names
     assert table['traffic_separation_schemes__chs_lane_part__recorded_feature_count'].to_pylist()==[1]
     assert table['traffic_separation_schemes__noaa_traffic_lane__recorded_feature_count'].to_pylist()==[None]

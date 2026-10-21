@@ -48,34 +48,28 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
 nav:
   - Home: index.md
-  - Parquet outputs: parquet-products.md
-  - Query API: query-api.md
-  - Coverage: coverage.md
-  - Layers: layers.md
-  - How to use:
-      - Install, build, and inspect: how-to-use.md
-      - Installation details: getting-started.md
-      - Configuration: configuration.md
-      - Historical study: study-guide.md
-      - Internal H3 calculation: h3-matrix.md
-      - Troubleshooting: troubleshooting.md
+  - Quickstart: how-to-use.md
+  - Families:
+      - Overview: layers.md
+      - "Administrative Boundaries": families/administrative-boundaries.md
+      - "Coast Guard Sectors": families/coast-guard-sectors.md
+      - "Critical Habitat": families/critical-habitat.md
+      - "Exclusion Zones": families/exclusion-zones.md
+      - "Fisheries Management Areas": families/fisheries-management-areas.md
+      - "Marine Conservation Areas": families/marine-conservation-areas.md
+      - "Vessel Routing & Regulations": families/vessel-routing-regulations.md
+  - Product contract: parquet-products.md
+  - Coverage and refresh: coverage.md
+  - Configuration: configuration.md
   - Reference:
-      - CLI: reference/cli.md
-      - Flat output commands: cli.md
+      - CLI and Python API: reference/cli.md
+      - Physical columns: reference/columns.md
       - Sources and rights: reference/sources.md
-      - Source quality index: sources.md
-      - Source acceptance inventory: source-acceptance.md
-      - Product contracts: CONTRACTS.md
-      - Limitations: limitations.md
-      - Historical qualification: production-readiness.md
+      - Contract invariants: CONTRACTS.md
   - Development:
-      - Workflows and checks: WORKFLOWS.md
+      - Verification: WORKFLOWS.md
       - Architecture: ARCHITECTURE.md
-      - Hardening handoff: hardening-report.md
-      - Hardening corrections: hardening-corrections.md
-      - Conditional agent checks: agent-checks.md
       - Documentation site: documentation-site.md
-      - Migration history: MIGRATION.md
 validation:
   nav:
     omitted_files: warn

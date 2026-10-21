@@ -1,0 +1,273 @@
+{
+  "version": 1,
+  "resolutions": [
+    6,
+    8
+  ],
+  "families": [
+    "Administrative Boundaries",
+    "Coast Guard Sectors",
+    "Critical Habitat",
+    "Exclusion Zones",
+    "Fisheries Management Areas",
+    "Marine Conservation Areas",
+    "Vessel Routing & Regulations"
+  ],
+  "columns": [
+    "h3_index",
+    "county_regional_boundaries__recorded_feature_count",
+    "county_regional_boundaries__feature_memberships_v1",
+    "critical_habitat__recorded_feature_count",
+    "critical_habitat__recorded_feature_count_status",
+    "critical_habitat__feature_memberships_v1",
+    "critical_habitat__feature_memberships_v1_status",
+    "exclusion_zones__recorded_feature_count",
+    "exclusion_zones__recorded_feature_count_status",
+    "exclusion_zones__feature_memberships_v1",
+    "exclusion_zones__feature_memberships_v1_status",
+    "management_areas__recorded_feature_count",
+    "management_areas__feature_memberships_v1",
+    "speed_restriction_zones__recorded_feature_count",
+    "speed_restriction_zones__recorded_feature_count_status",
+    "speed_restriction_zones__feature_memberships_v1",
+    "speed_restriction_zones__feature_memberships_v1_status",
+    "tribal_first_nations_areas__mapped_area",
+    "tribal_first_nations_areas__mapped_area_status",
+    "tribal_first_nations_areas__recorded_feature_count",
+    "tribal_first_nations_areas__recorded_feature_count_status",
+    "tribal_first_nations_areas__feature_memberships_v1",
+    "tribal_first_nations_areas__feature_memberships_v1_status",
+    "state_provincial_waters__assignment__feature_memberships_v1",
+    "state_provincial_waters__assignment__feature_memberships_v1_status",
+    "state_provincial_waters__assignment__recorded_feature_count",
+    "state_provincial_waters__assignment__recorded_feature_count_status",
+    "federal_waters__assignment__feature_memberships_v1",
+    "federal_waters__assignment__feature_memberships_v1_status",
+    "federal_waters__assignment__recorded_feature_count",
+    "federal_waters__assignment__recorded_feature_count_status",
+    "federal_waters__international_boundary",
+    "federal_waters__international_boundary_status",
+    "federal_waters__international_boundary__feature_memberships_v1",
+    "federal_waters__international_boundary__feature_memberships_v1_status",
+    "federal_waters__international_boundary__recorded_feature_count",
+    "federal_waters__international_boundary__recorded_feature_count_status",
+    "coast_guard_sectors__feature_memberships_v1",
+    "coast_guard_sectors__feature_memberships_v1_status",
+    "coast_guard_sectors__recorded_feature_count",
+    "coast_guard_sectors__recorded_feature_count_status",
+    "marine_conservation_areas__feature_memberships_v1",
+    "marine_conservation_areas__recorded_feature_count",
+    "marine_conservation_areas__recorded_polygon_union_area_fraction",
+    "marine_conservation_areas__feature_memberships_v1_status",
+    "marine_conservation_areas__recorded_feature_count_status",
+    "marine_conservation_areas__recorded_polygon_union_area_fraction_status",
+    "proposed_interim_conservation_references__feature_memberships_v1",
+    "proposed_interim_conservation_references__recorded_feature_count",
+    "proposed_interim_conservation_references__feature_memberships_v1_status",
+    "proposed_interim_conservation_references__recorded_feature_count_status",
+    "vessel_routing_regulations__recorded_reference",
+    "vessel_routing_regulations__recorded_reference_status",
+    "vessel_routing_regulations__shipping_lanes__feature_memberships_v1",
+    "vessel_routing_regulations__shipping_lanes__feature_memberships_v1_status",
+    "vessel_routing_regulations__shipping_lanes__recorded_feature_count",
+    "vessel_routing_regulations__shipping_lanes__recorded_feature_count_status",
+    "vessel_routing_regulations__traffic_separation_zones__feature_memberships_v1",
+    "vessel_routing_regulations__traffic_separation_zones__feature_memberships_v1_status",
+    "vessel_routing_regulations__traffic_separation_zones__recorded_feature_count",
+    "vessel_routing_regulations__traffic_separation_zones__recorded_feature_count_status"
+  ],
+  "features": [
+    {
+      "id": "GOVERNANCE__county_regional_boundaries__recorded_feature_count",
+      "column": "county_regional_boundaries__recorded_feature_count",
+      "name": "County / District Count",
+      "family": "Administrative Boundaries",
+      "kind": "numeric",
+      "unit": "count"
+    },
+    {
+      "id": "GOVERNANCE__critical_habitat__recorded_feature_count",
+      "column": "critical_habitat__recorded_feature_count",
+      "name": "Critical Habitat Count",
+      "family": "Critical Habitat",
+      "kind": "numeric",
+      "unit": "count"
+    },
+    {
+      "id": "GOVERNANCE__exclusion_zones__recorded_feature_count",
+      "column": "exclusion_zones__recorded_feature_count",
+      "name": "Exclusion Zone Count",
+      "family": "Exclusion Zones",
+      "kind": "numeric",
+      "unit": "count"
+    },
+    {
+      "id": "GOVERNANCE__management_areas__recorded_feature_count",
+      "column": "management_areas__recorded_feature_count",
+      "name": "Management Area Count",
+      "family": "Fisheries Management Areas",
+      "kind": "numeric",
+      "unit": "count"
+    },
+    {
+      "id": "GOVERNANCE__tribal_first_nations_areas__mapped_area",
+      "column": "tribal_first_nations_areas__mapped_area",
+      "name": "Tribal / First Nations Area",
+      "family": "Administrative Boundaries",
+      "kind": "categorical",
+      "unit": "boolean"
+    },
+    {
+      "id": "GOVERNANCE__federal_waters__international_boundary",
+      "column": "federal_waters__international_boundary",
+      "name": "International Boundary",
+      "family": "Administrative Boundaries",
+      "kind": "categorical",
+      "unit": "boolean"
+    },
+    {
+      "id": "GOVERNANCE__marine_conservation_areas__recorded_feature_count",
+      "column": "marine_conservation_areas__recorded_feature_count",
+      "name": "Marine Conservation Area Count",
+      "family": "Marine Conservation Areas",
+      "kind": "numeric",
+      "unit": "count"
+    },
+    {
+      "id": "GOVERNANCE__marine_conservation_areas__recorded_polygon_union_area_fraction",
+      "column": "marine_conservation_areas__recorded_polygon_union_area_fraction",
+      "name": "Marine Conservation Area Coverage",
+      "family": "Marine Conservation Areas",
+      "kind": "numeric",
+      "unit": "fraction"
+    },
+    {
+      "id": "GOVERNANCE__vessel_routing_regulations__recorded_reference",
+      "column": "vessel_routing_regulations__recorded_reference",
+      "name": "Routing / regulation recorded",
+      "family": "Vessel Routing & Regulations",
+      "kind": "categorical",
+      "unit": "boolean"
+    },
+    {
+      "id": "GOVERNANCE__county_regional_boundaries__feature_memberships_v1",
+      "column": "county_regional_boundaries__feature_memberships_v1",
+      "name": "County / District Assignment",
+      "family": "Administrative Boundaries",
+      "kind": "categorical",
+      "unit": "recorded membership"
+    },
+    {
+      "id": "GOVERNANCE__critical_habitat__feature_memberships_v1",
+      "column": "critical_habitat__feature_memberships_v1",
+      "name": "Critical Habitat Assignment",
+      "family": "Critical Habitat",
+      "kind": "categorical",
+      "unit": "recorded membership"
+    },
+    {
+      "id": "GOVERNANCE__exclusion_zones__feature_memberships_v1",
+      "column": "exclusion_zones__feature_memberships_v1",
+      "name": "Exclusion Zone Assignment",
+      "family": "Exclusion Zones",
+      "kind": "categorical",
+      "unit": "recorded membership"
+    },
+    {
+      "id": "GOVERNANCE__management_areas__feature_memberships_v1",
+      "column": "management_areas__feature_memberships_v1",
+      "name": "Management Area",
+      "family": "Fisheries Management Areas",
+      "kind": "categorical",
+      "unit": "recorded membership"
+    },
+    {
+      "id": "GOVERNANCE__speed_restriction_zones__feature_memberships_v1",
+      "column": "speed_restriction_zones__feature_memberships_v1",
+      "name": "Speed Restriction Zones",
+      "family": "Vessel Routing & Regulations",
+      "kind": "categorical",
+      "unit": "recorded membership"
+    },
+    {
+      "id": "GOVERNANCE__tribal_first_nations_areas__feature_memberships_v1",
+      "column": "tribal_first_nations_areas__feature_memberships_v1",
+      "name": "Tribal / First Nations Assignment",
+      "family": "Administrative Boundaries",
+      "kind": "categorical",
+      "unit": "recorded membership"
+    },
+    {
+      "id": "GOVERNANCE__state_provincial_waters__assignment__feature_memberships_v1",
+      "column": "state_provincial_waters__assignment__feature_memberships_v1",
+      "name": "State / Province Assignment",
+      "family": "Administrative Boundaries",
+      "kind": "categorical",
+      "unit": "recorded membership"
+    },
+    {
+      "id": "GOVERNANCE__federal_waters__assignment__feature_memberships_v1",
+      "column": "federal_waters__assignment__feature_memberships_v1",
+      "name": "Country Assignment",
+      "family": "Administrative Boundaries",
+      "kind": "categorical",
+      "unit": "recorded membership"
+    },
+    {
+      "id": "GOVERNANCE__coast_guard_sectors__feature_memberships_v1",
+      "column": "coast_guard_sectors__feature_memberships_v1",
+      "name": "Coast Guard Assignment",
+      "family": "Coast Guard Sectors",
+      "kind": "categorical",
+      "unit": "recorded membership"
+    },
+    {
+      "id": "GOVERNANCE__vessel_routing_regulations__traffic_separation_zones__feature_memberships_v1",
+      "column": "vessel_routing_regulations__traffic_separation_zones__feature_memberships_v1",
+      "name": "Shipping Lanes & Traffic Separation Zones",
+      "family": "Vessel Routing & Regulations",
+      "kind": "categorical",
+      "unit": "recorded membership"
+    },
+    {
+      "id": "GOVERNANCE__marine_conservation_areas__feature_memberships_v1",
+      "column": "marine_conservation_assignment__feature_memberships_v1",
+      "name": "Marine Conservation Area Assignment",
+      "family": "Marine Conservation Areas",
+      "kind": "categorical",
+      "unit": "recorded membership"
+    }
+  ],
+  "compatibility_columns": [
+    "vessel_routing_regulations__shipping_lanes__feature_memberships_v1",
+    "vessel_routing_regulations__shipping_lanes__feature_memberships_v1_status",
+    "vessel_routing_regulations__shipping_lanes__recorded_feature_count",
+    "vessel_routing_regulations__shipping_lanes__recorded_feature_count_status"
+  ],
+  "derived_columns": [
+    "county_regional_boundaries__feature_memberships_v1_status",
+    "county_regional_boundaries__recorded_feature_count_status",
+    "management_areas__feature_memberships_v1_status",
+    "management_areas__recorded_feature_count_status",
+    "marine_conservation_assignment__feature_memberships_v1_status",
+    "marine_conservation_assignment__recorded_feature_count"
+  ],
+  "source_collections": [
+    "coast_guard_sectors",
+    "conservation_designations",
+    "county_regional_boundaries",
+    "critical_habitat",
+    "exclusion_zones",
+    "federal_waters",
+    "international_boundaries",
+    "management_areas",
+    "marine_protected_areas",
+    "national_marine_sanctuaries",
+    "shipping_lanes",
+    "speed_restriction_zones",
+    "state_provincial_waters",
+    "traffic_separation_schemes",
+    "tribal_first_nations_areas",
+    "wildlife_refuges"
+  ]
+}
