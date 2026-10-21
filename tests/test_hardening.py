@@ -10,8 +10,6 @@ import pytest
 import yaml
 from shapely.geometry import LineString, MultiPoint, Polygon, box, Point
 
-from governance import (get_layer, get_fishery_management_areas, get_marine_protected_areas,
-                        get_gear_restrictions, LayerNotImplementedError)
 from governance._config.document import ConfigDocument
 from governance.shared import acquisition
 from governance.shared.acquisition import AcquisitionBudget, CacheScopeError, SourceUnavailableError
@@ -49,18 +47,6 @@ def test_date_parser_declared_ms_ambiguous_and_schema_drift():
     with pytest.raises(ValueError,match='schema drift'):source_date(frame,'date',1590969600000,arcgis_date=True)
 
 
-def test_native_repeated_dates_still_reject_late_invalid_values(tmp_path,snapshot_fixture):
-    cfg=configured(tmp_path);source,_,_=cached_area(cfg,snapshot_fixture)
-    native=get_fishery_management_areas((-124,47,-122,49),config=cfg,sources=source.source_id,mode='offline',allow_partial=True).features
-    frame=gpd.GeoDataFrame(pd.concat([native]*3,ignore_index=True),crs=native.crs)
-    frame['GEOMETRY_PART_ID']=['part0','part1','part2']
-    frame['EFFECTIVE_START']=['2020-06-01']*3
-    frame['SYSTEM_LEARNED_AT']=['2026-10-14T00:00:00Z']*3
-    validate_governance_geometry(frame)
-    for field,bad in [('EFFECTIVE_START','2020-02-30'),('EFFECTIVE_START',1590969600000),
-                      ('SYSTEM_LEARNED_AT','badZ'),('SYSTEM_LEARNED_AT','2026-10-14T00:00:00+01:00')]:
-        changed=frame.copy();changed[field]=changed[field].astype(object);changed.loc[2,field]=bad
-        with pytest.raises(ValueError):validate_governance_geometry(changed)
 
 
 def test_dateline_half_line_and_multipart_points():
@@ -141,42 +127,10 @@ def test_cache_scope_mask_pin_and_tamper(tmp_path,snapshot_fixture):
     with pytest.raises(CacheScopeError,match='roster'):acquisition.read_source_frame(source,bbox=(-123.1,48.4,-122.9,48.6))
 
 
-def test_getter_native_h3_full_support_relationships_and_offline(tmp_path,snapshot_fixture,monkeypatch):
-    cfg=configured(tmp_path);source,_,_=cached_area(cfg,snapshot_fixture)
-    monkeypatch.setattr(acquisition.requests,'get',lambda *a,**k:pytest.fail('offline network call'))
-    kwargs=dict(config=cfg,sources=source.source_id,mode='offline',allow_partial=True)
-    native=get_fishery_management_areas((-123.01,48.49,-122.99,48.51),**kwargs)
-    assert len(native.features)==1 and native.h3 is None and native.memberships is None
-    assert native.features.geometry.iloc[0].bounds==(-123.1,48.4,-122.9,48.6)
-    first=native.features.SYSTEM_LEARNED_AT.tolist()
-    again=get_fishery_management_areas((-123.01,48.49,-122.99,48.51),**kwargs)
-    assert again.features.SYSTEM_LEARNED_AT.tolist()==first==['2026-10-01T00:00:00Z']
-    h3=get_fishery_management_areas((-123.01,48.49,-122.99,48.51),make_h3=True,**kwargs)
-    assert set(h3.h3.H3_RESOLUTION)=={7} and h3.h3.H3_INDEX.is_unique
-    assert set(h3.memberships.GEOMETRY_PART_ID)<=set(h3.features.GEOMETRY_PART_ID)
-    assert h3.h3.filter(like='polygon_coverage').max().max()==pytest.approx(1.)
 
 
-def test_valid_empty_and_unavailable_are_distinct(tmp_path,snapshot_fixture):
-    cfg=configured(tmp_path);source,raw,_=cached_area(cfg,snapshot_fixture,raw=gpd.GeoDataFrame({'OBJECTID':pd.Series(dtype='int'),'AreaName':pd.Series(dtype='str')},geometry=[],crs=4326))
-    result=get_fishery_management_areas((-124,47,-122,49),config=cfg,sources=source.source_id,mode='offline',allow_partial=True)
-    assert result.features.empty and result.coverage.status.tolist()==['empty']
-    validate_governance_geometry(result.features)
-    source.snapshot_path.unlink()
-    result=get_fishery_management_areas((-124,47,-122,49),config=cfg,sources=source.source_id,mode='offline',allow_partial=True)
-    assert result.features.empty and result.coverage.status.tolist()==['unavailable']
-    with pytest.raises(SourceUnavailableError):get_fishery_management_areas((-124,47,-122,49),config=cfg,sources=source.source_id,mode='offline')
 
 
-def test_small_polygon_without_cell_center_and_dateline(tmp_path,snapshot_fixture):
-    cfg=configured(tmp_path)
-    for bbox,shape in [((-123.0001,48.5001,-122.9999,48.5003),box(-123.0001,48.5001,-122.9999,48.5003)),((179.98,50,-179.98,50.02),Polygon([(179.98,50),(-179.98,50),(-179.98,50.02),(179.98,50.02)]))]:
-        raw=gpd.GeoDataFrame({'OBJECTID':[1],'AreaName':['x']},geometry=[shape],crs=4326)
-        source,_,receipt=cached_area(cfg,snapshot_fixture,raw=raw,bbox=(-180,-90,180,90))
-        result=get_fishery_management_areas(bbox,config=cfg,sources=source.source_id,mode='offline',allow_partial=True,make_h3=True,h3_res=6)
-        assert len(result.memberships)>0
-        assert result.features.RETAINED_MEASURE_FRACTION.min()==pytest.approx(1.)
-        assert result.h3.filter(like='polygon_coverage').max().max()>0
 
 
 def test_proposal_exclusion_marine_zero_and_source_drift(tmp_path,snapshot_fixture):
@@ -186,39 +140,15 @@ def test_proposal_exclusion_marine_zero_and_source_drift(tmp_path,snapshot_fixtu
     native=normalize(raw,cfg.sources['noaa_mpa_inventory_2023'])
     assert native.SOURCE_MARINE_AREA_KM2.tolist()==[0.] and native.SOURCE_AREA_KM2.tolist()==[0.]
     assert native.SOURCE_TOTAL_SITE_AREA_KM2.tolist()==[10.] and native.EFFECTIVE_START.isna().all()
-    source=cfg.sources['dfo_oceans_act_areas_of_interest'];source.snapshot_path.parent.mkdir(parents=True)
-    raw=gpd.GeoDataFrame({'OBJECTID':[1],'NAME_E':['Proposal']},geometry=[Point(-123,48)],crs=4326)
-    source.snapshot_path.write_text(json.dumps(snapshot_fixture(source,raw)))
-    kwargs=dict(config=cfg,sources=source.source_id,mode='offline',allow_partial=True)
-    excluded=get_marine_protected_areas((-124,47,-122,49),**kwargs)
-    assert excluded.features.empty
-    included=get_marine_protected_areas((-124,47,-122,49),include_proposed=True,make_h3=True,**kwargs)
-    assert included.features.DESIGNATION_STATUS.tolist()==['area_of_interest']
-    assert any('__proposed__point_count' in field for field in included.h3)
-    wdfw,raw,_=cached_area(cfg,snapshot_fixture)
-    raw=raw.drop(columns='AreaName');wdfw.snapshot_path.write_text(json.dumps(snapshot_fixture(wdfw,raw)))
-    with pytest.raises(ValueError,match='schema drift'):get_fishery_management_areas((-124,47,-122,49),config=cfg,sources=wdfw.source_id,mode='offline',allow_partial=True)
+    from governance.shared.registry import normalize_collection
+    source=cfg.sources['wdfw_recreational_marine_areas']
+    raw=gpd.GeoDataFrame({'OBJECTID':[1]},geometry=[box(-124,47,-122,49)],crs=4326)
+    with pytest.raises(ValueError,match='schema drift'):
+        normalize_collection(raw,source,cfg.collections['management_areas'])
 
 
-@pytest.mark.parametrize('kwargs',[{'make_h3':'false'},{'h3_res':16},{'make_h3':True,'h3_res':True},{'as_of':'2020-01-01'},{'mode':'bad'},{'sources':['typo']},{'sources':['wdfw_recreational_marine_areas'],'systems':['x']}])
-def test_invalid_options_fail_before_network(tmp_path,monkeypatch,kwargs):
-    monkeypatch.setattr(acquisition.requests,'get',lambda *a,**k:pytest.fail('unexpected network'))
-    with pytest.raises(ValueError):get_fishery_management_areas((-124,47,-122,49),workspace=tmp_path,**kwargs)
 
 
-def test_concurrent_workspaces_and_cli(tmp_path,snapshot_fixture,monkeypatch,capsys):
-    roots=[tmp_path/'a',tmp_path/'b']
-    for root in roots:
-        cfg=configured(root);cached_area(cfg,snapshot_fixture)
-    monkeypatch.setenv('GOVERNANCE_WORKSPACE','preserved-sentinel')
-    def query(root):return get_fishery_management_areas((-124,47,-122,49),workspace=root,sources='wdfw_recreational_marine_areas',mode='offline',allow_partial=True)
-    with ThreadPoolExecutor(max_workers=2) as pool:results=list(pool.map(query,roots))
-    assert all(len(result.features)==1 for result in results)
-    import os
-    assert os.environ['GOVERNANCE_WORKSPACE']=='preserved-sentinel'
-    from governance.cli import main
-    assert main(['--workspace',str(roots[0]),'get','fishery-management-areas','--bbox','-124','47','-122','49','--source','wdfw_recreational_marine_areas','--mode','offline','--allow-partial'])==0
-    assert json.loads(capsys.readouterr().out)['features']==1
 
 
 def test_config_typo_boolean_cycle(tmp_path):
@@ -231,22 +161,6 @@ def test_config_typo_boolean_cycle(tmp_path):
     with pytest.raises(ValueError,match='reference cycle'):ConfigDocument.load(p,workspace=tmp_path)
 
 
-def test_native_pair_failure_restores_prior_outputs(tmp_path,snapshot_fixture,monkeypatch):
-    cfg=configured(tmp_path);source,_,_=cached_area(cfg,snapshot_fixture)
-    result=get_fishery_management_areas((-124,47,-122,49),config=cfg,sources=source.source_id,mode='offline',allow_partial=True)
-    collection=cfg.collections['management_areas']
-    payload=manifest_payload(config=cfg,collection=collection,frame=result.features,sources=[],clip_diagnostics=[],limitations=[])
-    publish_native_pair(result.features,collection.artifact_path,collection.manifest_path,payload)
-    original=(collection.artifact_path.read_bytes(),collection.manifest_path.read_bytes())
-    import governance.shared.artifacts as artifacts
-    original_replace=artifacts.os.replace
-    def fail(source,dest):
-        if str(source).endswith('.manifest.part'):raise OSError('injected manifest replacement failure')
-        return original_replace(source,dest)
-    monkeypatch.setattr(artifacts.os,'replace',fail)
-    with pytest.raises(OSError):publish_native_pair(result.features,collection.artifact_path,collection.manifest_path,payload,overwrite=True)
-    assert original==(collection.artifact_path.read_bytes(),collection.manifest_path.read_bytes())
-    load_manifest(collection.manifest_path)
 
 
 def test_empty_mpa_builder_and_secondary_publishers(tmp_path,snapshot_fixture,monkeypatch):
@@ -264,46 +178,14 @@ def test_empty_mpa_builder_and_secondary_publishers(tmp_path,snapshot_fixture,mo
     assert gpd.read_parquet(path).empty
     manifest=load_manifest(path.parent/'manifest.json')
     assert manifest['valid_empty_result'] is True
-    assert gpd.read_parquet(path.parent/'mpa_designation_polygons.parquet').empty
-    assert gpd.read_parquet(path.parent/'area_of_interest_geometry.parquet').empty
+    assert gpd.read_parquet(path).empty
+    assert manifest['source_authority_evaluation']['retained_us_designations'] == 0
+    assert manifest['designation_counts'] == {}
+    assert {item.name for item in path.parent.iterdir()} == {path.name, 'manifest.json'}
 
 
-def test_request_key_is_reused_offline_and_refresh_failure_is_qualified(tmp_path,monkeypatch):
-    cfg=configured(tmp_path);source=cfg.sources['wdfw_recreational_marine_areas']
-    def response(url,*,params,timeout):
-        if not url.endswith('/query'):return {'objectIdField':'OBJECTID','maxRecordCount':2,'fields':[{'name':'OBJECTID','type':'esriFieldTypeOID'},{'name':'AreaName','type':'esriFieldTypeString'}]}
-        if params.get('returnIdsOnly'):return {'objectIds':[1]}
-        return {'features':[{'type':'Feature','properties':{'OBJECTID':1,'AreaName':'7'},'geometry':{'type':'Polygon','coordinates':[[[-123.1,48.4],[-122.9,48.4],[-122.9,48.6],[-123.1,48.6],[-123.1,48.4]]]}}]}
-    monkeypatch.setattr(acquisition,'_response_json',response)
-    kwargs=dict(config=cfg,sources=source.source_id,allow_partial=True)
-    cold=get_fishery_management_areas((-124,47,-122,49),**kwargs)
-    archived=Path(cold.provenance['sources'][0]['snapshot_path']);original=archived.read_bytes()
-    monkeypatch.setattr(acquisition,'_response_json',lambda *a,**k:pytest.fail('offline attempted acquisition'))
-    warm=get_fishery_management_areas((-124,47,-122,49),mode='offline',**kwargs)
-    assert warm.features.equals(cold.features)
-    def failed(*a,**k):raise SourceUnavailableError('injected provider failure')
-    monkeypatch.setattr(acquisition,'_response_json',failed)
-    failed_result=get_fishery_management_areas((-124,47,-122,49),mode='refresh',**kwargs)
-    assert failed_result.coverage.status.tolist()==['unavailable']
-    assert archived.read_bytes()==original
 
 
-def test_cross_border_and_single_country_do_not_require_matching_both_countries(tmp_path,snapshot_fixture):
-    cfg=configured(tmp_path)
-    usa=cfg.sources['noaa_mpa_inventory_2023'];can=cfg.sources['dfo_oceans_act_marine_protected_areas']
-    us_frame=gpd.GeoDataFrame({'site_id':['us'],'site_name':['US fixture']},geometry=[box(-124,47.5,-123.5,48)],crs=4326)
-    local=tmp_path/'usa.parquet';us_frame.to_parquet(local,index=False)
-    usa=replace(usa,local_path=local,expected_sha256=sha256_file(local))
-    local.with_suffix('.parquet.metadata.json').write_text(json.dumps(dict(source_id=usa.source_id,source_url=usa.url,provider=usa.provider,source_as_of=usa.source_as_of,sha256=sha256_file(local),full_source_dataset=True)))
-    cfg=replace(cfg,sources={**cfg.sources,usa.source_id:usa})
-    can_frame=gpd.GeoDataFrame({'OBJECTID':[1],'NAME_E':['Canadian fixture'],'ZONE_E':['Core']},geometry=[box(-124,49,-123.5,49.5)],crs=4326)
-    can.snapshot_path.parent.mkdir(parents=True);can.snapshot_path.write_text(json.dumps(snapshot_fixture(can,can_frame)))
-    kwargs=dict(config=cfg,sources=[usa.source_id,can.source_id],mode='offline',allow_partial=True)
-    across=get_marine_protected_areas((-124.5,47,-123,50),**kwargs)
-    assert set(across.features.COUNTRY_CODE)=={'USA','CAN'}
-    single=get_marine_protected_areas((-124.5,47,-123,48.5),**kwargs)
-    assert set(single.features.COUNTRY_CODE)=={'USA'}
-    assert single.coverage.set_index('source_id').loc[can.source_id,'status']=='empty'
 
 
 def test_pydantic_validation_remains_a_supported_configuration_extension(tmp_path):
@@ -339,3 +221,37 @@ def test_shapefile_dataset_pin_covers_sidecars_without_circular_receipt_hash(tmp
     assert len(acquisition.read_source_frame(source,bbox=(-124,47,-122,49)))==1
     with path.with_suffix('.dbf').open('ab') as handle:handle.write(b'changed')
     with pytest.raises(ValueError,match='checksum'):acquisition.read_source_frame(source,bbox=(-124,47,-122,49))
+
+
+def test_native_repeated_dates_still_reject_late_invalid_values(tmp_path,snapshot_fixture):
+    cfg=configured(tmp_path);source,raw,_=cached_area(cfg,snapshot_fixture)
+    from governance.shared.registry import normalize_collection
+    native,_=clip_to_full_area(normalize_collection(raw,source,cfg.collections['management_areas']),cfg)
+    frame=gpd.GeoDataFrame(pd.concat([native]*3,ignore_index=True),crs=native.crs)
+    frame['GEOMETRY_PART_ID']=['part0','part1','part2']
+    frame['EFFECTIVE_START']=['2020-06-01']*3
+    frame['SYSTEM_LEARNED_AT']=['2026-10-14T00:00:00Z']*3
+    validate_governance_geometry(frame)
+    for field,bad in [('EFFECTIVE_START','2020-02-30'),('EFFECTIVE_START',1590969600000),
+                      ('SYSTEM_LEARNED_AT','badZ'),('SYSTEM_LEARNED_AT','2026-10-14T00:00:00+01:00')]:
+        changed=frame.copy();changed[field]=changed[field].astype(object);changed.loc[2,field]=bad
+        with pytest.raises(ValueError):validate_governance_geometry(changed)
+
+
+def test_native_pair_failure_restores_prior_outputs(tmp_path,snapshot_fixture,monkeypatch):
+    cfg=configured(tmp_path);source,raw,_=cached_area(cfg,snapshot_fixture)
+    from governance.shared.registry import normalize_collection
+    native,_=clip_to_full_area(normalize_collection(raw,source,cfg.collections['management_areas']),cfg)
+    collection=cfg.collections['management_areas']
+    payload=manifest_payload(config=cfg,collection=collection,frame=native,sources=[],clip_diagnostics=[],limitations=[])
+    publish_native_pair(native,collection.artifact_path,collection.manifest_path,payload)
+    original=(collection.artifact_path.read_bytes(),collection.manifest_path.read_bytes())
+    import governance.shared.artifacts as artifacts
+    original_replace=artifacts.os.replace
+    def fail(source,dest):
+        if str(source).endswith('.manifest.part'):raise OSError('injected manifest replacement failure')
+        return original_replace(source,dest)
+    monkeypatch.setattr(artifacts.os,'replace',fail)
+    with pytest.raises(OSError):publish_native_pair(native,collection.artifact_path,collection.manifest_path,payload,overwrite=True)
+    assert original==(collection.artifact_path.read_bytes(),collection.manifest_path.read_bytes())
+    load_manifest(collection.manifest_path)

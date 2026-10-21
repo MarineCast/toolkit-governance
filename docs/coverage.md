@@ -1,48 +1,44 @@
-# Regional availability and source qualification
+# Coverage and refresh
 
-The software supports bounded native/H3 queries; regional source acceptance is a separate
-question. `governance availability` emits 408 layer/provider/region rows with separate
-implementation, acquisition completeness, geographic completeness, legal-currentness,
-geometry type, temporal capability, source vintage, rights and limitations. The same
-versioned matrix ships as `governance/resources/availability.json`. Runtime query results
-add actual request receipts; the static matrix never claims an acquired roster is complete.
+Coverage describes the evidence available for a requested source, scope and cell. It is not a binary test of whether a governance rule exists.
 
-| Region | Qualified software/source additions | Remaining evidence |
+| Evidence | What it establishes | What it does not establish |
 | --- | --- | --- |
-| Central/mid-Oregon | Pinned ODFW published 2016 native boundaries; NOAA discovery inventory | Current designation instruments, full source roster and Oregon fishery vectors |
-| Washington | WDFW recreational identity retained; NOAA/source reference families | Commercial/species-specific rosters, legal applicability/history |
-| Southern BC | DFO designated inventories; TC 2026 Saturna/Pender and Swiftsure coordinate rings | Nitinat authoritative coastline; other instruments/systems; legal-currentness |
-| Northern BC | Query-capable DFO/NRCan/ECCC qualified provider systems | DFO whole-area/current applicability, provincial marine inclusion taxonomy and legal applicability |
-| Southeast Alaska | Bounded ADF&G groundfish statistical adapter | Other fisheries/protected-system rosters and fresh regional receipt acceptance |
-| Gulf of Alaska | Same distinct reporting system | Independent regional geometry/completeness and current instrument evidence |
-| Aleutians/dateline | Split queries, split native geometries and exact generic H3 cells | Provider-by-provider positive-longitude support and full-system regional acceptance |
-| Arctic Alaska | Synthetic geometry/API fixture only | Qualified provider roster, acquisition/geometry support, source terms and instruments; groundfish layer extent alone is insufficient |
+| Valid source checksum | Exact retained bytes | Source currency or authority |
+| Reconciled query receipt | The declared bounded request was acquired consistently | Complete geography, all source classes or current law |
+| Positive intersection | A documented reference intersects the stated support | Universal restriction, legal ownership or protection |
+| No recorded intersection under partial support | No retained match | Zero, false, no habitat, no restriction or no jurisdiction |
+| Product validation | Contract/checksum/identity consistency | Scientific or legal completeness |
 
-All output remains model-ineligible research reference. Source-query completeness is
-neither a geographic denominator nor legal-currentness. Dates in geometry inventories are
-not automatically the dates that a rule came into force. Traditional territories/treaties/
-fishing rights cannot be inferred from BIA land references or NRCan reserves.
+## Offline rebuild from retained originals
 
-## Sources checked on 2026-10-13
+Use the public `build_products` API or `governance build --original-data` with a complete validated flat Governance directory and explicit grids. The builder verifies its catalog, substitutes originals by source ID, normalizes in temporary storage, computes the supplied cell products and writes a new flat directory. It never downloads missing sources. Keep the original directory until the replacement has been reviewed and validated.
 
-The official [ODFW coordinates/download page](https://oregonmarinereserves.com/rules/)
-provides the independently pinned 20,803-byte 2016 archive. Inspection found 14 original
-placemarks with multipart geometry; current OARs remain a separate legal authority. The
-[ADF&G service metadata](https://gis.adfg.alaska.gov/mapping/rest/services/CF_public/Groundfish/MapServer/3?f=pjson)
-declares polygon geometry, original statistical codes, geometry dates, supported queries,
-a dateline-spanning extent ending about 68.5 N and restrictions on reproduction/distribution.
-No national source download or public dataset redistribution accompanies this work.
+```python
+from governance.products import build_products, validate_products
 
-The [TC 2026 instrument](https://tc.canada.ca/en/interim-order-protection-killer-whale-orcinus-orca-waters-southern-british-columbia)
-supplies two closed vessel-zone rings and one closed Swiftsure speed ring. Its Nitinat
-boundary follows the coastline, which requires separately pinned support. The official
-[DFO Pacific area maps](https://www.pac.dfo-mpo.gc.ca/fm-gp/maps-cartes/areas-secteurs/index-eng.html)
-led to the official Pacific `DFO_BC_PFMA_SUBAREAS_50K_V3_1/MapServer/0` service. Its subarea polygon hierarchy is now implemented separately, retaining MGNT_AREA, SUBAREA_, OBJECTID and GLOBALID. Metadata copyright/licence fields are blank: local reference inspection is supported, while dataset redistribution, whole-area/legal applicability and historical qualification remain unresolved. [BC Parks/Tantalis](https://catalogue.data.gov.bc.ca/dataset/bc-parks-ecological-reserves-and-protected-areas)
-is a park/eco-reserve/protected-area inventory; mapping every park to a marine designation
-would change meaning and is not implemented. Existing ECCC marine classifications remain
-separate provider evidence.
+result = build_products(
+    ['/path/to/grid-r6.parquet', '/path/to/grid-r8.parquet'],
+    '/path/to/review/Governance',
+    workspace='/path/to/workspace',
+    config_path='/path/to/workspace/config/data/governance/governance.yaml',
+    original_data='/path/to/retained/Governance',
+    allow_partial=True,
+    keep_workspace_data=True,
+)
+print(validate_products(result))
+```
 
-Each blocked matrix row identifies the missing input. Proposed or unresolved geometry is
-never manufactured to fill the coverage checklist. Historical local study releases and
-source-acceptance notes retain their original counts, pins and acceptance boundaries;
-this software hardening does not activate or recertify them.
+Use the explicit API `workspace` argument; relative YAML paths retain workspace semantics. A refresh with unchanged originals is a processing refresh, not a new observation or newer legal inventory.
+
+## Acquiring replacement evidence
+
+Read the family's authoritative DATA_SOURCES notes and inspect resolved configuration/preflight. Select an explicit bounded provider operation, with declared source IDs, query scope, limits, rights and required receipts. `download COLLECTION` is an explicit acquisition path; some sources require separately provisioned official snapshots and refuse implicit bulk requests. Never silently change a pin or substitute a different provider edition.
+
+Review geometry type, feature/record/part identities, source dates, selectors, receipt completeness, authority scope and rights before promoting replacement originals. Compare delivered fields, all overlaps, support states and nulls on the same grid. Keep counts and coverage denominators consistent with the [product contract](parquet-products.md). Retain qualifications where source editions disagree or legal evidence is incomplete.
+
+## Geographic and legal gaps
+
+Each [family page](layers.md) explains its gaps. Regional source coverage is not global coverage. Indigenous administrative references do not define all Indigenous territories or rights. Geographic country/state assignments do not establish legal marine ownership. Critical-habitat polygon presence does not resolve conditional habitat attributes. Conservation proposals/interim references do not enter designated count/coverage. Exclusion/routing geometry does not establish current activation or vessel-specific applicability.
+
+Do not infer dates between snapshots, construct a 2009-present history, or report legal absence from missing input. Preserve all unknowns in downstream views and exports.

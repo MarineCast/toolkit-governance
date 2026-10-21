@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "reviewed_at_utc": "2026-10-19",
+  "evidence": {
+    "report_sha256": "321b2e0de71422f7d9f1bf63f789e9aa30f0b44f9cad67bb802eb63abf193d68",
+    "independent_geometry_sha256": "e3f61afa1dc9e94c80a7a5fd2fb3f65c3e36fbd2228e0c0e3aeb409580703825",
+    "report_reference": "Reports/governance-exclusions-2026-10-19/report.json",
+    "mask_sha256": "0c5dc64d6e6b58621ce05a6f8cc1dbe182d974ec0d91d2342d567a8d95d53072",
+    "mask_scope": "Previously checked source-derived study reporting mask; not current law or water-only intersection support",
+    "distance_crs": "EPSG:32610",
+    "tc_live_html_sha256": "53d88b024eeab76ca1dc01ee02e8b19742f0e1b8ba48d22b87606196b6db045a"
+  },
+  "grids": {
+    "6": {
+      "rows": 2621,
+      "sorted_h3_ids_sha256": "c8b081503defa593cafbe51b5b646e0a76a78a838c0e4b726c988ef089dc6b6f"
+    },
+    "8": {
+      "rows": 88243,
+      "sorted_h3_ids_sha256": "177df0274adf2a98560127caf479d11b565cb2e923c90b356ef749ffa840352d"
+    }
+  },
+  "records": {
+    "us.cfr33.165.1336:a2": {
+      "source_id": "uscg_lockheed_rna_20261015",
+      "identity_column": "ZONE_ID",
+      "identity_value": "us.cfr33.165.1336:a2",
+      "source_snapshot_sha256": "8868d0730ca664896b82065ef4f7126929013b72702139ad8f44ec3bb2a4088e",
+      "geometry_wkb_sha256": "318a78aa7ed03ab92dcb753aaceac34f83fa35f4abec370ffa6878e0d4281508",
+      "facts": {
+        "spatial_support": "Full supplied H3 cell intersections. Published area lies 21.5 m outside source-derived study water mask; no water-only overlap or moved boundary.",
+        "study_water_mask_intersection": "false",
+        "study_water_mask_distance_m": "21.524905948359503",
+        "source_datum_transform_accuracy_m": "4"
+      }
+    },
+    "tc.2026:saturna": {
+      "source_id": "tc_srkw_interim_order_2026",
+      "identity_column": "TC_ZONE_ID",
+      "identity_value": "saturna",
+      "source_snapshot_sha256": "f60dfcdb32688a7bca30fa0eff08d3c4ca1fa49524575f32ef5957124b8bb426",
+      "geometry_wkb_sha256": "cc52015b0fc1e9698195b4b49c269d29deeb02615bbcb5d461d8645330a985b0",
+      "facts": {
+        "source_pin_status": "Retained source pin unchanged; live HTML hash drift pending requalification; parsed coordinate rings match original geometry"
+      }
+    },
+    "tc.2026:pender": {
+      "source_id": "tc_srkw_interim_order_2026",
+      "identity_column": "TC_ZONE_ID",
+      "identity_value": "pender",
+      "source_snapshot_sha256": "f60dfcdb32688a7bca30fa0eff08d3c4ca1fa49524575f32ef5957124b8bb426",
+      "geometry_wkb_sha256": "dfe4ab6def61d63e2a39196d7f3b73cefef1ce49c775934eee194b1988b184d6",
+      "facts": {
+        "source_pin_status": "Retained source pin unchanged; live HTML hash drift pending requalification; parsed coordinate rings match original geometry"
+      }
+    }
+  },
+  "qualified_mask_limitation": "Lockheed geometry is 21.5 m outside the source-relative reporting water mask; full H3 support is retained and no water-only overlap is implied."
+}

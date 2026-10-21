@@ -1,0 +1,1131 @@
+{
+  "checked_at_utc": "2026-10-20",
+  "dfo_reef_coordinate_audit": {
+    "163": {
+      "coordinate_vertices": 7,
+      "name": "Alberta Bay",
+      "numeric_coordinate_hausdorff_m": 1.629580176103242,
+      "parts": 1,
+      "provider_geometry_sha256": "b83be43d2453a221d9d23f00aa87c8d04f12672bfa820909eb19644ca8b861a4",
+      "published_coordinate_rings": [
+        [
+          [
+            -123.25083333333333,
+            49.46863333333334
+          ],
+          [
+            -123.2448,
+            49.468833333333336
+          ],
+          [
+            -123.24333333333334,
+            49.466033333333336
+          ],
+          [
+            -123.24196666666667,
+            49.460766666666665
+          ],
+          [
+            -123.2441,
+            49.458666666666666
+          ],
+          [
+            -123.25013333333334,
+            49.45871666666667
+          ],
+          [
+            -123.25196666666666,
+            49.465066666666665
+          ],
+          [
+            -123.25083333333333,
+            49.46863333333334
+          ]
+        ]
+      ],
+      "relative_symmetric_difference": 0.005891616716944735,
+      "source_feature_id": 163
+    },
+    "164": {
+      "coordinate_vertices": 5,
+      "name": "Anvil Island",
+      "numeric_coordinate_hausdorff_m": 3.0913756433517197,
+      "parts": 1,
+      "provider_geometry_sha256": "a4ea271a4d9370befbc26a35963a6df1a2b37382d1fbae0633344b0960b4e6b1",
+      "published_coordinate_rings": [
+        [
+          [
+            -123.29041666666667,
+            49.5479
+          ],
+          [
+            -123.28025,
+            49.54775
+          ],
+          [
+            -123.28115,
+            49.54221666666667
+          ],
+          [
+            -123.2853,
+            49.54136666666667
+          ],
+          [
+            -123.29138333333333,
+            49.5429
+          ],
+          [
+            -123.29041666666667,
+            49.5479
+          ]
+        ]
+      ],
+      "relative_symmetric_difference": 0.009572761247251134,
+      "source_feature_id": 164
+    },
+    "165": {
+      "coordinate_vertices": 4,
+      "name": "Brunswick Point",
+      "numeric_coordinate_hausdorff_m": 2.9503444042057554,
+      "parts": 1,
+      "provider_geometry_sha256": "7ca6e261b623362b236c0736c4896164fd1f57e379d340715fef882cc79e66e0",
+      "published_coordinate_rings": [
+        [
+          [
+            -123.24941666666666,
+            49.476283333333335
+          ],
+          [
+            -123.24553333333333,
+            49.4739
+          ],
+          [
+            -123.25051666666667,
+            49.46961666666667
+          ],
+          [
+            -123.25628333333333,
+            49.473283333333335
+          ],
+          [
+            -123.24941666666666,
+            49.476283333333335
+          ]
+        ]
+      ],
+      "relative_symmetric_difference": 0.012421161667657091,
+      "source_feature_id": 165
+    },
+    "166": {
+      "coordinate_vertices": 5,
+      "name": "Carmelo Point",
+      "numeric_coordinate_hausdorff_m": 1.7386273402177888,
+      "parts": 1,
+      "provider_geometry_sha256": "00b7e64202b854a8c3d306b2eb6ae8afef5c09763d776179419922046462221d",
+      "published_coordinate_rings": [
+        [
+          [
+            -123.38996666666667,
+            49.45421666666667
+          ],
+          [
+            -123.3838,
+            49.454316666666664
+          ],
+          [
+            -123.38858333333333,
+            49.43983333333333
+          ],
+          [
+            -123.3935,
+            49.43405
+          ],
+          [
+            -123.40005,
+            49.4356
+          ],
+          [
+            -123.38996666666667,
+            49.45421666666667
+          ]
+        ]
+      ],
+      "relative_symmetric_difference": 0.005221080260563812,
+      "source_feature_id": 166
+    },
+    "167": {
+      "coordinate_vertices": 8,
+      "name": "Collingwood Channel",
+      "numeric_coordinate_hausdorff_m": 2.0845473585781202,
+      "parts": 1,
+      "provider_geometry_sha256": "bc68fd5dc0542a26f6fc45d889ef97dbecb9ef85821760709d965634ef4dbdbf",
+      "published_coordinate_rings": [
+        [
+          [
+            -123.41063333333334,
+            49.39171666666667
+          ],
+          [
+            -123.41041666666666,
+            49.389116666666666
+          ],
+          [
+            -123.41716666666667,
+            49.38446666666667
+          ],
+          [
+            -123.41908333333333,
+            49.382016666666665
+          ],
+          [
+            -123.4216,
+            49.379983333333335
+          ],
+          [
+            -123.42758333333333,
+            49.38245
+          ],
+          [
+            -123.42243333333333,
+            49.388
+          ],
+          [
+            -123.41475,
+            49.393366666666665
+          ],
+          [
+            -123.41063333333334,
+            49.39171666666667
+          ]
+        ]
+      ],
+      "relative_symmetric_difference": 0.005478842988285557,
+      "source_feature_id": 167
+    },
+    "169": {
+      "coordinate_vertices": 4,
+      "name": "Dorman Point",
+      "numeric_coordinate_hausdorff_m": 3.2088236741849805,
+      "parts": 1,
+      "provider_geometry_sha256": "2d5dd04004fa39ea11a52ed9d1ccf2c6b1b910d44766f59a1fb2cda0ad936927",
+      "published_coordinate_rings": [
+        [
+          [
+            -123.32298333333334,
+            49.37628333333333
+          ],
+          [
+            -123.31751666666666,
+            49.37571666666667
+          ],
+          [
+            -123.3192,
+            49.37145
+          ],
+          [
+            -123.32423333333334,
+            49.37251666666667
+          ],
+          [
+            -123.32298333333334,
+            49.37628333333333
+          ]
+        ]
+      ],
+      "relative_symmetric_difference": 0.015710244128745367,
+      "source_feature_id": 169
+    },
+    "170": {
+      "coordinate_vertices": 5,
+      "name": "East Defence Islands",
+      "numeric_coordinate_hausdorff_m": 3.3163825688070276,
+      "parts": 1,
+      "provider_geometry_sha256": "453abd5fb668f1d7fa24b7086ba82ecbae181fddf6fbd3ba78c6ca108d9f0e43",
+      "published_coordinate_rings": [
+        [
+          [
+            -123.27591666666666,
+            49.57885
+          ],
+          [
+            -123.27261666666666,
+            49.580799999999996
+          ],
+          [
+            -123.26866666666666,
+            49.5809
+          ],
+          [
+            -123.26806666666667,
+            49.57633333333333
+          ],
+          [
+            -123.27565,
+            49.575583333333334
+          ],
+          [
+            -123.27591666666666,
+            49.57885
+          ]
+        ]
+      ],
+      "relative_symmetric_difference": 0.015706224993308468,
+      "source_feature_id": 170
+    },
+    "171": {
+      "coordinate_vertices": 7,
+      "name": "East of Hornby Island",
+      "numeric_coordinate_hausdorff_m": 2.008682766637622,
+      "parts": 1,
+      "provider_geometry_sha256": "2e11a58e9db4a1929e6f9b01261e539607c27d58e7aa57547738bd2716a2ac0d",
+      "published_coordinate_rings": [
+        [
+          [
+            -124.48716666666667,
+            49.558166666666665
+          ],
+          [
+            -124.47933333333333,
+            49.54501666666667
+          ],
+          [
+            -124.49056666666667,
+            49.52761666666667
+          ],
+          [
+            -124.49826666666667,
+            49.52771666666667
+          ],
+          [
+            -124.49586666666667,
+            49.544183333333336
+          ],
+          [
+            -124.49891666666667,
+            49.55566666666667
+          ],
+          [
+            -124.49621666666667,
+            49.5583
+          ],
+          [
+            -124.48716666666667,
+            49.558166666666665
+          ]
+        ]
+      ],
+      "relative_symmetric_difference": 0.002386976219578905,
+      "source_feature_id": 171
+    },
+    "172": {
+      "coordinate_vertices": 5,
+      "name": "Foreslope Hills",
+      "numeric_coordinate_hausdorff_m": 1.7483507205499695,
+      "parts": 1,
+      "provider_geometry_sha256": "9e8914d64022bbaaf07709449eb908ce99fe3ed763cecdfade62ba171a7777e2",
+      "published_coordinate_rings": [
+        [
+          [
+            -123.38413333333334,
+            49.16056666666667
+          ],
+          [
+            -123.37703333333333,
+            49.156483333333334
+          ],
+          [
+            -123.37645,
+            49.15311666666667
+          ],
+          [
+            -123.39278333333333,
+            49.15351666666667
+          ],
+          [
+            -123.39238333333333,
+            49.16076666666667
+          ],
+          [
+            -123.38413333333334,
+            49.16056666666667
+          ]
+        ]
+      ],
+      "relative_symmetric_difference": 0.0028342486903258145,
+      "source_feature_id": 172
+    },
+    "173": {
+      "coordinate_vertices": 5,
+      "name": "Gabriola Island",
+      "numeric_coordinate_hausdorff_m": 1.6711421684858114,
+      "parts": 1,
+      "provider_geometry_sha256": "1c3454b0f6cb66d3184a347118400f510ff89af51f6f35bb25c09b6dd3a18a40",
+      "published_coordinate_rings": [
+        [
+          [
+            -123.79295,
+            49.227866666666664
+          ],
+          [
+            -123.79048333333333,
+            49.22058333333333
+          ],
+          [
+            -123.79803333333334,
+            49.21975
+          ],
+          [
+            -123.80198333333334,
+            49.22318333333333
+          ],
+          [
+            -123.80276666666667,
+            49.22705
+          ],
+          [
+            -123.79295,
+            49.227866666666664
+          ]
+        ]
+      ],
+      "relative_symmetric_difference": 0.004588317649099073,
+      "source_feature_id": 173
+    },
+    "181": {
+      "coordinate_vertices": 5,
+      "name": "Halkett Point",
+      "numeric_coordinate_hausdorff_m": 2.857673564537538,
+      "parts": 1,
+      "provider_geometry_sha256": "fd29101f426ac32abc9c7b543c95e07a91ec7af17efff20b25006c3ab7b4a4fb",
+      "published_coordinate_rings": [
+        [
+          [
+            -123.31143333333333,
+            49.4506
+          ],
+          [
+            -123.3074,
+            49.448283333333336
+          ],
+          [
+            -123.30963333333334,
+            49.44493333333333
+          ],
+          [
+            -123.31293333333333,
+            49.44428333333333
+          ],
+          [
+            -123.3164,
+            49.4457
+          ],
+          [
+            -123.31143333333333,
+            49.4506
+          ]
+        ]
+      ],
+      "relative_symmetric_difference": 0.013507045183534008,
+      "source_feature_id": 181
+    },
+    "182": {
+      "coordinate_vertices": 27,
+      "name": "Howe Sound \u2013 Queen Charlotte Channel",
+      "numeric_coordinate_hausdorff_m": 282.4009911612463,
+      "parts": 4,
+      "provider_geometry_sha256": "91f1030cb2b30064cea6bd8d63a99e3cdc4902b4a7bf508dee9ce1140adcd39f",
+      "published_coordinate_rings": [
+        [
+          [
+            -123.28756666666666,
+            49.3581
+          ],
+          [
+            -123.29483333333333,
+            49.34213333333334
+          ],
+          [
+            -123.29926666666667,
+            49.34001666666666
+          ],
+          [
+            -123.31323333333333,
+            49.34608333333333
+          ],
+          [
+            -123.30973333333333,
+            49.3497
+          ],
+          [
+            -123.30061666666667,
+            49.35163333333333
+          ],
+          [
+            -123.29561666666666,
+            49.35835
+          ],
+          [
+            -123.28756666666666,
+            49.3581
+          ]
+        ],
+        [
+          [
+            -123.29488333333333,
+            49.33813333333333
+          ],
+          [
+            -123.29168333333334,
+            49.337066666666665
+          ],
+          [
+            -123.28961666666666,
+            49.333216666666665
+          ],
+          [
+            -123.29073333333334,
+            49.33003333333333
+          ],
+          [
+            -123.29733333333333,
+            49.32866666666666
+          ],
+          [
+            -123.30178333333333,
+            49.332283333333336
+          ],
+          [
+            -123.29488333333333,
+            49.33813333333333
+          ]
+        ],
+        [
+          [
+            -123.33078333333333,
+            49.331966666666666
+          ],
+          [
+            -123.33175,
+            49.3216
+          ],
+          [
+            -123.33906666666667,
+            49.321783333333336
+          ],
+          [
+            -123.34035,
+            49.32738333333333
+          ],
+          [
+            -123.33935,
+            49.33031666666667
+          ],
+          [
+            -123.33495,
+            49.33245
+          ],
+          [
+            -123.33078333333333,
+            49.331966666666666
+          ]
+        ],
+        [
+          [
+            -123.31936666666667,
+            49.34395
+          ],
+          [
+            -123.312,
+            49.34295
+          ],
+          [
+            -123.31061666666666,
+            49.34068333333333
+          ],
+          [
+            -123.31363333333333,
+            49.334466666666664
+          ],
+          [
+            -123.31891666666667,
+            49.3346
+          ],
+          [
+            -123.31978333333333,
+            49.328633333333336
+          ],
+          [
+            -123.32523333333333,
+            49.32876666666667
+          ],
+          [
+            -123.33046666666667,
+            49.33765
+          ],
+          [
+            -123.31936666666667,
+            49.34395
+          ]
+        ]
+      ],
+      "relative_symmetric_difference": 0.01836114422674408,
+      "source_feature_id": 182
+    },
+    "183": {
+      "coordinate_vertices": 6,
+      "name": "Defence Islands",
+      "numeric_coordinate_hausdorff_m": 1.778684083321448,
+      "parts": 1,
+      "provider_geometry_sha256": "cb6be2cf43744e85a875e2afc0862f16db30ccc3cf59447f73a4435014c533ca",
+      "published_coordinate_rings": [
+        [
+          [
+            -123.2845,
+            49.56836666666667
+          ],
+          [
+            -123.27603333333333,
+            49.56216666666667
+          ],
+          [
+            -123.27436666666667,
+            49.559216666666664
+          ],
+          [
+            -123.27916666666667,
+            49.5573
+          ],
+          [
+            -123.28668333333333,
+            49.56178333333333
+          ],
+          [
+            -123.28985,
+            49.56655
+          ],
+          [
+            -123.2845,
+            49.56836666666667
+          ]
+        ]
+      ],
+      "relative_symmetric_difference": 0.003239926057434493,
+      "source_feature_id": 183
+    },
+    "188": {
+      "coordinate_vertices": 5,
+      "name": "Langdale",
+      "numeric_coordinate_hausdorff_m": 1.8330862758660842,
+      "parts": 1,
+      "provider_geometry_sha256": "1da876d1c81bd0120218f2794a6ec602bad3512c1a3894469201da65fd556d9d",
+      "published_coordinate_rings": [
+        [
+          [
+            -123.46008333333333,
+            49.43805
+          ],
+          [
+            -123.44825,
+            49.4366
+          ],
+          [
+            -123.44816666666667,
+            49.4233
+          ],
+          [
+            -123.46723333333334,
+            49.42385
+          ],
+          [
+            -123.47151666666667,
+            49.427233333333334
+          ],
+          [
+            -123.46008333333333,
+            49.43805
+          ]
+        ]
+      ],
+      "relative_symmetric_difference": 0.0022860216531773968,
+      "source_feature_id": 188
+    },
+    "189": {
+      "coordinate_vertices": 5,
+      "name": "Lions Bay and Kelvin Grove",
+      "numeric_coordinate_hausdorff_m": 3.3913734643934283,
+      "parts": 1,
+      "provider_geometry_sha256": "847db2cefb0fca41b6dc11d4441d201e9d6f859fca63d204074d72648fe453fa",
+      "published_coordinate_rings": [
+        [
+          [
+            -123.26268333333333,
+            49.460483333333336
+          ],
+          [
+            -123.24193333333334,
+            49.45525
+          ],
+          [
+            -123.24325,
+            49.44916666666666
+          ],
+          [
+            -123.25076666666666,
+            49.4492
+          ],
+          [
+            -123.26091666666666,
+            49.45325
+          ],
+          [
+            -123.26268333333333,
+            49.460483333333336
+          ]
+        ]
+      ],
+      "relative_symmetric_difference": 0.005143632785616969,
+      "source_feature_id": 189
+    },
+    "190": {
+      "coordinate_vertices": 5,
+      "name": "Lost Reef",
+      "numeric_coordinate_hausdorff_m": 2.8463269831698703,
+      "parts": 1,
+      "provider_geometry_sha256": "1c32c43b2d1b2385e39d5cc99593d9b0d2ed84f9a95171f050cf48fc86690069",
+      "published_coordinate_rings": [
+        [
+          [
+            -123.30338333333333,
+            49.49665
+          ],
+          [
+            -123.30011666666667,
+            49.498916666666666
+          ],
+          [
+            -123.2972,
+            49.49803333333333
+          ],
+          [
+            -123.29198333333333,
+            49.493183333333334
+          ],
+          [
+            -123.29901666666666,
+            49.49245
+          ],
+          [
+            -123.30338333333333,
+            49.49665
+          ]
+        ]
+      ],
+      "relative_symmetric_difference": 0.010183849699346445,
+      "source_feature_id": 190
+    },
+    "191": {
+      "coordinate_vertices": 25,
+      "name": "Outer Gulf Islands",
+      "numeric_coordinate_hausdorff_m": 22.68186927882536,
+      "parts": 4,
+      "provider_geometry_sha256": "1162348d0ab0ec585effdc4601e4de8147b4066abdd703ff4c5149e69261e450",
+      "published_coordinate_rings": [
+        [
+          [
+            -123.32648333333333,
+            48.9156
+          ],
+          [
+            -123.30881666666667,
+            48.904716666666666
+          ],
+          [
+            -123.31031666666667,
+            48.9019
+          ],
+          [
+            -123.31285,
+            48.90108333333333
+          ],
+          [
+            -123.33215,
+            48.91311666666667
+          ],
+          [
+            -123.32988333333333,
+            48.915033333333334
+          ],
+          [
+            -123.32648333333333,
+            48.9156
+          ]
+        ],
+        [
+          [
+            -123.25435,
+            48.876466666666666
+          ],
+          [
+            -123.24228333333333,
+            48.87533333333333
+          ],
+          [
+            -123.22946666666667,
+            48.86618333333333
+          ],
+          [
+            -123.23245,
+            48.86325
+          ],
+          [
+            -123.24073333333334,
+            48.869166666666665
+          ],
+          [
+            -123.24463333333334,
+            48.8673
+          ],
+          [
+            -123.25868333333334,
+            48.87465
+          ],
+          [
+            -123.25435,
+            48.876466666666666
+          ]
+        ],
+        [
+          [
+            -123.22055,
+            48.860033333333334
+          ],
+          [
+            -123.21251666666667,
+            48.85515
+          ],
+          [
+            -123.21563333333333,
+            48.84855
+          ],
+          [
+            -123.21765,
+            48.8474
+          ],
+          [
+            -123.2277,
+            48.852716666666666
+          ],
+          [
+            -123.22296666666666,
+            48.85965
+          ],
+          [
+            -123.22055,
+            48.860033333333334
+          ]
+        ],
+        [
+          [
+            -123.20651666666667,
+            48.849983333333334
+          ],
+          [
+            -123.19338333333333,
+            48.843466666666664
+          ],
+          [
+            -123.1826,
+            48.83495
+          ],
+          [
+            -123.18636666666667,
+            48.83265
+          ],
+          [
+            -123.2109,
+            48.84761666666667
+          ],
+          [
+            -123.20943333333334,
+            48.84931666666667
+          ],
+          [
+            -123.20651666666667,
+            48.849983333333334
+          ]
+        ]
+      ],
+      "relative_symmetric_difference": 0.0052362597103634235,
+      "source_feature_id": 191
+    },
+    "192": {
+      "coordinate_vertices": 6,
+      "name": "Parksville",
+      "numeric_coordinate_hausdorff_m": 2.076994187257064,
+      "parts": 1,
+      "provider_geometry_sha256": "840911c91d0b9c83fbda0e691f52941d1a33543b7ff01e4cd52f2073f0fa10b3",
+      "published_coordinate_rings": [
+        [
+          [
+            -124.32936666666667,
+            49.361333333333334
+          ],
+          [
+            -124.31488333333333,
+            49.35856666666667
+          ],
+          [
+            -124.29538333333333,
+            49.353183333333334
+          ],
+          [
+            -124.2954,
+            49.35106666666667
+          ],
+          [
+            -124.30633333333333,
+            49.345416666666665
+          ],
+          [
+            -124.33018333333334,
+            49.3572
+          ],
+          [
+            -124.32936666666667,
+            49.361333333333334
+          ]
+        ]
+      ],
+      "relative_symmetric_difference": 0.0018863560965694925,
+      "source_feature_id": 192
+    },
+    "193": {
+      "coordinate_vertices": 7,
+      "name": "Sechelt",
+      "numeric_coordinate_hausdorff_m": 1.6139103920544384,
+      "parts": 1,
+      "provider_geometry_sha256": "0b127150cfbe50b5b28125ee8c7b85a606fac8412dace635d566ed5abcadbd92",
+      "published_coordinate_rings": [
+        [
+          [
+            -123.81481666666667,
+            49.43246666666667
+          ],
+          [
+            -123.78776666666667,
+            49.43165
+          ],
+          [
+            -123.7749,
+            49.42288333333333
+          ],
+          [
+            -123.78471666666667,
+            49.41223333333333
+          ],
+          [
+            -123.79918333333333,
+            49.415166666666664
+          ],
+          [
+            -123.80471666666666,
+            49.40421666666667
+          ],
+          [
+            -123.8319,
+            49.41408333333333
+          ],
+          [
+            -123.81481666666667,
+            49.43246666666667
+          ]
+        ]
+      ],
+      "relative_symmetric_difference": 0.0013403268114284162,
+      "source_feature_id": 193
+    },
+    "198": {
+      "coordinate_vertices": 11,
+      "name": "Halibut Bank",
+      "numeric_coordinate_hausdorff_m": 1.602213571503943,
+      "parts": 1,
+      "provider_geometry_sha256": "a027a57039116fc979140e8dfdd05846f5b5073bbfe4d1937feebf15189ec71d",
+      "published_coordinate_rings": [
+        [
+          [
+            -123.69168333333333,
+            49.3628
+          ],
+          [
+            -123.66741666666667,
+            49.3529
+          ],
+          [
+            -123.66898333333333,
+            49.34935
+          ],
+          [
+            -123.66433333333333,
+            49.346716666666666
+          ],
+          [
+            -123.6697,
+            49.34275
+          ],
+          [
+            -123.69738333333333,
+            49.360166666666665
+          ],
+          [
+            -123.71071666666667,
+            49.361216666666664
+          ],
+          [
+            -123.7318,
+            49.364916666666666
+          ],
+          [
+            -123.7458,
+            49.369566666666664
+          ],
+          [
+            -123.74093333333333,
+            49.37591666666667
+          ],
+          [
+            -123.70278333333333,
+            49.3698
+          ],
+          [
+            -123.69168333333333,
+            49.3628
+          ]
+        ]
+      ],
+      "relative_symmetric_difference": 0.0016545105121629916,
+      "source_feature_id": 198
+    },
+    "199": {
+      "coordinate_vertices": 4,
+      "name": "Bowyer Island",
+      "numeric_coordinate_hausdorff_m": 2.8200154016876695,
+      "parts": 1,
+      "provider_geometry_sha256": "da84ff281825b9d1f7055bda43784ad494073c2c4f1a79d3f0f61a9cc4c12388",
+      "published_coordinate_rings": [
+        [
+          [
+            -123.27031666666667,
+            49.4129
+          ],
+          [
+            -123.26271666666666,
+            49.413666666666664
+          ],
+          [
+            -123.26738333333333,
+            49.4016
+          ],
+          [
+            -123.27346666666666,
+            49.406483333333334
+          ],
+          [
+            -123.27031666666667,
+            49.4129
+          ]
+        ]
+      ],
+      "relative_symmetric_difference": 0.0126240313665016,
+      "source_feature_id": 199
+    },
+    "200": {
+      "coordinate_vertices": 4,
+      "name": "Mariners Rest",
+      "numeric_coordinate_hausdorff_m": 1.6604633958299766,
+      "parts": 1,
+      "provider_geometry_sha256": "a6a7fe570bca43b5ce8ca75d5d066b65f19151086111f96a6f420fadc1eacd53",
+      "published_coordinate_rings": [
+        [
+          [
+            -123.45595,
+            49.462133333333334
+          ],
+          [
+            -123.44785,
+            49.457316666666664
+          ],
+          [
+            -123.45231666666666,
+            49.45353333333333
+          ],
+          [
+            -123.46176666666666,
+            49.458466666666666
+          ],
+          [
+            -123.45595,
+            49.462133333333334
+          ]
+        ]
+      ],
+      "relative_symmetric_difference": 0.005714809559248622,
+      "source_feature_id": 200
+    }
+  },
+  "documents": {
+    "dfo-FN0039-2022.html": {
+      "bytes": 20333,
+      "resolved_url": "https://notices.dfo-mpo.gc.ca/fns-sap/index-eng.cfm?DOC_ID=254231&ID=all&pg=view_notice",
+      "retrieved_at_utc": "2026-10-20T00:27:57.244514+00:00",
+      "scope": "Bounded official legal-source qualification, no operational currentness certification",
+      "sha256": "05a8cafae1b4e159c3369dd5003f87da3b8f3aa4e5b90881c9a4d3959e338822",
+      "source_url": "https://notices.dfo-mpo.gc.ca/fns-sap/index-eng.cfm?DOC_ID=254231&ID=all&pg=view_notice"
+    },
+    "dfo-FN0205-2019.html": {
+      "bytes": 20754,
+      "resolved_url": "https://notices.dfo-mpo.gc.ca/fns-sap/index-eng.cfm?pg=view_notice&DOC_ID=219517&ID=all",
+      "retrieved_at_utc": "2026-10-20T00:29:46.600354+00:00",
+      "sha256": "5762a628c1d4a9ba61c44ecbc4839aadf556e93efcf8a0e70f9ba60e764c435c",
+      "source_url": "https://notices.dfo-mpo.gc.ca/fns-sap/index-eng.cfm?pg=view_notice&DOC_ID=219517&ID=all"
+    },
+    "dfo-FN0521-2026.html": {
+      "bytes": 18104,
+      "resolved_url": "https://notices.dfo-mpo.gc.ca/fns-sap/index-eng.cfm?DOC_ID=355565&ID=all&pg=view_notice",
+      "retrieved_at_utc": "2026-10-20T00:27:56.679895+00:00",
+      "scope": "Bounded official legal-source qualification, no operational currentness certification",
+      "sha256": "57bb8606ac9b7d27ad46470665b8860fa6c9141dfeb7bbb11b3e9bd47a1fa1ca",
+      "source_url": "https://notices.dfo-mpo.gc.ca/fns-sap/index-eng.cfm?DOC_ID=355565&ID=all&pg=view_notice"
+    },
+    "dfo-FN0571-2015.html": {
+      "bytes": 23023,
+      "resolved_url": "https://notices.dfo-mpo.gc.ca/fns-sap/index-eng.cfm?pg=view_notice&DOC_ID=172180&ID=all",
+      "retrieved_at_utc": "2026-10-20T00:29:45.989897+00:00",
+      "sha256": "e9af26e84bc921126c7a0536e0533d4ba5ac83cbcdc486b7398522dfb3217244",
+      "source_url": "https://notices.dfo-mpo.gc.ca/fns-sap/index-eng.cfm?pg=view_notice&DOC_ID=172180&ID=all"
+    },
+    "dfo-reef-closures.html": {
+      "bytes": 82277,
+      "resolved_url": "https://www.dfo-mpo.gc.ca/oceans/ceccsr-cerceef/closures-fermetures-eng.html",
+      "retrieved_at_utc": "2026-10-20T00:27:58.336336+00:00",
+      "scope": "Bounded official legal-source qualification, no operational currentness certification",
+      "sha256": "23a9b84cb51118f62509cfb57df5aa44d2aa0f43fe676a5d96121fc56249447e",
+      "source_url": "https://www.dfo-mpo.gc.ca/oceans/ceccsr-cerceef/closures-fermetures-eng.html"
+    }
+  },
+  "schema_version": 1,
+  "scope": "Numerical comparison of provider GIS with published agency coordinate tables in EPSG:32610. Datum not assumed where absent. No provider polygon replacement or legal/current applicability certification.",
+  "wac_landmark_check": {
+    "chart_source_date": "19941116",
+    "inventory_vertex_radius_max_m": 371.184001310031,
+    "inventory_vertex_radius_min_m": 361.5055289275792,
+    "name": "Orchard Rocks Daybeacon",
+    "noaa_enc_beacon_objectid": 100742,
+    "required_radius_m": 365.76,
+    "scope": "Independent NOAA landmark check supports approximate depiction only; not a surveyed legal boundary.",
+    "source_sha256": "9ff2f7e6e4b68632f56967a6adb33175363fb1ba6d909796d87bf8feb571df2e",
+    "wgs84_coordinates": [
+      -122.531993,
+      47.577503
+    ]
+  }
+}

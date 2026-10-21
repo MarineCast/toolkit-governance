@@ -53,7 +53,9 @@ def test_build_has_only_resolution_parquets_catalog_and_originals(flat_inputs, t
         assert 'date' not in table.column_names
         metadata = json.loads(table.schema.metadata[b'governance'])
         assert metadata['model_eligible'] is False
-        assert metadata['fields']['management_areas__recorded_polygon_union_area_fraction']['units'] == '1'
+        assert set(table.column_names) == {'h3_index', 'management_areas__recorded_feature_count', 'management_areas__feature_memberships_v1'}
+        assert metadata['fields']['management_areas__recorded_feature_count']['units'] == 'count'
+        assert metadata['fields']['management_areas__recorded_feature_count']['implicit_status'] == 'partial'
         assert 'data_release_id' not in metadata and 'native_manifests' not in metadata
     # A flat dataset itself is sufficient for a later offline rebuild. No ZIP/JSON copy.
     rebuilt = build_products([grid], tmp_path / 'rebuilt', config_path=config, original_data=output, allow_partial=True)

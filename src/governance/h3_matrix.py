@@ -22,6 +22,7 @@ from shapely.ops import transform
 from .shared.artifacts import load_manifest, sha256_dataset, sha256_file
 from .shared.config import DEFAULT_CONFIG_PATH, load_governance_config
 from .shared.schema import CANONICAL_FIELDS, validate_governance_geometry
+from .memberships import MEMBERSHIP_TYPE, memberships, prepare_records
 
 
 # Backward-compatible private alias; internal consumers use shared.grid.read_grid.
@@ -49,6 +50,7 @@ def overlay_collection(
     completeness: str,
     length_crs: str,
     include_attributes: bool = True,
+    include_geometry_metrics: bool = True,
 ) -> dict[str, pa.Array]:
     """Overlay one validated native collection; preserve empty-intersection missingness."""
     if native.empty:
@@ -62,7 +64,7 @@ def overlay_collection(
     local = native.iloc[indexes].copy().reset_index(drop=True)
     local.geometry = local.geometry.intersection(extent)
     projected = local.to_crs(6933)
-    lengths = Transformer.from_crs(6933, length_crs, always_xy=True).transform
+    lengths = Transformer.from_crs(6933, length_crs, always_xy=True).transform if include_geometry_metrics else None
     matches: dict[int, list[tuple[int, Any, int]]] = defaultdict(list)
     if not local.empty:
         pairs = projected.sindex.query(projected_grid.geometry, predicate="intersects")
@@ -85,17 +87,18 @@ def overlay_collection(
                 matches[int(cell_index)].append(
                     (int(feature_index), geometry, dimension)
                 )
+    membership_records = prepare_records(local)
     size = len(grid)
     names = [column for column in native.columns if column != native.geometry.name] if include_attributes else []
     attributes = {name: [_attribute(value) for value in local[name]] for name in names}
     result: dict[str, list[Any]] = {
         key: [None] * size
-        for key in (
+        for key in ((
             "FEATURE_COUNT",
             "POLYGON_COVERAGE_FRAC",
             "LINE_LENGTH_M",
             "POINT_COUNT",
-        )
+        ) if include_geometry_metrics else ("FEATURE_COUNT",))
     }
     if completeness not in {
         "complete",
@@ -115,6 +118,7 @@ def overlay_collection(
     empty = f"no_recorded_geometry_under_{coverage_state}_coverage"
     result["INTERSECTION_STATUS"] = [empty] * size
     result["SOURCE_COMPLETENESS"] = [completeness] * size
+    result["FEATURE_MEMBERSHIPS_V1"] = [None] * size
     for name in names:
         result[f"NATIVE_{name}"] = [None] * size
     for cell_index, hits in matches.items():
@@ -122,26 +126,28 @@ def overlay_collection(
         result["FEATURE_COUNT"][cell_index] = len(
             set(local.iloc[list(ids)]["GOVERNANCE_FEATURE_ID"])
         )
+        result["FEATURE_MEMBERSHIPS_V1"][cell_index] = memberships(membership_records, ids)
         result["INTERSECTION_STATUS"][cell_index] = "recorded_geometry_intersects"
-        polygons = [geom for _, geom, dim in hits if dim == 2]
-        lines = [geom for _, geom, dim in hits if dim == 1]
-        points = {
-            local.iloc[i]["GOVERNANCE_FEATURE_ID"] for i, _, dim in hits if dim == 0
-        }
-        if polygons:
-            fraction = (
-                shapely.union_all(polygons).area
-                / projected_grid.geometry.iloc[cell_index].area
-            )
-            if fraction < -1e-10 or fraction > 1 + 1e-8:
-                raise ValueError("Governance polygon fraction exceeds cell support.")
-            result["POLYGON_COVERAGE_FRAC"][cell_index] = min(1.0, max(0.0, fraction))
-        if lines:
-            result["LINE_LENGTH_M"][cell_index] = transform(
-                lengths, shapely.union_all(lines)
-            ).length
-        if points:
-            result["POINT_COUNT"][cell_index] = len(points)
+        if include_geometry_metrics:
+            polygons = [geom for _, geom, dim in hits if dim == 2]
+            lines = [geom for _, geom, dim in hits if dim == 1]
+            points = {
+                local.iloc[i]["GOVERNANCE_FEATURE_ID"] for i, _, dim in hits if dim == 0
+            }
+            if polygons:
+                fraction = (
+                    shapely.union_all(polygons).area
+                    / projected_grid.geometry.iloc[cell_index].area
+                )
+                if fraction < -1e-10 or fraction > 1 + 1e-8:
+                    raise ValueError("Governance polygon fraction exceeds cell support.")
+                result["POLYGON_COVERAGE_FRAC"][cell_index] = min(1.0, max(0.0, fraction))
+            if lines:
+                result["LINE_LENGTH_M"][cell_index] = transform(
+                    lengths, shapely.union_all(lines)
+                ).length
+            if points:
+                result["POINT_COUNT"][cell_index] = len(points)
         for name in names:
             values = sorted(
                 {attributes[name][i] for i in ids if attributes[name][i] is not None}
@@ -149,16 +155,16 @@ def overlay_collection(
             result[f"NATIVE_{name}"][cell_index] = values or None
     # Explicitly complete inventories support recorded zeros, still not legal absence.
     if completeness == "complete":
-        for key in (
-            "FEATURE_COUNT",
-            "POLYGON_COVERAGE_FRAC",
-            "LINE_LENGTH_M",
-            "POINT_COUNT",
-        ):
+        for key in ("FEATURE_COUNT", "POLYGON_COVERAGE_FRAC", "LINE_LENGTH_M", "POINT_COUNT") if include_geometry_metrics else ("FEATURE_COUNT",):
             for i in range(size):
                 if i not in matches:
                     result[key][i] = 0
+    if completeness == "complete":
+        for i in range(size):
+            if i not in matches:
+                result["FEATURE_MEMBERSHIPS_V1"][i] = []
     types = {
+        "FEATURE_MEMBERSHIPS_V1": MEMBERSHIP_TYPE,
         "FEATURE_COUNT": pa.int64(),
         "POINT_COUNT": pa.int64(),
         "POLYGON_COVERAGE_FRAC": pa.float64(),
@@ -181,6 +187,7 @@ def export_h3_matrix(
     allow_partial: bool = False,
     overwrite: bool = False,
     include_attributes: bool = True,
+    application_only: bool = False,
 ) -> Path:
     """Write one explicit H3 overlay after validating every configured native product."""
     crs = CRS(length_crs)
@@ -303,7 +310,8 @@ def export_h3_matrix(
                 group_completeness = 'unavailable'
             columns = overlay_collection(
                 grid, subset, completeness=group_completeness, length_crs=length_crs,
-                include_attributes=include_attributes
+                include_attributes=include_attributes and name != 'management_areas',
+                include_geometry_metrics=not application_only and name != 'management_areas',
             )
             for column, values in columns.items():
                 key = f"{prefix}__{column}"
@@ -360,7 +368,8 @@ def export_h3_matrix(
         "support": "full H3 polygon, positive-area/positive-length or point intersections",
         "missingness": "Empty intersections under partial, unknown or unavailable coverage remain null. No inference of legal or ecological absence.",
         "temporal_support": "Unfiltered native inventory snapshots; effective dates retained as attribute sets, not an as-of legal reconstruction.",
-        "attribute_semantics": "Distinct native attribute sets are lists of strings, not aligned records; resolve feature/part IDs in checksum-verified native products.",
+        "membership_schema_version": 1,
+        "attribute_semantics": "FEATURE_MEMBERSHIPS_V1 preserves paired feature/source/category records and part lineage. Independent NATIVE attribute sets are unaligned legacy diagnostics.",
     }
     table = pa.table(arrays).replace_schema_metadata(
         {

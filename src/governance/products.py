@@ -23,6 +23,7 @@ import pyarrow.parquet as pq
 import yaml
 
 from .delivery import METHOD_VERSION, STATES, project_delivery
+from .memberships import validate_memberships
 from .shared.acquisition import read_source_frame, resolve_source_path
 from .shared.artifacts import load_manifest, sha256_dataset, sha256_file, source_record
 from .shared.config import DEFAULT_CONFIG_PATH, load_governance_config
@@ -52,6 +53,15 @@ def validate_metric_table(table, metadata):
         raise ValueError('Invalid H3 identity/resolution')
     if set(table.column_names) != set(metadata['fields']):
         raise ValueError('Metric fields do not match embedded definitions')
+    application = metadata.get('application_contract')
+    if application:
+        from .app_contract import contract
+        expected = contract()
+        if (application.get('version') != expected['version']
+                or table.column_names != application.get('columns')
+                or set(table.column_names).difference(expected['columns'])
+                or resolution not in expected['resolutions']):
+            raise ValueError('Application schema/version/resolution mismatch')
     keys = ['h3_index']
     if metadata['temporal']['type'] == 'dynamic':
         if 'date' not in table.column_names or not (pa.types.is_date(table['date'].type) or pa.types.is_timestamp(table['date'].type)) or table['date'].null_count:
@@ -61,9 +71,14 @@ def validate_metric_table(table, metadata):
         raise ValueError('Static data has no date column')
     if table.select(keys).to_pandas().duplicated().any():
         raise ValueError('Duplicate metric row identity')
+    validate_memberships(table, metadata['fields'])
     for name, field in metadata['fields'].items():
+        if 'membership_schema_version' in field:
+            continue
         if 'missing_reason_field' not in field:
             continue
+        if field.get('value_semantics') == 'boolean_overlap' and not pa.types.is_boolean(table[name].type):
+            raise ValueError('Boolean overlap requires an Arrow boolean column')
         if field.get('units') not in ('1', 'm', 'count'):
             raise ValueError('Missing or unsupported metric units')
         if field['units'] == 'count' and not pa.types.is_integer(table[name].type):
@@ -192,7 +207,7 @@ def cleanup_workspace_data(output_directory, *, config_path=DEFAULT_CONFIG_PATH,
     if any(p.is_symlink() for p in entries):
         return keep('contains a symbolic link')
     protected = [output, *config.document.include_chain, config.common_config_path,
-                 config.catalog_path, config.presentation_config_path, *protected_paths]
+                 config.catalog_path, *protected_paths]
     if any(Path(p).resolve().is_relative_to(root) for p in protected):
         return keep('contains output, configuration or a protected build input')
     catalog = json.loads((output / 'catalog.json').read_text())
@@ -231,7 +246,7 @@ def cleanup_workspace_data(output_directory, *, config_path=DEFAULT_CONFIG_PATH,
     return True
 
 
-def export_products(matrix_path, output_directory, *, config_path=DEFAULT_CONFIG_PATH,
+def _export_products(matrix_path, output_directory, *, config_path=DEFAULT_CONFIG_PATH,
                     software_revision=None, overwrite=False):
     """Write one static metric Parquet per supplied resolution and original shapes.
 
@@ -282,8 +297,22 @@ def export_products(matrix_path, output_directory, *, config_path=DEFAULT_CONFIG
         originals, sources = _write_originals(config, staging)
         updated = datetime.now(UTC).replace(microsecond=0).isoformat()
         catalog = {'schema_version': 1, 'domain': 'governance', 'last_updated_utc': updated,
-                   'areas': {n: {'last_updated_utc': updated} for n in config.collections},
+                   'areas': {n: {'last_updated_utc': updated} for n in config.collections if n != 'ports'},
                    'tables': {}, 'original_data': originals}
+        from .protected_areas.critical_habitat.interface import annotate_catalog as annotate_habitat_catalog
+        annotate_habitat_catalog(catalog)
+        from .vessel_management.exclusion_zones.interface import annotate_catalog as annotate_exclusion_catalog
+        annotate_exclusion_catalog(catalog)
+        from .jurisdiction.water_assignments import FAMILIES, scientific_features
+        from .fisheries_management.management_areas.interface import SCIENTIFIC_FEATURES as MANAGEMENT_FEATURES
+        if 'management_areas' in catalog['areas']:
+            catalog['areas']['management_areas']['scientific_features'] = MANAGEMENT_FEATURES
+        from .administrative_context.coast_guard_sectors.interface import SCIENTIFIC_FEATURES as COAST_GUARD_FEATURES
+        if 'coast_guard_sectors' in catalog['areas']:
+            catalog['areas']['coast_guard_sectors']['scientific_features'] = COAST_GUARD_FEATURES
+        for family in FAMILIES:
+            if family in catalog['areas']:
+                catalog['areas'][family].update(scientific_features=scientific_features(family), assignment_updated_utc=updated)
         for resolution in sorted(set(keys.H3_RESOLUTION)):
             selected = table.filter(pc.equal(table['H3_RESOLUTION'], int(resolution)))
             product, envelope = project_delivery(selected, overlay, int(resolution), software_revision)
@@ -295,10 +324,33 @@ def export_products(matrix_path, output_directory, *, config_path=DEFAULT_CONFIG
                             collections={n: {'source_ids': list(c.source_ids), 'normalization_profile': c.normalization_profile,
                                              'native_method': overlay['native_manifests'][n]['manifest'].get('scientific_method_version'),
                                              'clipping': overlay['native_manifests'][n]['manifest'].get('clipping')}
-                                         for n, c in config.collections.items()})
+                                         for n, c in config.collections.items() if n != 'ports'})
             metadata['spatial']['grid'].pop('path', None)
             metadata['temporal']['meaning'] = 'Static recorded inventory; source dates and receipt times remain in OriginalData, not a legal history'
             metadata['limitations'] = [s.replace('Attribute relations remain in native companion records', 'Source attributes remain in OriginalData') for s in metadata['limitations']]
+            from .protected_areas.critical_habitat.interface import annotate_product as annotate_habitat_product
+            product = annotate_habitat_product(product, metadata, staging)
+            from .vessel_management.exclusion_zones.interface import annotate_product as annotate_exclusion_product
+            product = annotate_exclusion_product(product, metadata, staging)
+            from .jurisdiction.geographic_water import populate_features
+            product = populate_features(product, metadata, staging)
+            from .administrative_context.coast_guard_sectors.interface import populate_water_features
+            product = populate_water_features(product, metadata, staging)
+            from .jurisdiction.international_boundary import populate_features as populate_boundary
+            product = populate_boundary(product, metadata, staging)
+            from .jurisdiction.county_regional_boundaries.interface import populate_features as populate_regions
+            product = populate_regions(product, metadata, staging)
+            from .protected_areas.marine_conservation_areas.interface import populate_features as populate_conservation, GROUP, REFERENCE, SCIENTIFIC_FEATURES
+            product = populate_conservation(product, metadata, staging)
+            if 'marine_conservation_unification' in metadata:
+                catalog['feature_families'] = {GROUP: {'display_name': 'Marine Conservation Areas', 'scientific_features': SCIENTIFIC_FEATURES, 'source_collections': metadata['marine_conservation_unification']['source_collections']},
+                                               REFERENCE: {'display_name': 'Proposed / Interim Conservation References', 'excluded_from_conservation_totals': True}}
+            from .administrative_context.ports.retired import retire_delivery
+            product = retire_delivery(product, metadata)
+            from .jurisdiction.presentation import annotate_fields as annotate_administrative_fields
+            annotate_administrative_fields(metadata['fields'])
+            from .app_contract import project_app_contract
+            product = project_app_contract(product, metadata)
             validate_metric_table(product, metadata)
             name = f'governance-r{int(resolution)}-static.parquet'
             destination = staging / name
@@ -306,6 +358,12 @@ def export_products(matrix_path, output_directory, *, config_path=DEFAULT_CONFIG
             if not product.equals(pq.read_table(destination), check_metadata=False):
                 raise ValueError('Metric readback mismatch')
             catalog['tables'][str(int(resolution))] = {'static': {'path': name, 'sha256': sha256_file(destination), 'rows': product.num_rows}}
+        from .vessel_management.presentation import annotate_catalog as annotate_routing_catalog
+        annotate_routing_catalog(catalog)
+        from .jurisdiction.presentation import annotate_catalog as annotate_administrative_catalog
+        annotate_administrative_catalog(catalog)
+        from .app_contract import annotate_catalog as annotate_app_catalog
+        annotate_app_catalog(catalog, sources, staging)
         (staging / 'catalog.json').write_bytes(_json(catalog) + b'\n')
         validate_products(staging)
         if output.exists():
@@ -323,7 +381,7 @@ def export_products(matrix_path, output_directory, *, config_path=DEFAULT_CONFIG
         lock.unlink(missing_ok=True)
 
 
-def build_products(grid_paths, output_directory, *, config_path=DEFAULT_CONFIG_PATH,
+def _build_products(grid_paths, output_directory, *, config_path=DEFAULT_CONFIG_PATH,
                    original_data=None, length_crs='EPSG:32610', allow_partial=False,
                    software_revision=None, overwrite=False, keep_workspace_data=False):
     """Build flat data offline, cleaning disposable workspace data after success.
@@ -350,7 +408,6 @@ def build_products(grid_paths, output_directory, *, config_path=DEFAULT_CONFIG_P
         values = dict(config.document.data)
         values['common_config_path'] = str(config.common_config_path)
         values['catalog_path'] = str(config.catalog_path)
-        values['inspection'] = dict(values['inspection'], presentation_config_path=str(config.presentation_config_path))
         values['output'] = {'processed_root': str(work / 'native'), 'coverage_matrix_path': str(work / 'coverage.json')}
         values['collections'] = {n: dict(values['collections'][n], artifact_path=str(work / 'native' / n / 'geometry.parquet'),
                                         manifest_path=str(work / 'native' / n / 'manifest.json')) for n in config.collections}
@@ -378,10 +435,39 @@ def build_products(grid_paths, output_directory, *, config_path=DEFAULT_CONFIG_P
         pq.write_table(combined, grid)
         matrix = work / 'metrics.parquet'
         export_h3_matrix(grid, matrix, config_path=staged_config, length_crs=length_crs,
-                         allow_partial=allow_partial, include_attributes=False)
-        result = export_products(matrix, output, config_path=staged_config,
+                         allow_partial=allow_partial, include_attributes=False, application_only=True)
+        result = _export_products(matrix, output, config_path=staged_config,
                                  software_revision=software_revision, overwrite=overwrite)
     if not keep_workspace_data:
         protected = [*grid_paths, *([original_root] if original_root else [])]
         cleanup_workspace_data(result, config_path=config.path, protected_paths=protected)
     return result
+
+
+def export_products(matrix_path, output_directory=None, *, config_path=None,
+                    software_revision=None, overwrite=False, workspace=None, env_file=None):
+    """Export with argument > environment > .env path settings."""
+    from .run_settings import resolve_settings
+    from ._config.paths import workspace_scope
+    settings = resolve_settings(workspace=workspace, env_file=env_file,
+        config_path=config_path, output_directory=output_directory, require_output=True)
+    with workspace_scope(settings.workspace):
+        return _export_products(matrix_path, settings.output_directory,
+            config_path=settings.config_path, software_revision=software_revision, overwrite=overwrite)
+
+
+def build_products(grid_paths=None, output_directory=None, *, config_path=None,
+                   original_data=None, length_crs='EPSG:32610', allow_partial=False,
+                   software_revision=None, overwrite=False, keep_workspace_data=False,
+                   workspace=None, env_file=None):
+    """Build offline with argument > environment > .env path settings."""
+    from .run_settings import resolve_settings
+    from ._config.paths import workspace_scope
+    settings = resolve_settings(workspace=workspace, env_file=env_file, config_path=config_path,
+        output_directory=output_directory, grid_paths=grid_paths, original_data=original_data,
+        require_output=True, require_grids=True)
+    with workspace_scope(settings.workspace):
+        return _build_products(settings.grid_paths, settings.output_directory,
+            config_path=settings.config_path, original_data=settings.original_data,
+            length_crs=length_crs, allow_partial=allow_partial, software_revision=software_revision,
+            overwrite=overwrite, keep_workspace_data=keep_workspace_data)

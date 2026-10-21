@@ -1,21 +1,12 @@
-"""Single-resolution wide inventory tables and explicit toolkit-local manifests.
-
-Governance is not a quantity_kind in shared manifest 0.1. This envelope therefore
-makes no shared-schema conformance claim and does not repurpose another quantity.
-"""
+"""Project native overlay metrics into per-resolution tables and metadata."""
 from __future__ import annotations
 
 from datetime import UTC, datetime
-import json
-from pathlib import Path
-import re
 
 import pyarrow as pa
-import pyarrow.compute as pc
-import pyarrow.parquet as pq
 
 from . import __version__
-from .shared.artifacts import sha256_file
+from .memberships import SUFFIX, definition as membership_definition, validate_memberships
 
 METHOD_VERSION = 'native-inventory-overlay-1.3.0'
 METRICS = {
@@ -27,74 +18,6 @@ METRICS = {
 STATES = ['observed', 'unknown', 'unavailable', 'not_applicable', 'partial']
 
 
-def export_delivery(matrix_path: str | Path, output_directory: str | Path, *,
-                    release_id: str, software_revision: str) -> list[Path]:
-    """Project a validated overlay into separate resolution tables, retaining lineage.
-
-    The caller must publish the complete output directory as one immutable generation.
-    Existing output directories are refused; a failed run is never a published release.
-    """
-    if not release_id or not re.fullmatch('[0-9a-f]{40}', software_revision):
-        raise ValueError('Release identity and full software revision required')
-    matrix_path = Path(matrix_path).resolve()
-    table = pq.read_table(matrix_path)
-    metadata = json.loads(table.schema.metadata[b'governance_h3_matrix'])
-    if metadata.get('schema_version') != 1:
-        raise ValueError('Unsupported overlay schema')
-    keys = table.select(['H3_INDEX', 'H3_RESOLUTION']).to_pandas()
-    if keys.empty or keys.isna().any().any() or keys.duplicated().any():
-        raise ValueError('Invalid overlay identity')
-    import h3
-    for cell, resolution in keys.itertuples(index=False, name=None):
-        if not h3.is_valid_cell(cell) or h3.get_resolution(cell) != resolution:
-            raise ValueError('Invalid H3 identity')
-    output = Path(output_directory)
-    output.mkdir(parents=True, exist_ok=False)
-    written = []
-    for resolution in sorted(set(keys.H3_RESOLUTION)):
-        selected = table.filter(pc.equal(table['H3_RESOLUTION'], resolution))
-        projected, manifest = project_delivery(selected, metadata, int(resolution), software_revision)
-        artifact = output / f'governance-inventory-r{resolution}.parquet'
-        pq.write_table(projected, artifact, compression='zstd')
-        manifest.update(data_release_id=release_id, overlay={'path': str(matrix_path), 'sha256': sha256_file(matrix_path)},
-                        artifact={'path': artifact.name, 'format': 'parquet', 'sha256': sha256_file(artifact), 'row_count': selected.num_rows})
-        companion = artifact.with_suffix('.manifest.json')
-        companion.write_text(json.dumps(manifest, indent=2, sort_keys=True, allow_nan=False) + '\n')
-        validate_delivery(artifact, companion)
-        written.extend([artifact, companion])
-    return written
-
-
-def validate_delivery(artifact: str | Path, manifest_path: str | Path) -> dict:
-    """Verify round-trip identity, checksums and per-metric value/status associations."""
-    import h3
-    import math
-    artifact = Path(artifact)
-    manifest = json.loads(Path(manifest_path).read_text())
-    if sha256_file(artifact) != manifest['artifact']['sha256']:
-        raise ValueError('Delivery artifact checksum mismatch')
-    table = pq.read_table(artifact)
-    if table.num_rows != manifest['artifact']['row_count'] or set(table.column_names) != set(manifest['fields']):
-        raise ValueError('Delivery shape mismatch')
-    cells = table['h3_index'].to_pylist()
-    resolution = manifest['spatial']['h3_resolution']
-    if not cells or len(set(cells)) != len(cells) or any(not h3.is_valid_cell(c) or h3.get_resolution(c) != resolution for c in cells):
-        raise ValueError('Delivery H3 keys/resolution mismatch')
-    for name, field in manifest['fields'].items():
-        if 'missing_reason_field' not in field:
-            continue
-        for value, status in zip(table[name].to_pylist(), table[field['missing_reason_field']].to_pylist()):
-            if status not in STATES or (status == 'observed' and value is None):
-                raise ValueError(f'Invalid status for {name}')
-            if status in ('unknown', 'unavailable', 'not_applicable') and value is not None:
-                raise ValueError(f'Non-null missing value for {name}')
-            if value is not None and (not math.isfinite(value) or value < 0):
-                raise ValueError(f'Invalid metric value for {name}')
-            if 'area_fraction' in name and value is not None and value > 1:
-                raise ValueError('Invalid area fraction')
-    return {'rows': len(cells), 'resolution': resolution, 'sha256': manifest['artifact']['sha256'], 'status': 'passed'}
-
-
 def project_delivery(selected: pa.Table, metadata: dict, resolution: int, software_revision: str | None = None) -> tuple[pa.Table, dict]:
     """Project metrics and statuses without writing companions or release records."""
     columns = {'h3_index': selected['H3_INDEX']}
@@ -102,6 +25,8 @@ def project_delivery(selected: pa.Table, metadata: dict, resolution: int, softwa
     coverage = {}
     groups = metadata.get('metric_groups') or {name: {'collection': name} for name in metadata['native_manifests']}
     for collection, group in groups.items():
+        if group['collection'] == 'ports':
+            continue  # Physical port locations now belong to toolkit-human.
         native_record = metadata['native_manifests'][group['collection']]
         native = native_record['manifest']
         completeness = native.get('source_completeness', 'unknown')
@@ -128,6 +53,10 @@ def project_delivery(selected: pa.Table, metadata: dict, resolution: int, softwa
             'effect': 'Finite values summarize received records only. Empty intersections and absent geometry types stay null under incomplete support.',
         }
         for original, (suffix, units, definition) in METRICS.items():
+            if f'{collection}__{original}' not in selected.column_names:
+                continue  # Production computes membership/count support only.
+            if collection == 'management_areas' and original != 'FEATURE_COUNT':
+                continue
             if 'geometry_family' in group:
                 applicable = 'POLYGON_COVERAGE_FRAC' if group['geometry_family'] == 'polygon' else 'LINE_LENGTH_M'
                 if original not in ('FEATURE_COUNT', applicable):
@@ -146,6 +75,35 @@ def project_delivery(selected: pa.Table, metadata: dict, resolution: int, softwa
                             'missing_reason_field': name + '_status', 'coverage_reference': collection,
                             'interpretation': 'Recorded inventory geometry; not law, regulatory compliance, complete jurisdiction or effective-date history'}
             fields[name + '_status'] = {'units': None, 'definition': 'Metric support state; observed means valid derived result', 'nullable': False, 'enum': STATES}
+        membership_key = f'{collection}__FEATURE_MEMBERSHIPS_V1'
+        if membership_key in selected.column_names:
+            name = f'{collection}__{SUFFIX}'
+            columns[name] = selected[membership_key]
+            columns[name + '_status'] = columns[f'{collection}__recorded_feature_count_status']
+            fields[name] = membership_definition(collection)
+            fields[name + '_status'] = {'units': None, 'definition': 'Same support state as the distinct feature count', 'nullable': False, 'enum': STATES}
+    from .protected_areas.wildlife_refuges.interface import annotate_fields
+    annotate_fields(fields)
+    from .protected_areas.critical_habitat.interface import annotate_fields as annotate_habitat
+    annotate_habitat(fields)
+    from .vessel_management.exclusion_zones.interface import annotate_fields as annotate_exclusions
+    annotate_exclusions(fields)
+    from .jurisdiction.tribal_first_nations_areas.interface import add_features
+    projected = add_features(pa.table(columns), fields, coverage)
+    from .jurisdiction.water_assignments import add_features as add_water_assignments
+    projected = add_water_assignments(projected, fields, coverage)
+    from .jurisdiction.international_boundary import populate_features as add_boundary
+    projected = add_boundary(projected, {'fields': fields, 'coverage': coverage}, None)
+    from .jurisdiction.county_regional_boundaries.interface import compact_features
+    projected = compact_features(projected, fields, coverage)
+    from .fisheries_management.management_areas.interface import compact_features as compact_management
+    projected = compact_management(projected, fields, coverage)
+    from .administrative_context.coast_guard_sectors.interface import compact_features as compact_coast_guard
+    projected = compact_coast_guard(projected, fields, coverage)
+    from .vessel_management.presentation import add_features as add_routing
+    projected = add_routing(projected, fields, coverage)
+    from .jurisdiction.presentation import annotate_fields as annotate_administrative
+    annotate_administrative(fields)
     manifest = {
         'governance_delivery_schema_version': 1,
         'shared_contract_conformance': {'status': 'not_claimed_by_local_envelope', 'reason': 'v0.1 has no reference_geometry category. An optional separately validated shared manifest can declare adoption of an explicitly supplied approved extension.'},
@@ -162,7 +120,8 @@ def project_delivery(selected: pa.Table, metadata: dict, resolution: int, softwa
 
         'limitations': ['Retained snapshots do not establish current law or legal effective dates.',
                         'Partial source receipt and unknown geographic coverage are distinct.',
-                        'Attribute relations remain in native companion records; no inferred legal authority.',
+                        'Paired categorical memberships retain source records and native part lineage; no inferred legal authority.',
                         'No antimeridian support; resolution is preserved from the explicit supplied grid.'],
     }
-    return pa.table(columns), manifest
+    validate_memberships(projected, fields)
+    return projected, manifest

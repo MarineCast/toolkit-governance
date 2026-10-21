@@ -14,8 +14,8 @@ It has no application or sibling-toolkit runtime dependency. Start with README.m
   from source retrieval/build times, establishment years or unknown effective dates.
 - No public releases, generation directories, current pointers, manifests, crosswalks or
   duplicated native/study bundles. Native products/manifests and reconciliation outputs
-  are temporary implementation intermediates. Historical Python helpers/tests remain only
-  for compatibility; their old CLI commands are retired.
+  are temporary implementation intermediates. Production entry points are build/export/validate, explicit acquisition, initialization and
+  read-only catalog/preflight. Query/get, inspection, study and release runtimes are not public APIs.
 - OriginalData preserves original retrieved feature extents and attributes before toolkit
   clipping, source IDs, receipt scopes and date evidence. Store shared sources once.
   Acquired feature selections do not imply an exhaustive global polygon inventory.
@@ -34,9 +34,11 @@ is explicit and bounded. Builds are offline; partial coverage and replacement re
 explicit options. Inspect acquisition, processing, cleanup and replacement effects first.
 No source-data redistribution or automatic hosting is authorized by an ordinary build.
 
-Read [contracts](docs/CONTRACTS.md), [architecture](docs/ARCHITECTURE.md), affected family
+Read [contracts](docs/CONTRACTS.md), [the application handoff schema](src/governance/resources/app_contract.json),
+[architecture](docs/ARCHITECTURE.md), affected family
 `DATA_SOURCES.md` and source/tests for scientific changes. Configuration and packaged defaults
-must remain byte-identical. Catalog has 24 families, seventeen implemented and seven planned.
+must remain byte-identical. The registry has sixteen implemented acquisition collections. Seven presentation families
+group the application features; acquisition collections and displayed features are distinct.
 Do not use stale organization/navigation summaries as contract authority.
 
 ## Verification

@@ -4,6 +4,12 @@ Current adapters preserve three separate source systems: WDFW recreational marin
 areas, DFO Pacific V3.1 subareas, and ADF&G groundfish statistical reporting areas.
 They share native product structure, not area meanings or code equivalence.
 
+The current H3 delivery has only **Management Area Count** and **Management Area**
+(all paired memberships). Removed polygon coverage, line length and point-count
+metrics are no longer calculated for this family. Source attributes/geometry and
+count/membership support remain preserved; status is encoded in field metadata.
+See the [two-column output contract](../../../../docs/parquet-products.md#management-areas-interface-2026-10-19).
+
 ## WDFW recreational marine areas
 
 WDFW Recreational Marine Area Code polygons are one Washington recreational system.
@@ -11,7 +17,7 @@ WDFW Recreational Marine Area Code polygons are one Washington recreational syst
 - [Service layer 6](https://geodataservices.wdfw.wa.gov/arcgis/rest/services/ApplicationServices/Major_Fishing_Area/MapServer/6)
 - [WAC 220-56-185](https://app.leg.wa.gov/WAC/default.aspx?cite=220-56-185)
 
-## DFO Pacific subarea adapter (0.2)
+## DFO Pacific subarea adapter
 
 
 A fresh 2026-10-13 official Pacific service-directory check discovered
@@ -25,7 +31,7 @@ redistribution clearance. Local research/inspection only; source-specific reuse 
 is required before sharing datasets. Subarea shapes do not manufacture whole-area polygons,
 fishery/species/gear applicability, current law or historical rules.
 
-### Zero-subarea qualification (0.2.1)
+### Zero-subarea qualification
 
 Retrieved 2026-10-14 UTC (2026-10-13 America/New_York), the exact configured service
 and layer 0 declare integer MGNT_AREA/SUBAREA_ fields, both with null domains and no
@@ -55,14 +61,14 @@ Null, negative, fractional and boolean identifiers fail. Provider attributes, or
 OBJECTID/GLOBALID and hierarchy remain intact. Tests use synthetic geometry and UUIDs;
 no provider geometry/dataset is committed and blank service rights remain unresolved.
 
-## Bounded Alaska groundfish adapter (0.2)
+## Bounded Alaska groundfish adapter
 
 
 The [ADF&G Groundfish layer 3](https://gis.adfg.alaska.gov/mapping/rest/services/CF_public/Groundfish/MapServer/3)
 exposes queryable polygon geometry, original OBJECTID, six-digit STAT_AREA and geometry
 start/end dates. The current `PVG_Statewide_2001_Present_GCS_WGS1984` service is a separate
 commercial statistical/reporting system; geometry dates are not legal effective dates.
-The getter reconciles a bounded bbox ID roster and preserves all source attributes.
+The acquisition engine reconciles a bounded bbox ID roster and preserves all source attributes.
 Southeast, Gulf and Aleutian/dateline query completeness are qualified separately;
 the declared layer extent ends about 68.5 N and establishes no Arctic completeness.
 The layer's metadata forbids reproduction/distribution without ADF&G consent; retain
@@ -84,7 +90,7 @@ support, not catch/effort allocation weights. Native geometry-part IDs travel wi
 relation. A shared provider code does not identify the same area across different systems.
 
 Future quantity joins include recreational and commercial scope and the Oregon study
-portion. No catch/effort quantities or allocation are acquired or computed in this release.
+portion. No catch/effort quantities or allocation are acquired or computed by this toolkit.
 Agency administrative regions remain separate from fishing/reporting systems.
 
 Official source candidates remain qualified separately:
@@ -107,3 +113,12 @@ Phase 1 initially implemented only WDFW and listed DFO/Alaska as unavailable.
 The current adapters above supersede that implementation inventory. Oregon fisheries,
 other Canadian/Alaskan fisheries, federal/council systems and a complete cross-jurisdiction
 roster remain unqualified; discovery never substitutes for source-system acceptance.
+
+## Public handoff boundary
+
+Source evidence and native processing described here are distinct from public
+columns. The [flat product contract](../../../../docs/parquet-products.md) and
+[exact physical schema](../../../../docs/reference/columns.md) define delivery.
+OriginalData preserves source geometry/attributes and receipt evidence; native
+manifests, diagnostic products and unused scientific measures are internal build
+support. No source qualification is broadened by the application projection.

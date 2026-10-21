@@ -15,7 +15,7 @@ from governance.shared.catalog import validate_catalog
 
 def test_workspace_init_is_complete_and_preserves_edits(tmp_path, monkeypatch):
     created = initialize_workspace(tmp_path)
-    assert len(created) == 10
+    assert len(created) == 9
     common = tmp_path / 'config/common.yaml'
     common.write_text(common.read_text() + '\n# user edit\n')
     assert initialize_workspace(tmp_path) == []
@@ -26,9 +26,9 @@ def test_workspace_init_is_complete_and_preserves_edits(tmp_path, monkeypatch):
     assert config.path == tmp_path / 'config/data/governance/governance.yaml'
     assert config.processed_root.is_relative_to(tmp_path)
     assert config.catalog_path.is_file()
-    assert len(validate_catalog()['collections']) == 24
+    assert len(validate_catalog()['collections']) == 16
     for collection_id, collection in config.collections.items():
-        for stage in ('build', 'download', 'inspect'):
+        for stage in ('build', 'download'):
             importlib.import_module(f'governance.{collection.category}.{collection_id}.{stage}')
 
 
@@ -53,7 +53,7 @@ def test_cli_external_workspace_does_not_change_environment(tmp_path, monkeypatc
     assert main(['--workspace',str(tmp_path),'init'])==0
     capsys.readouterr()
     assert main(['--workspace',str(tmp_path),'catalog'])==0
-    assert len(json.loads(capsys.readouterr().out)['collections'])==24
+    assert len(json.loads(capsys.readouterr().out)['collections'])==16
     import os
     assert 'GOVERNANCE_WORKSPACE' not in os.environ
 

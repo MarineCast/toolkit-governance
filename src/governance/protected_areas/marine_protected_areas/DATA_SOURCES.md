@@ -13,7 +13,7 @@ is a national reference compilation of existing MPAs. The toolkit pins NOAA's ex
 2023 geodatabase archive, preserves it unchanged, and clips its combined polygon
 layer locally to `full_area`. The live service's bounded spatial query was
 evaluated but timed out on its highly detailed national geometry, so it is not
-the release acquisition path. The archive retains source site ID, management
+the configured acquisition path. The archive retains source site ID, management
 agency, agency/site URL, establishment year, conservation purpose, protection
 classification, management-plan status, permanence, constancy, and
 fishing/vessel/anchoring restriction classifications.
@@ -46,7 +46,7 @@ feature regulation citation.
 
 The separate [DFO Oceans Act Areas of Interest service](https://egisp.dfo-mpo.gc.ca/arcgis/rest/services/open_data_donnees_ouvertes/oceans_act_areas_of_interest_sites_dinteret_de_la_loi_sur_les_oceans/MapServer)
 publishes points rather than proposed boundaries. Those native points are
-published separately with `DESIGNATION_STATUS=area_of_interest`; no area is
+retained internally with `DESIGNATION_STATUS=area_of_interest`; no area is
 buffered or inferred.
 
 ## Activity and IUCN fields
@@ -59,17 +59,20 @@ provides complete site-level legal activity rules. NOAA's fishing, vessel, and
 anchoring classifications are preserved in their own reference fields and are
 not reinterpreted as exact allowed/prohibited activities.
 
-## Outputs
+## Internal normalization outputs
+
+These files are temporary build intermediates, not standalone public deliveries.
+Public output is the flat H3 contract plus retained OriginalData; only fields
+declared by `resources/app_contract.json` reach the application handoff.
 
 - `marine_protected_areas.parquet`: canonical full-AOI native geometry
-- `mpa_designation_polygons.parquet`: designated/reference MPA polygons
-- `area_of_interest_geometry.parquet`: non-designated native AOI points
-- `source_authority_evaluation.json`: U.S. authority and governing-rule gap audit
 - `manifest.json`: source snapshots, retrieval times, checksums, clipping,
-  designation counts, and no-score policy
+  designation counts, U.S. authority/governing-rule gap evaluation, and no-score policy.
+  Designated polygons and AOI points remain distinguished by native attributes;
+  no duplicate subset geometry or evaluation sidecar is written.
 
 
-## Oregon published reference adapter (0.2)
+## Oregon published reference adapter
 
 [ODFW's maps/coordinates page](https://oregonmarinereserves.com/rules/) links a 2016
 KML/KMZ download. This additional source is pinned independently: 14 placemarks, including
@@ -81,3 +84,12 @@ date or marine/total-site area interchange is inferred. Current OAR 635-012, 141
 reference: cross-provider totals are non-additive. The newly added source pin was computed
 from the bounded official 20,803-byte archive on 2026-10-13; existing NOAA/ONMS pins were
 not changed. No source archive or generated dataset is committed or redistributed.
+
+## Public handoff boundary
+
+Source evidence and native processing described here are distinct from public
+columns. The [flat product contract](../../../../docs/parquet-products.md) and
+[exact physical schema](../../../../docs/reference/columns.md) define delivery.
+OriginalData preserves source geometry/attributes and receipt evidence; native
+manifests, diagnostic products and unused scientific measures are internal build
+support. No source qualification is broadened by the application projection.

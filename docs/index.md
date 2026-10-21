@@ -1,23 +1,11 @@
-![Coastal chart](assets/governance-toolkit-banner.png)
+# Governance Toolkit
 
-# Marine governance Parquets
+Build and inspect marine governance reference information on supplied H3 cells. Preserve every overlapping source identity and the distinction between unknown coverage, source evidence and legal authority.
 
-`toolkit-governance` produces H3 cells × metric columns in a flat `Data/Governance`
-directory. Keep R6 and R8 in separate static Parquets, with one optional dated
-Parquet per resolution when temporal evidence supports it. A small update catalog
-and one original-shape GeoParquet per source dataset complete the output.
+- [Quickstart](how-to-use.md): install and build offline from retained originals.
+- [Families and features](layers.md): meanings, exact columns, units and source qualifications.
+- [Product contract](parquet-products.md): files, row identity, embedded metadata and null semantics.
+- [Coverage and refresh](coverage.md): qualify support and update sources without inventing history.
+- [Configuration](configuration.md) and [CLI/Python API](reference/cli.md).
 
-Start with the [Parquet output guide](parquet-products.md) for installation,
-acquisition boundaries, building, reading and updating. There are no governance
-data releases or current pointers. Units, source provenance, coverage and missingness
-are embedded in the Parquets. Original feature extents live in `OriginalData`.
-
-Seventeen implemented collections cover protected areas, jurisdictional references,
-fisheries systems, vessel-management references and administrative context.
-Seven other catalog families remain planned. The default native normalization
-extent is the Northeast Pacific (-180, 32, -109, 72); H3 cells are supplied explicitly.
-
-Read [contracts](CONTRACTS.md), [layers](layers.md), [sources and rights](reference/sources.md)
-and [limitations](limitations.md) before interpreting metrics. All current outputs
-remain research-only and model-ineligible. Geometry, current law, effective dates,
-source vintage and retrieval times are distinct.
+The products are static research inventories and remain model-ineligible. They do not establish legal jurisdiction, current restrictions, navigation safety or regulatory compliance. Provider source notes remain authoritative for acquisition, rights and source-specific interpretation.

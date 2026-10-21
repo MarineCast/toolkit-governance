@@ -11,7 +11,7 @@ BLOCKERS = {
     'management_areas': 'DFO Pacific subarea geometry is implemented; whole-area/regulatory applicability and redistribution remain unqualified. Oregon commercial PDF/chart blocks lack qualified vector/identity; Alaska groundfish is one reporting system, not all fisheries.',
     'tribal_first_nations_areas': 'BIA land-area and NRCan BC Indian Reserves only; traditional territory, treaties, title and fishing rights need separate provider/interpretation contracts.',
     'marine_protected_areas': 'NOAA 2023 discovery and ODFW 2016 reference vintages; current site instruments and complete jurisdiction rosters remain unverified. DFO AOIs require opt-in and are not designation boundaries.',
-    'exclusion_zones': 'Only TC 2026 Saturna/Pender closed rings; other issuers/zones unqualified. Shoreline exceptions require vessel/context interpretation.',
+    'exclusion_zones': 'Partial TC, DFO, USCG, USACE, WAC and one DND WG active-area reference. Complete legal boundaries, other systems and current activation/history remain unqualified; inspect each source evidence class.',
     'speed_restriction_zones': 'Only TC 2026 Swiftsure closed ring; Nitinat requires pinned authoritative coastline support. Other systems/unversioned law unavailable.',
     'state_provincial_waters': 'BOEM reference boundary line only; no complete provincial legal water geometry supplied.',
     'whale_approach_regulation_zones': 'Moving-animal applicability requires animal/vessel/species/activity context; permanent zone geometry is not applicable.',
@@ -41,12 +41,12 @@ def availability_matrix(config):
                         implementation='implemented_reference' if collection else 'not_implemented',
                         acquisition_completeness='not_evaluated',geographic_completeness=geographic,
                         legal_currentness='not_verified',temporal_capability='instrument_version_snapshot' if source and source.source_id=='tc_srkw_interim_order_2026' else 'inventory_snapshot_only' if collection else 'unavailable',
-                        geometry_type='polygon' if name in {'marine_protected_areas','management_areas','exclusion_zones','speed_restriction_zones','tribal_first_nations_areas'} and not (source and source.source_id=='dfo_oceans_act_areas_of_interest') else 'point' if name=='ports' or (source and source.source_id=='dfo_oceans_act_areas_of_interest') else 'provider_native_mixed_or_unqualified',
+                        geometry_type='polygon' if name in {'marine_protected_areas','management_areas','exclusion_zones','speed_restriction_zones','tribal_first_nations_areas'} and not (source and source.source_id=='dfo_oceans_act_areas_of_interest') else 'point' if (source and source.source_id=='dfo_oceans_act_areas_of_interest') else 'provider_native_mixed_or_unqualified',
                         source_vintage=source.source_as_of if source else None,source_url=source.url if source else None,
                         limitation=BLOCKERS.get(name, 'Named provider reference scope only; exhaustive regional/legal qualification remains unverified.') + (' '+source.source_limitation if source else ' Required evidence: named issuer/system, authoritative geometry, stable identities, access/rights, applicable instrument versions and intervals.'),
                         rights=source.redistribution if source else 'unqualified',attribution=source.attribution if source else None))
     return {'availability_schema_version':1,'qualification_date':'2026-10-13','scope':'central Oregon, Washington, BC and separately qualified Alaska regions',
-            'semantics':'Implementation, complete acquisition receipt, geographic completeness and legal currentness are separate. Runtime get_layer.coverage supplies actual receipt state; synthetic tests do not certify these regions.',
+            'semantics':'Implementation, complete acquisition receipt, geographic completeness and legal currentness are separate. Native build manifests supply actual receipt state; synthetic tests do not certify these regions.',
             'rows':rows,
             'additional_source_gaps':[
                 {'layer':'marine_protected_areas','jurisdiction':'BC','provider':'BC Parks/Tantalis','status':'not_implemented','evidence_url':'https://catalogue.data.gov.bc.ca/dataset/bc-parks-ecological-reserves-and-protected-areas','blocker':'Provincial park/eco-reserve/protected-area polygons do not by themselves classify marine designations; marine inclusion taxonomy, stable zone identity and authoritative vector/terms need qualification. Existing ECCC marine classification remains separate.'},
