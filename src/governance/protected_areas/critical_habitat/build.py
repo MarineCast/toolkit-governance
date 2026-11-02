@@ -4,4 +4,4 @@ from .normalize import normalize
 
 
 def build(config_path=DEFAULT_CONFIG_PATH, *, allow_partial=False, overwrite=False):
-    return build_collection('critical_habitat',normalize,normalization_profile='noaa_nmfs_critical_habitat_reference',config_path=config_path,allow_partial=allow_partial,overwrite=overwrite)
+    return build_collection('critical_habitat',normalize,normalization_profile='noaa_dfo_eccc_marine_critical_habitat_reference',config_path=config_path,allow_partial=allow_partial,overwrite=overwrite)

@@ -1,105 +1,46 @@
-> Version 0.3 public output uses the [flat Parquet workflow](parquet-products.md).
-> Native artifacts and release/study commands below describe historical or internal workflows;
-> they are not the current public data layout.
-
 # Configuration
 
-The selected workspace contains editable YAML, raw snapshots, processed products,
-and inspection outputs. Installed package resources are read-only defaults copied
-by `init`; they are never a data/output directory.
+Workspace precedence is CLI `--workspace`, then `GOVERNANCE_WORKSPACE`, then the current directory. Python product APIs also accept an explicit `workspace`. Package resources are read-only defaults, never the place for acquired data or output.
 
-## Choose the workspace
+`init` copies missing configuration and catalog files without replacing user edits or acquiring data. Prefer absolute paths in commands. Relative configuration paths and paths inside YAML resolve against the workspace; an absolute alternate config file does not change that workspace.
 
-Precedence is:
-
-1. CLI `--workspace`.
-2. The `GOVERNANCE_WORKSPACE` environment variable.
-3. The process current directory.
-
-```sh
-governance --workspace /absolute/path/to/governance-workspace init
-export GOVERNANCE_WORKSPACE=/absolute/path/to/governance-workspace
-governance catalog
-```
-
-`init` copies missing config/catalog files and preserves existing files.
-Rerunning it does not reset your configuration or acquire data.
-
-## Configuration files
-
-| File | Responsibility |
+| File | Purpose |
 | --- | --- |
-| `config/common.yaml` | Named WGS84 processing extent |
-| `config/data/governance/governance.yaml` | Sources, collection registry, clipping, coverage regions, raw/processed paths, catalog, and inspection |
-| `config/data/governance/<category>/<collection>.yaml` | Family configuration extending the shared governance file and selecting a collection |
-| `config/data/governance/feature_catalog.yaml` | Explicit implemented/planned collection and feature metadata |
-| `config/data/presentation_settings.yaml` | Shared presentation settings |
+| `config/common.yaml` | Named WGS84 processing extent (`full_area`) |
+| `config/data/governance/governance.yaml` | Sources, collections, clipping, coverage, input and intermediate paths |
+| `config/data/governance/<category>/<collection>.yaml` | Family overrides of shared configuration |
+| `config/data/governance/feature_catalog.yaml` | Acquisition collection metadata and implementation status |
 
-The default `area: full_area` refers to `areas.full_area.bbox_wgs84`:
+Source definitions retain provider, acquisition type, source/local paths, exact pins, vintage, attribution, license, authority scope, redistribution terms and regional support. A configured source is not evidence of availability or complete geographic coverage. Do not auto-update pins, reinterpret blank rights as permission or extend a source's legal scope.
 
-```yaml
-areas:
-  full_area:
-    description: Northeast Pacific governance processing extent.
-    bbox_wgs84:
-      min_lon: -180.0
-      min_lat: 32.0
-      max_lon: -109.0
-      max_lat: 72.0
-```
+YAML supports mapping deep merges, list replacement, references, environment values and cycle checks. Unknown keys, malformed booleans, invalid bounds and invalid source references fail. Keep the required `full_area` name when changing bounds; revalidate source rosters and required subsets for the new extent.
 
-The current governance loader requires `full_area`. Keep that name when changing
-bounds. Narrowing the extent can remove required family subsets; the sanctuary
-publisher still requires its configured six-site roster. Rebuild and validate
-products against the new extent rather than reusing old manifests.
+For offline refresh, pass a complete verified flat directory through `--original-data`; the builder substitutes catalog-bound originals for configured source paths. See [refresh](coverage.md). `--output-directory` remains explicit. Presentation is a consumer responsibility; source and metric geometry remain scientific inputs.
 
-## Path rules
+Maintained repository `config/` defaults and `src/governance/resources/config/` must remain byte-identical. Personal workspace edits do not need to be copied into package resources. Source-specific receipt requirements and immutable archive exceptions remain in the authoritative family source notes. A pinned local subset does not establish full-source completeness.
+## Optional run settings file
 
-Relative paths **inside YAML resolve against the workspace**, even when the
-configuration file itself is supplied by absolute path. A relative `--config`
-also resolves against the workspace. CLI inspection/overlay `--output` paths and
-the overlay's `--grid` path are process-relative; absolute paths avoid ambiguity.
+The CLI and `build_products` / `export_products` Python APIs accept `env_file`
+(`--env-file` before the CLI command). The default is `.env` in the selected
+workspace. An explicitly requested missing file fails before processing. Only
+`GOVERNANCE_CONFIG`, `GOVERNANCE_OUTPUT_DIRECTORY`, `GOVERNANCE_GRIDS`, and
+`GOVERNANCE_ORIGINAL_DATA` are read; unrelated settings and credentials are ignored.
+No values are copied into the process environment. `.env` never selects workspace.
 
-```sh
-governance --workspace /absolute/path/to/governance-workspace \
-  catalog --config /absolute/path/to/alternate-governance.yaml
-```
+Precedence is explicit argument, process environment, selected `.env`, then packaged
+configuration path default. Output and grids have no implicit defaults: build
+requires both, export requires output and its explicit matrix argument. Grids in
+the file/environment use a JSON array, for example
+`GOVERNANCE_GRIDS='["/absolute/path/to/grid.parquet"]'` in a shell-style file.
+Paths from the file resolve beside it. Explicit/environment paths preserve cwd
+resolution, except configuration paths resolve against workspace. YAML paths
+continue to resolve against workspace. Quotes and inline comments are supported;
+variable interpolation, duplicate known keys, empty values and malformed known
+settings fail with key/line diagnostics that omit values.
 
-That alternate file selects configuration, not a different data workspace.
-Sources can use explicit absolute local paths. International reconciliation needs
-the provisioned local support described in [workflows](WORKFLOWS.md#external-local-inputs).
-
-## Source and coverage settings
-
-Each source records provider, acquisition type, URL/local path, snapshot path,
-vintage, license, attribution, legal citation, redistribution terms, authority
-scope, limitations, and region-specific coverage. Archive sources may also pin
-SHA-256 and archive members/layers. Keep pins paired with the exact intended source.
-
-Configured coverage and runtime availability are different. Downloading a source
-does not automatically make its geographic coverage complete. An unavailable or
-reference-only source must remain explicitly qualified.
-
-YAML composition supports mapping deep-merges, list replacement, references,
-environment values and cycle checks. The loader rejects unknown root/source/collection/
-clipping/path/inspection keys, malformed booleans, invalid bounds and invalid source references.
-Read the resolved configuration and product manifest after changing it.
-
-Direct/vector caches require compatible identity, selector and support receipts. Only a
-reviewed immutable full-source ZIP contract may declare `immutable_full_source_archive: true`;
-it also requires a configured verified SHA-256, direct-archive acquisition, an unfiltered
-`1=1` selector, no mask and no server filtering. Pinning a local subset alone is insufficient.
-Older strict loaders reject this new key; configurations using it require 0.2.1. Existing
-source pins are never replaced automatically. See [cache contracts](query-api.md#cache-and-network-modes).
-
-## Output and presentation settings
-
-Defaults place processed collections under `data/processed/domain/governance/`
-and maps under `outputs/domains/governance/`. Collection paths are explicit in
-the governance configuration. Inspection colors and default visibility are
-collection-specific; simplification defaults to 250 metres for display only.
-
-If you change artifact paths, review matching feature-catalog entries before
-using `catalog --verify-artifacts`. In maintained repository defaults, keep
-`config/` and `src/governance/resources/config/` byte-identical. This parity rule
-does not require copying personal workspace edits back into installed resources.
+Copy `.env.example` to a local, ignored `.env` and edit the paths. No date settings
+are provided: static governance inventory does not establish legal effective dates.
+Overwrite, acquisition, partial coverage, and cleanup remain explicit API/CLI choices.
+`resolve_settings` is a read-only resolver; it validates syntax and required settings,
+while downstream product readers validate grid content, source readiness and output
+contracts. No source downloads occur during settings resolution.

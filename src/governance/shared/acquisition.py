@@ -142,7 +142,7 @@ def validate_snapshot(source, snapshot, *, bbox=None):
 
 
 def download_arcgis_snapshot(source: GovernanceSource, *, bbox, overwrite=False, budget: AcquisitionBudget | None = None, transfer_budget=None) -> Path:
-    bbox = validate_bbox(bbox)
+    bbox = validate_bbox(source.selection_bbox or bbox)
     if source.requested_grid_mask_sha256 is not None:
         raise SourceUnavailableError('Masked acquisition requires explicit qualified mask geometry; a hash alone cannot apply a mask')
     budget = budget or AcquisitionBudget()
@@ -371,17 +371,18 @@ def download_direct_snapshot(source, *, overwrite=False, max_bytes=64_000_000, t
 
 def acquire_source(config: GovernanceConfig, source_id: str, *, overwrite=False):
     source = config.sources[source_id]
+    requested_bbox = source.selection_bbox or config.bbox_tuple
     if source.local_path is not None and source.local_path.exists():
         _validate_expected_checksum(source, source.local_path)
         if source.local_path.suffix.lower() == '.json':
-            validate_snapshot(source, json.loads(source.local_path.read_text()), bbox=config.bbox_tuple)
+            validate_snapshot(source, json.loads(source.local_path.read_text()), bbox=requested_bbox)
         else:
-            _validate_direct_receipt(source, source.local_path, bbox=config.bbox_tuple)
+            _validate_direct_receipt(source, source.local_path, bbox=requested_bbox)
         return source.local_path
     if source.acquisition_type == 'direct_archive':
         return download_direct_snapshot(source, overwrite=overwrite)
     if source.acquisition_type in {'arcgis', 'local_vector_or_arcgis'}:
-        return download_arcgis_snapshot(source, bbox=config.bbox_tuple, overwrite=overwrite)
+        return download_arcgis_snapshot(source, bbox=requested_bbox, overwrite=overwrite)
     if source.source_status == 'unavailable' or source.acquisition_type == 'reference_only':
         return None
     raise SourceUnavailableError(f'Unsupported governance acquisition type: {source.acquisition_type}')
@@ -430,6 +431,9 @@ def _validate_direct_receipt(source, path, *, bbox):
 
 
 def read_source_frame(source: GovernanceSource, *, bbox=None) -> gpd.GeoDataFrame:
+    # A declared partial selection is an input subset, never a full-AOI receipt.
+    # Validate that exact configured scope; geometry outside it remains unknown.
+    bbox = source.selection_bbox or bbox
     path = resolve_source_path(source)
     if path is None:
         raise SourceUnavailableError(f'No runtime snapshot is available for {source.source_id}')
@@ -439,10 +443,16 @@ def read_source_frame(source: GovernanceSource, *, bbox=None) -> gpd.GeoDataFram
         metadata = pq.read_schema(path).metadata or {}
         if b'governance_original' in metadata:
             return _read_original_frame(source, path, metadata, bbox=bbox)
-    if source.source_id in {'odfw_marine_reserves_2016', 'tc_srkw_interim_order_2026'}:
+    if source.source_id in {'odfw_marine_reserves_2016', 'tc_srkw_interim_order_2026', 'uscg_lockheed_rna_20261015', 'uscg_theafoss_rna_20261015', 'dnd_wg_active_reference_20261020'}:
         receipt = _validate_direct_receipt(source, path, bbox=bbox)
         if source.source_id == 'odfw_marine_reserves_2016':
             from governance.protected_areas.marine_protected_areas.oregon import source_frame
+        elif source.source_id == 'dnd_wg_active_reference_20261020':
+            from governance.vessel_management.exclusion_zones.nanoose import source_frame
+        elif source.source_id == 'uscg_theafoss_rna_20261015':
+            from governance.vessel_management.exclusion_zones.theafoss import source_frame
+        elif source.source_id == 'uscg_lockheed_rna_20261015':
+            from governance.vessel_management.exclusion_zones.washington import source_frame
         else:
             from governance.vessel_management.fixed_rules import source_frame
         frame = source_frame(path)

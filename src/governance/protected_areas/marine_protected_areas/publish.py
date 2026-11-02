@@ -1,30 +1,19 @@
-"""Publish MPA status sidecars and authority/rule evaluation metadata."""
+"""Validate MPA status groups and retain authority/rule evaluation metadata."""
 
 from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
 
 import geopandas as gpd
 
 from governance.shared.artifacts import (
-    atomic_write_geoparquet,
     atomic_write_json,
-    sha256_file,
 )
 from governance.shared.config import load_governance_config
 from governance.shared.schema import validate_governance_geometry
 
 
-def _related_artifact(path: Path, frame: gpd.GeoDataFrame) -> dict[str, Any]:
-    return {
-        "path": str(path),
-        "rows": int(len(frame)),
-        "geometry_types": sorted(set(frame.geometry.geom_type.astype(str))),
-        "sha256": sha256_file(path),
-        "bytes": path.stat().st_size,
-    }
 
 
 def publish_mpa_products(
@@ -59,13 +48,6 @@ def publish_mpa_products(
     validate_governance_geometry(polygons, required_extra_fields=required)
     validate_governance_geometry(areas_of_interest, required_extra_fields=required)
 
-    output_dir = artifact_path.parent
-    polygons_path = output_dir / "mpa_designation_polygons.parquet"
-    aoi_path = output_dir / "area_of_interest_geometry.parquet"
-    evaluation_path = output_dir / "source_authority_evaluation.json"
-    atomic_write_geoparquet(polygons, polygons_path, overwrite=overwrite)
-    atomic_write_geoparquet(areas_of_interest, aoi_path, overwrite=overwrite)
-
     us = frame.loc[frame["COUNTRY_CODE"].eq("USA")]
     us_designations = us.drop_duplicates("DESIGNATION_ID")
     evaluation = {
@@ -91,7 +73,6 @@ def publish_mpa_products(
         "area_of_interest_policy": "native_points_separate_from_designated_mpa_polygons",
         "protection_score": None,
     }
-    atomic_write_json(evaluation_path, evaluation, overwrite=overwrite)
 
     config = load_governance_config(config_path)
     manifest_path = config.collections["marine_protected_areas"].manifest_path
@@ -119,14 +100,5 @@ def publish_mpa_products(
         for country, count in designations["COUNTRY_CODE"].value_counts().items()
     }
     manifest["source_authority_evaluation"] = evaluation
-    manifest["related_artifacts"] = {
-        "mpa_designation_polygons": _related_artifact(polygons_path, polygons),
-        "area_of_interest_geometry": _related_artifact(aoi_path, areas_of_interest),
-        "source_authority_evaluation": {
-            "path": str(evaluation_path),
-            "sha256": sha256_file(evaluation_path),
-            "bytes": evaluation_path.stat().st_size,
-        },
-    }
     atomic_write_json(manifest_path, manifest, overwrite=True)
     return artifact_path

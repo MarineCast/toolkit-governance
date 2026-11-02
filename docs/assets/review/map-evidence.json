@@ -1,0 +1,119 @@
+{
+  "input_sha256": "866f4e4f8ddca70340fde131929c0d6d1ad08c5b17d74e3bc9cca6080457e78c",
+  "rows": 1087,
+  "resolution": 6,
+  "bbox_center_wgs84": [
+    -125,
+    47,
+    -122,
+    50
+  ],
+  "projection": "EPSG:32610",
+  "review_date": "2026-10-29",
+  "temporal": {
+    "meaning": "Static recorded inventory; source dates and receipt times remain in OriginalData, not a legal history",
+    "type": "static"
+  },
+  "fields": {
+    "country_membership": {
+      "nulls": 19,
+      "unit": "Recorded geographic assignment; + means overlap",
+      "definition_location": "Parquet governance metadata fields/country_membership"
+    },
+    "state_province_membership": {
+      "nulls": 103,
+      "unit": "Recorded geographic assignment; + means overlap",
+      "definition_location": "Parquet governance metadata fields/state_province_membership"
+    },
+    "county_district_count": {
+      "nulls": 90,
+      "unit": "Recorded feature count",
+      "definition_location": "Parquet governance metadata fields/county_district_count"
+    },
+    "has_international_boundary": {
+      "nulls": 1035,
+      "unit": "Nullable recorded intersection",
+      "definition_location": "Parquet governance metadata fields/has_international_boundary"
+    },
+    "critical_habitat_count": {
+      "nulls": 291,
+      "unit": "Recorded feature count",
+      "definition_location": "Parquet governance metadata fields/critical_habitat_count"
+    },
+    "conservation_area_count": {
+      "nulls": 617,
+      "unit": "Recorded feature count",
+      "definition_location": "Parquet governance metadata fields/conservation_area_count"
+    },
+    "conservation_area_coverage_fraction": {
+      "nulls": 617,
+      "unit": "Full-cell union fraction",
+      "definition_location": "Parquet governance metadata fields/conservation_area_coverage_fraction"
+    },
+    "has_mapped_tribal_area": {
+      "nulls": 939,
+      "unit": "Nullable recorded intersection",
+      "definition_location": "Parquet governance metadata fields/has_mapped_tribal_area"
+    },
+    "fisheries_management_area_count": {
+      "nulls": 16,
+      "unit": "Recorded feature count",
+      "definition_location": "Parquet governance metadata fields/fisheries_management_area_count"
+    },
+    "exclusion_zone_count": {
+      "nulls": 787,
+      "unit": "Recorded feature count",
+      "definition_location": "Parquet governance metadata fields/exclusion_zone_count"
+    },
+    "has_routing_reference": {
+      "nulls": 870,
+      "unit": "Nullable recorded intersection",
+      "definition_location": "Parquet governance metadata fields/has_routing_reference"
+    },
+    "coast_guard_membership": {
+      "nulls": 0,
+      "unit": "Name-list multiplicity",
+      "definition_location": "Parquet governance metadata fields/coast_guard_membership"
+    },
+    "county_district_membership": {
+      "nulls": 90,
+      "unit": "Name-list multiplicity",
+      "definition_location": "Parquet governance metadata fields/county_district_membership"
+    },
+    "critical_habitat_membership": {
+      "nulls": 291,
+      "unit": "Name-list multiplicity",
+      "definition_location": "Parquet governance metadata fields/critical_habitat_membership"
+    },
+    "fisheries_management_area_membership": {
+      "nulls": 16,
+      "unit": "Name-list multiplicity",
+      "definition_location": "Parquet governance metadata fields/fisheries_management_area_membership"
+    },
+    "conservation_area_membership": {
+      "nulls": 617,
+      "unit": "Name-list multiplicity",
+      "definition_location": "Parquet governance metadata fields/conservation_area_membership"
+    },
+    "mapped_tribal_area_membership": {
+      "nulls": 939,
+      "unit": "Name-list multiplicity",
+      "definition_location": "Parquet governance metadata fields/mapped_tribal_area_membership"
+    },
+    "exclusion_zone_membership": {
+      "nulls": 787,
+      "unit": "Name-list multiplicity",
+      "definition_location": "Parquet governance metadata fields/exclusion_zone_membership"
+    },
+    "speed_restriction_zone_membership": {
+      "nulls": 1078,
+      "unit": "Name-list multiplicity",
+      "definition_location": "Parquet governance metadata fields/speed_restriction_zone_membership"
+    },
+    "vessel_routing_membership": {
+      "nulls": 873,
+      "unit": "Name-list multiplicity",
+      "definition_location": "Parquet governance metadata fields/vessel_routing_membership"
+    }
+  }
+}

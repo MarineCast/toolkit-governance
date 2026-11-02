@@ -12,12 +12,10 @@ from pyproj import Geod, Transformer
 from shapely.geometry import GeometryCollection, LineString, MultiLineString, MultiPolygon, Point, Polygon, box
 from shapely.ops import transform, unary_union
 
-from governance import get_fishery_management_areas
 from governance.shared import acquisition
 from governance.shared.acquisition import CacheScopeError
 from governance.shared.artifacts import sha256_file
 from governance.shared.config import load_governance_config
-from governance.shared.query_overlay import overlay
 from governance.shared.spatial import clip_to_full_area
 from governance.workspace import initialize_workspace
 
@@ -31,50 +29,14 @@ def native(geometry):
     return gpd.GeoDataFrame(dict(SOURCE_DATASET_ID=['fixture'],GOVERNANCE_FEATURE_ID=['feature'],SOURCE_FEATURE_ID=['record'],GEOMETRY_PART_ID=['record:part-001']),geometry=[geometry],crs=4326)
 
 
-def metrics(geometry, cell=box(0,0,2,2), limit=10):
-    grid=gpd.GeoDataFrame(dict(H3_INDEX=['synthetic'],H3_RESOLUTION=[7]),geometry=[cell],crs=4326)
-    return overlay(grid,native(geometry),source_ids=['fixture'],coverage=[dict(source_id='fixture',status='available')],max_memberships=limit)
 
 
-@pytest.mark.parametrize('remnant',[box(2,.5,3,1.5),Polygon([(2,2),(3,2),(3,3)])])
-def test_polygon_intersection_keeps_area_with_boundary_remnant(remnant):
-    positive=box(.2,.2,1,1)
-    shape=MultiPolygon([positive,remnant])
-    assert shape.is_valid and shape.intersection(box(0,0,2,2)).geom_type=='GeometryCollection'
-    table,members=metrics(shape)
-    assert len(members)==1
-    assert members.INTERSECTION_AREA_M2.iloc[0]==pytest.approx(area(positive),rel=1e-10)
-    assert table['fixture__polygon_coverage_full_cell_fraction'].iloc[0]==pytest.approx(area(positive)/area(box(0,0,2,2)))
-    assert table['fixture__part_count'].iloc[0]==1
-    assert members.GEOMETRY_PART_ID.is_unique
 
 
-def test_line_intersection_keeps_length_with_isolated_endpoint():
-    positive=LineString([(.2,.5),(1,.5)])
-    shape=MultiLineString([positive,[(2,2),(3,3)]])
-    assert shape.intersection(box(0,0,2,2)).geom_type=='GeometryCollection'
-    table,members=metrics(shape)
-    expected=Geod(ellps='WGS84').inv(.2,.5,1,.5)[2]
-    assert len(members)==1 and members.INTERSECTION_LENGTH_M.iloc[0]==pytest.approx(expected)
-    assert table['fixture__line_union_length_m'].iloc[0]==pytest.approx(expected)
 
 
-@pytest.mark.parametrize('shape',[box(2,0,3,1),box(3,0,4,1),LineString([(2,2),(3,3)]),LineString([(3,3),(4,4)])])
-def test_boundary_only_or_disjoint_has_no_membership(shape):
-    table,members=metrics(shape)
-    assert members.empty and pd.isna(table['fixture__feature_count'].iloc[0])
 
 
-def test_hole_multipart_union_and_budget():
-    first=Polygon([(.1,.1),(1.5,.1),(1.5,1.5),(.1,1.5)],holes=[[(.3,.3),(.8,.3),(.8,.8),(.3,.8)]])
-    second=box(1.6,.2,1.9,.6)
-    table,members=metrics(MultiPolygon([first,second,box(2,.5,3,1.5)]),limit=1)
-    assert len(members)==1
-    assert members.INTERSECTION_AREA_M2.iloc[0]==pytest.approx(area(first)+area(second))
-    assert table['fixture__part_count'].iloc[0]==1
-    grid=gpd.GeoDataFrame(dict(H3_INDEX=['a','b'],H3_RESOLUTION=[7,7]),geometry=[box(0,0,2,2)]*2,crs=4326)
-    with pytest.raises(ValueError,match='budget'):
-        overlay(grid,native(first),source_ids=['fixture'],coverage=[],max_memberships=1)
 
 
 def repaired_polygon():
@@ -223,50 +185,8 @@ def test_measurement_errors_not_hidden_and_lost_dimension_fails(monkeypatch):
     with pytest.raises(ValueError,match='exceeds'):clip_to_full_area(frame,cfg)
 
 
-def test_public_getter_actual_h3_collection_intersection(tmp_path,snapshot_fixture):
-    import h3
-    from governance.shared.grid import candidate_grid
-    bbox=(-123.00001,48.49999,-122.99999,48.50001)
-    grid=candidate_grid(bbox,7,max_cells=100);assert len(grid)==1
-    cell=grid.geometry.iloc[0]
-    half=cell.intersection(box(cell.bounds[0]-1,cell.bounds[1]-1,cell.centroid.x,cell.bounds[3]+1))
-    shape=unary_union([cell.buffer(.005).difference(cell),half])
-    assert shape.is_valid and shape.geom_type=='Polygon'
-    assert cell.intersection(shape).geom_type=='GeometryCollection'
-    initialize_workspace(tmp_path);cfg=load_governance_config(workspace=tmp_path)
-    source=cfg.sources['wdfw_recreational_marine_areas']
-    raw=gpd.GeoDataFrame(dict(OBJECTID=[1],AreaName=['7']),geometry=[shape],crs=4326)
-    source.snapshot_path.parent.mkdir(parents=True)
-    source.snapshot_path.write_text(json.dumps(snapshot_fixture(source,raw)))
-    result=get_fishery_management_areas(bbox,config=cfg,sources=source.source_id,mode='offline',allow_partial=True,make_h3=True)
-    assert len(result.features)==len(result.memberships)==1
-    assert result.memberships.INTERSECTION_AREA_M2.iloc[0]==pytest.approx(area(half),rel=1e-8)
-    assert result.h3[source.source_id+'__polygon_coverage_full_cell_fraction'].iloc[0]==pytest.approx(area(half)/area(cell),rel=1e-8)
-    assert h3.get_resolution(result.h3.H3_INDEX.iloc[0])==7
-    from governance import __version__
-    assert result.provenance['producer']['version']==__version__
-    assert result.features.SYSTEM_LEARNED_AT.tolist()==['2026-10-01T00:00:00Z']
-    assert result.provenance['query_time_utc']!='2026-10-01T00:00:00Z'
 
 
-def test_query_legacy_polygon_comparison_where_definitions_agree(tmp_path,snapshot_fixture):
-    from governance.h3_matrix import overlay_collection
-    from governance.shared.grid import candidate_grid
-    bbox=(-123.00001,48.49999,-122.99999,48.50001)
-    grid=candidate_grid(bbox,7,max_cells=100);cell=grid.geometry.iloc[0]
-    # Smaller disjoint fragments strictly inside one cell: no projection/clipping edge ambiguity.
-    center=cell.centroid
-    shape=MultiPolygon([box(center.x-.0004,center.y-.0004,center.x-.0002,center.y-.0002),box(center.x+.0002,center.y+.0002,center.x+.0004,center.y+.0004)])
-    initialize_workspace(tmp_path);cfg=load_governance_config(workspace=tmp_path);source=cfg.sources['wdfw_recreational_marine_areas']
-    raw=gpd.GeoDataFrame(dict(OBJECTID=[1],AreaName=['7']),geometry=[shape],crs=4326)
-    source.snapshot_path.parent.mkdir(parents=True);source.snapshot_path.write_text(json.dumps(snapshot_fixture(source,raw)))
-    result=get_fishery_management_areas(bbox,config=cfg,sources=source.source_id,mode='offline',allow_partial=True,make_h3=True)
-    legacy=overlay_collection(grid,result.features,completeness='partial',length_crs='EPSG:32610')
-    expected=sum(area(part) for part in shape.geoms)/area(cell)
-    assert legacy['FEATURE_COUNT'][0].as_py()==result.h3[source.source_id+'__feature_count'].iloc[0]==1
-    assert legacy['POLYGON_COVERAGE_FRAC'][0].as_py()==pytest.approx(expected,rel=1e-8)
-    assert result.h3[source.source_id+'__polygon_coverage_full_cell_fraction'].iloc[0]==pytest.approx(expected,rel=1e-8)
-    assert len(result.memberships)==2 and result.h3[source.source_id+'__part_count'].iloc[0]==2
 
 
 def test_archive_qualification_config_validation(tmp_path):
@@ -285,11 +205,12 @@ def test_qualified_dfo_zero_subarea_is_known_provider_identifier(tmp_path,snapsh
     # Synthetic geometry/UUID; only the small published area/subarea identifier is reproduced.
     raw=gpd.GeoDataFrame(dict(OBJECTID=[1],MGNT_AREA=[area_code],SUBAREA_=[0],GLOBALID=['{01234567-89ab-cdef-0123-456789abcdef}'],NAME=[f'Subarea {area_code}-0']),geometry=[box(-123.1,48.4,-122.9,48.6)],crs=4326)
     source.snapshot_path.parent.mkdir(parents=True);source.snapshot_path.write_text(json.dumps(snapshot_fixture(source,raw)))
-    result=get_fishery_management_areas((-123.05,48.45,-122.95,48.55),config=cfg,systems='dfo.pacific.pfma.subareas',mode='offline',allow_partial=True)
-    assert result.features.AREA_CODE.tolist()==[f'{area_code}-0']
-    assert result.features.PARENT_AREA_CODE.tolist()==[str(area_code)]
-    assert result.features.DFO_PFMA_SUBAREA_.tolist()==['0']
-    assert result.features.AREA_HIERARCHY_LEVEL.tolist()==['subarea']
+    from governance.fisheries_management.management_areas.pacific import normalize
+    result=normalize(raw,source)
+    assert result.AREA_CODE.tolist()==[f'{area_code}-0']
+    assert result.PARENT_AREA_CODE.tolist()==[str(area_code)]
+    assert result.DFO_PFMA_SUBAREA_.tolist()==['0']
+    assert result.AREA_HIERARCHY_LEVEL.tolist()==['subarea']
 
 
 @pytest.mark.parametrize('field,value',[('MGNT_AREA',0),('MGNT_AREA',-1),('MGNT_AREA',True),('MGNT_AREA',np.bool_(True)),('MGNT_AREA',21.5),('MGNT_AREA',None),('SUBAREA_',None),('SUBAREA_',-1),('SUBAREA_',False),('SUBAREA_',np.bool_(False)),('SUBAREA_',.5),('SUBAREA_','invalid')])
@@ -303,33 +224,8 @@ def test_dfo_identifiers_reject_unknown_or_malformed(field,value):
     with pytest.raises(ValueError,match='unqualified'):normalize(raw,source)
 
 
-def test_producer_revision_uses_only_reliable_install_metadata(monkeypatch):
-    import importlib.metadata
-    from governance.query import _producer
-    class Distribution:
-        from governance import __version__ as version
-        def read_text(self,name):return json.dumps(dict(vcs_info=dict(vcs='git',commit_id='a'*40)))
-        def locate_file(self,name):
-            from pathlib import Path
-            import governance
-            return Path(governance.__file__)
-    monkeypatch.setattr(importlib.metadata,'distribution',lambda name:Distribution())
-    assert _producer()['code_revision']=='a'*40
-    Distribution.version='unrelated'
-    assert _producer()['code_revision'] is None
-    def unavailable(name):raise importlib.metadata.PackageNotFoundError(name)
-    monkeypatch.setattr(importlib.metadata,'distribution',unavailable)
-    assert _producer()['code_revision_source']=='unavailable'
 
 
-def test_point_boundary_policy_and_distinct_coordinates():
-    from shapely.geometry import MultiPoint
-    grid=gpd.GeoDataFrame(dict(H3_INDEX=['left','right'],H3_RESOLUTION=[7,7]),geometry=[box(0,0,1,1),box(1,0,2,1)],crs=4326)
-    table,members=overlay(grid,native(MultiPoint([(1,.5),(.5,.5)])),source_ids=['fixture'],coverage=[],max_memberships=2)
-    assert len(members)==2
-    assert members.POINT_COUNT.tolist()==[2,1]
-    assert table['fixture__point_count'].tolist()==[2,1]
-    assert members.INTERSECTION_AREA_M2.isna().all() and members.INTERSECTION_LENGTH_M.isna().all()
 
 
 def test_fully_retained_dateline_line_uses_consistent_split_vertices():

@@ -1,3 +1,120 @@
+feature_families:
+  administrative_boundaries:
+    display_name: Administrative Boundaries
+    source_collections:
+    - county_regional_boundaries
+    - federal_waters
+    - state_provincial_waters
+    - tribal_first_nations_areas
+  vessel_routing_regulations:
+    display_name: Vessel Routing & Regulations
+    source_collections:
+    - shipping_lanes
+    - traffic_separation_schemes
+    - speed_restriction_zones
+    scientific_features:
+      vessel_routing_regulations__recorded_reference:
+        display_name: Routing / regulation recorded
+        role: scientific_metric
+        value_semantics: boolean_overlap
+      vessel_routing_regulations__traffic_separation_zones__feature_memberships_v1:
+        role: recorded_feature_identity
+        display_name: Shipping Lanes & Traffic Separation Zones
+      speed_restriction_zones__feature_memberships_v1:
+        role: recorded_feature_identity
+        display_name: Speed Restriction Zones
+    identity_columns:
+    - vessel_routing_regulations__traffic_separation_zones__feature_memberships_v1
+    - speed_restriction_zones__feature_memberships_v1
+    measurement_columns:
+    - vessel_routing_regulations__recorded_reference
+    native_identity_columns:
+    - shipping_lanes__chs_navigation_line__feature_memberships_v1
+    - shipping_lanes__chs_recommended_centerline__feature_memberships_v1
+    - shipping_lanes__chs_recommended_lane_part__feature_memberships_v1
+    - shipping_lanes__chs_recommended_track__feature_memberships_v1
+    - shipping_lanes__chs_two_way_route_part__feature_memberships_v1
+    - shipping_lanes__noaa_fairway__feature_memberships_v1
+    - shipping_lanes__noaa_recommended_route__feature_memberships_v1
+    - shipping_lanes__noaa_two_way_route__feature_memberships_v1
+    - traffic_separation_schemes__chs_lane_part__feature_memberships_v1
+    - traffic_separation_schemes__chs_scheme_boundary__feature_memberships_v1
+    - traffic_separation_schemes__chs_scheme_crossing__feature_memberships_v1
+    - traffic_separation_schemes__chs_separation_line__feature_memberships_v1
+    - traffic_separation_schemes__chs_separation_zone__feature_memberships_v1
+    - traffic_separation_schemes__noaa_separation_zone__feature_memberships_v1
+    - traffic_separation_schemes__noaa_traffic_lane__feature_memberships_v1
+    - speed_restriction_zones__feature_memberships_v1
+    retained_compatibility_identity_columns:
+    - vessel_routing_regulations__shipping_lanes__feature_memberships_v1
+    saved_identity_aliases:
+      vessel_routing_regulations__shipping_lanes__feature_memberships_v1: vessel_routing_regulations__traffic_separation_zones__feature_memberships_v1
+    grouped_identity_components:
+      vessel_routing_regulations__shipping_lanes:
+      - shipping_lanes__chs_navigation_line
+      - shipping_lanes__chs_recommended_centerline
+      - shipping_lanes__chs_recommended_lane_part
+      - shipping_lanes__chs_recommended_track
+      - shipping_lanes__chs_two_way_route_part
+      - shipping_lanes__noaa_fairway
+      - shipping_lanes__noaa_recommended_route
+      - shipping_lanes__noaa_two_way_route
+      vessel_routing_regulations__traffic_separation_zones:
+      - shipping_lanes__chs_navigation_line
+      - shipping_lanes__chs_recommended_centerline
+      - shipping_lanes__chs_recommended_lane_part
+      - shipping_lanes__chs_recommended_track
+      - shipping_lanes__chs_two_way_route_part
+      - shipping_lanes__noaa_fairway
+      - shipping_lanes__noaa_recommended_route
+      - shipping_lanes__noaa_two_way_route
+      - traffic_separation_schemes__chs_lane_part
+      - traffic_separation_schemes__chs_scheme_boundary
+      - traffic_separation_schemes__chs_scheme_crossing
+      - traffic_separation_schemes__chs_separation_line
+      - traffic_separation_schemes__chs_separation_zone
+      - traffic_separation_schemes__noaa_separation_zone
+      - traffic_separation_schemes__noaa_traffic_lane
+    retained_hidden_support: Original count, area/length and status arrays remain exact;
+      no additional measurement options
+    interpretation: True means at least one retained routing/regulation reference feature
+      is recorded in the native cell. This includes navigation lines, recommended routes,
+      traffic-scheme components and seasonal speed references; it does not mean an unconditional
+      mandatory restriction, current activation, vessel-specific applicability or legal
+      compliance. False requires observed empty memberships for every expected component
+      and independently evidenced complete geographic inventory coverage of the full
+      supplied cells. Otherwise no-hit support is null (unknown/unavailable), never
+      inferred false. Identity layers retain all source-qualified IDs, overlaps, source
+      roles, advisory/conditional meanings and original details. Shipping Lanes & Traffic
+      Separation Zones groups all eight shipping roles and seven traffic-scheme roles
+      for display; navigation/recommended routes, boundaries, crossings, lane parts,
+      separation lines, traffic lanes and separation zones retain their native types.
+      Line and polygon memberships are combined as evidence of reference presence, never
+      as pooled area/length coverage. No source acquisition, geometry overlay or artificial
+      daily history is performed.
+  marine_conservation_areas:
+    display_name: Marine Conservation Areas
+    scientific_features:
+      marine_conservation_areas__feature_memberships_v1:
+        display_name: Marine Conservation Area Assignment
+      marine_conservation_areas__recorded_feature_count:
+        display_name: Marine Conservation Area Count
+      marine_conservation_areas__recorded_polygon_union_area_fraction:
+        display_name: Marine Conservation Area Coverage
+        display_unit: '%'
+        display_scale: 100
+    source_collections:
+    - marine_protected_areas
+    - conservation_designations
+    - wildlife_refuges
+    - national_marine_sanctuaries
+  proposed_interim_conservation_references:
+    display_name: Proposed / Interim Conservation References
+    excluded_from_conservation_totals: true
+retired_collections:
+  ports:
+    owner: toolkit-human
+    reason: Physical infrastructure points owned by toolkit-human; original source lineage retained
 schema_version: 1
 generated_by: governance.maintenance.catalog
 area: full_area
@@ -373,6 +490,7 @@ collections:
       measurement_status: derived
       model_eligible: false
       unit: text
+    presentation_family: marine_conservation_areas
   critical_habitat:
     category: protected_areas
     display_name: Critical Habitat reference inventory
@@ -381,6 +499,11 @@ collections:
     manifest: data/processed/domain/governance/protected_areas/critical_habitat/manifest.json
     map_layer: true
     model_policy: ineligible_pending_temporal_leakage_review
+    scientific_features:
+      critical_habitat__recorded_feature_count:
+        display_name: Critical Habitat Count
+      critical_habitat__feature_memberships_v1:
+        display_name: Critical Habitat Assignment
     features:
     - name: GOVERNANCE_FEATURE_ID
       role: support
@@ -786,6 +909,7 @@ collections:
       measurement_status: derived
       model_eligible: false
       unit: text
+    presentation_family: marine_conservation_areas
   wildlife_refuges:
     category: protected_areas
     display_name: Selected U.S. and Canadian wildlife refuge reference inventory
@@ -940,6 +1064,16 @@ collections:
       measurement_status: observed
       model_eligible: false
       unit: category
+    scientific_features:
+      wildlife_refuges__recorded_feature_count:
+        display_name: Wildlife Refuge Count
+      wildlife_refuges__feature_memberships_v1:
+        display_name: Wildlife Refuge Assignment
+      wildlife_refuges__recorded_polygon_union_area_fraction:
+        display_name: Wildlife Refuge Coverage
+        display_unit: '%'
+        display_scale: 100
+    presentation_family: marine_conservation_areas
   conservation_designations:
     category: protected_areas
     display_name: ECCC reported marine classifications
@@ -1114,6 +1248,7 @@ collections:
       measurement_status: derived
       model_eligible: false
       unit: text
+    presentation_family: marine_conservation_areas
   international_boundaries:
     category: jurisdiction
     display_name: International boundaries
@@ -1592,6 +1727,12 @@ collections:
       measurement_status: derived
       model_eligible: false
       unit: text
+    scientific_features:
+      federal_waters__assignment__feature_memberships_v1:
+        display_name: Federal Water Assignment
+      federal_waters__international_boundary:
+        display_name: International Boundary
+    presentation_family: administrative_boundaries
   state_provincial_waters:
     category: jurisdiction
     display_name: State seaward boundary lines
@@ -1756,9 +1897,13 @@ collections:
       measurement_status: unavailable
       model_eligible: false
       unit: category
+    scientific_features:
+      state_provincial_waters__assignment__feature_memberships_v1:
+        display_name: State / Province Assignment
+    presentation_family: administrative_boundaries
   county_regional_boundaries:
     category: jurisdiction
-    display_name: U.S. county-equivalent reference inventory
+    display_name: Regional Boundaries
     implementation_status: implemented_partial
     artifact: data/processed/domain/governance/jurisdiction/county_regional_boundaries/county_regional_boundaries.parquet
     manifest: data/processed/domain/governance/jurisdiction/county_regional_boundaries/manifest.json
@@ -1905,6 +2050,12 @@ collections:
       measurement_status: observed
       model_eligible: false
       unit: native_geometry
+    scientific_features:
+      county_regional_boundaries__recorded_feature_count:
+        display_name: County / District Count
+      county_regional_boundaries__feature_memberships_v1:
+        display_name: County / District Assignment
+    presentation_family: administrative_boundaries
   tribal_first_nations_areas:
     category: jurisdiction
     display_name: BIA and NRCan administrative references; not traditional territories
@@ -2069,6 +2220,12 @@ collections:
       measurement_status: derived
       model_eligible: false
       unit: text
+    scientific_features:
+      tribal_first_nations_areas__mapped_area:
+        display_name: Tribal / First Nations Area
+      tribal_first_nations_areas__feature_memberships_v1:
+        display_name: Tribal / First Nations Assignment
+    presentation_family: administrative_boundaries
   management_areas:
     category: fisheries_management
     display_name: Fisheries management areas
@@ -2263,42 +2420,11 @@ collections:
       measurement_status: observed
       model_eligible: false
       unit: date_or_unknown
-  seasonal_closures:
-    category: fisheries_management
-    display_name: Seasonal Closures
-    implementation_status: planned
-    artifact: null
-    manifest: null
-    map_layer: false
-    model_policy: ineligible_not_implemented
-    features: []
-  gear_restrictions:
-    category: fisheries_management
-    display_name: Gear Restrictions
-    implementation_status: planned
-    artifact: null
-    manifest: null
-    map_layer: false
-    model_policy: ineligible_not_implemented
-    features: []
-  harvest_regulations:
-    category: fisheries_management
-    display_name: Harvest Regulations
-    implementation_status: planned
-    artifact: null
-    manifest: null
-    map_layer: false
-    model_policy: ineligible_not_implemented
-    features: []
-  salmon_management_zones:
-    category: fisheries_management
-    display_name: Salmon Management Zones
-    implementation_status: planned
-    artifact: null
-    manifest: null
-    map_layer: false
-    model_policy: ineligible_not_implemented
-    features: []
+    scientific_features:
+      management_areas__recorded_feature_count:
+        display_name: Management Area Count
+      management_areas__feature_memberships_v1:
+        display_name: Management Area
   shipping_lanes:
     category: vessel_management
     display_name: Shipping Lanes typed reference components
@@ -2463,6 +2589,7 @@ collections:
       measurement_status: derived
       model_eligible: false
       unit: text
+    presentation_family: vessel_routing_regulations
   traffic_separation_schemes:
     category: vessel_management
     display_name: Traffic Separation Schemes typed reference components
@@ -2627,9 +2754,10 @@ collections:
       measurement_status: derived
       model_eligible: false
       unit: text
+    presentation_family: vessel_routing_regulations
   exclusion_zones:
     category: vessel_management
-    display_name: Fixed vessel exclusion zones
+    display_name: Exclusion Zones static activity restriction references
     implementation_status: implemented_partial
     artifact: data/processed/domain/governance/vessel_management/exclusion_zones/zones.parquet
     manifest: data/processed/domain/governance/vessel_management/exclusion_zones/manifest.json
@@ -3030,164 +3158,7 @@ collections:
       measurement_status: observed
       model_eligible: false
       unit: identifier
-  whale_approach_regulation_zones:
-    category: vessel_management
-    display_name: Whale Approach Regulation Zones
-    implementation_status: planned
-    artifact: null
-    manifest: null
-    map_layer: false
-    model_policy: ineligible_not_implemented
-    features: []
-  ports:
-    category: administrative_context
-    display_name: Ports reference inventory
-    implementation_status: implemented_partial
-    artifact: data/processed/domain/governance/administrative_context/ports/ports.parquet
-    manifest: data/processed/domain/governance/administrative_context/ports/manifest.json
-    map_layer: true
-    model_policy: ineligible_pending_temporal_leakage_review
-    features:
-    - name: GOVERNANCE_FEATURE_ID
-      role: support
-      measurement_status: derived
-      model_eligible: false
-      unit: identifier
-    - name: SOURCE_DATASET_ID
-      role: provenance
-      measurement_status: observed
-      model_eligible: false
-      unit: identifier
-    - name: SOURCE_FEATURE_ID
-      role: provenance
-      measurement_status: observed
-      model_eligible: false
-      unit: identifier
-    - name: GEOMETRY_PART_ID
-      role: support
-      measurement_status: derived
-      model_eligible: false
-      unit: identifier
-    - name: FEATURE_NAME
-      role: state
-      measurement_status: observed
-      model_eligible: false
-      unit: text
-    - name: FEATURE_TYPE
-      role: state
-      measurement_status: observed
-      model_eligible: false
-      unit: category
-    - name: AUTHORITY
-      role: provenance
-      measurement_status: observed
-      model_eligible: false
-      unit: text
-    - name: JURISDICTION
-      role: state
-      measurement_status: observed
-      model_eligible: false
-      unit: category
-    - name: LEGAL_BINDING_STATUS
-      role: evidence
-      measurement_status: derived
-      model_eligible: false
-      unit: category
-    - name: LEGAL_AUTHORITY
-      role: evidence
-      measurement_status: observed
-      model_eligible: false
-      unit: citation
-    - name: LEGAL_SOURCE_URL
-      role: provenance
-      measurement_status: observed
-      model_eligible: false
-      unit: url
-    - name: EFFECTIVE_START
-      role: support
-      measurement_status: observed
-      model_eligible: false
-      unit: date
-    - name: EFFECTIVE_END
-      role: support
-      measurement_status: observed
-      model_eligible: false
-      unit: date
-    - name: SYSTEM_LEARNED_AT
-      role: provenance
-      measurement_status: derived
-      model_eligible: false
-      unit: datetime
-    - name: SOURCE_VINTAGE
-      role: provenance
-      measurement_status: observed
-      model_eligible: false
-      unit: date_or_unknown
-    - name: SOURCE_COVERAGE_STATUS
-      role: coverage
-      measurement_status: derived
-      model_eligible: false
-      unit: category
-    - name: MEASUREMENT_STATUS
-      role: provenance
-      measurement_status: derived
-      model_eligible: false
-      unit: category
-    - name: MODEL_ELIGIBLE
-      role: qc
-      measurement_status: derived
-      model_eligible: false
-      unit: boolean
-    - name: QC_STATUS
-      role: qc
-      measurement_status: derived
-      model_eligible: false
-      unit: category
-    - name: QC_REASON
-      role: qc
-      measurement_status: derived
-      model_eligible: false
-      unit: text
-    - name: CLIPPED_TO_FULL_AREA
-      role: qc
-      measurement_status: derived
-      model_eligible: false
-      unit: boolean
-    - name: SOURCE_MIN_LON
-      role: provenance
-      measurement_status: derived
-      model_eligible: false
-      unit: degrees_east
-    - name: SOURCE_MIN_LAT
-      role: provenance
-      measurement_status: derived
-      model_eligible: false
-      unit: degrees_north
-    - name: SOURCE_MAX_LON
-      role: provenance
-      measurement_status: derived
-      model_eligible: false
-      unit: degrees_east
-    - name: SOURCE_MAX_LAT
-      role: provenance
-      measurement_status: derived
-      model_eligible: false
-      unit: degrees_north
-    - name: RETAINED_GEOMETRY_TYPE
-      role: qc
-      measurement_status: derived
-      model_eligible: false
-      unit: category
-    - name: RETAINED_MEASURE_FRACTION
-      role: qc
-      measurement_status: derived
-      model_eligible: false
-      unit: fraction
-    - name: geometry
-      role: support
-      measurement_status: observed
-      model_eligible: false
-      unit: native_geometry
+    presentation_family: vessel_routing_regulations
   coast_guard_sectors:
     category: administrative_context
     display_name: Distinct USCG sector and CCG region references
@@ -3347,21 +3318,6 @@ collections:
       measurement_status: derived
       model_eligible: false
       unit: text
-  management_regions:
-    category: administrative_context
-    display_name: Management Regions
-    implementation_status: planned
-    artifact: null
-    manifest: null
-    map_layer: false
-    model_policy: ineligible_not_implemented
-    features: []
-  reporting_areas:
-    category: administrative_context
-    display_name: Reporting Areas
-    implementation_status: planned
-    artifact: null
-    manifest: null
-    map_layer: false
-    model_policy: ineligible_not_implemented
-    features: []
+    scientific_features:
+      coast_guard_sectors__feature_memberships_v1:
+        display_name: Coast Guard Assignment

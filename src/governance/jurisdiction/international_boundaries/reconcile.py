@@ -269,14 +269,6 @@ def _apply_reconciliation_qc(
     return output
 
 
-def _related_artifact(path: Path, *, rows: int, geometry_types: list[str]) -> dict[str, Any]:
-    return {
-        "path": str(path),
-        "rows": rows,
-        "geometry_types": geometry_types,
-        "sha256": sha256_file(path),
-        "bytes": path.stat().st_size,
-    }
 
 
 def publish_reconciliation(
@@ -285,7 +277,7 @@ def publish_reconciliation(
     *,
     overwrite: bool = False,
 ) -> Path:
-    """Update the canonical artifact and publish boundary, polygon, and QC sidecars."""
+    """Update the canonical artifact and retain reconciliation QC in its manifest."""
 
     artifact_path = Path(artifact_path)
     artifact = gpd.read_parquet(artifact_path)
@@ -293,18 +285,6 @@ def publish_reconciliation(
     output = _apply_reconciliation_qc(artifact, reconciliation, config_path)
     validate_governance_geometry(output)
     atomic_write_geoparquet(output, artifact_path, overwrite=True)
-
-    output_dir = artifact_path.parent
-    segments_path = output_dir / "authoritative_boundary_segments.parquet"
-    country_path = output_dir / "country_water_polygons.parquet"
-    reconciliation_path = output_dir / "boundary_reconciliation.parquet"
-    segments = output.loc[output.geometry.geom_type.isin(["LineString", "MultiLineString"])].copy()
-    countries = output.loc[output["FEATURE_TYPE"].eq("country_water_reference_polygon")].copy()
-    validate_governance_geometry(segments)
-    validate_governance_geometry(countries)
-    atomic_write_geoparquet(segments, segments_path, overwrite=overwrite)
-    atomic_write_geoparquet(countries, country_path, overwrite=overwrite)
-    atomic_write_geoparquet(reconciliation, reconciliation_path, overwrite=overwrite)
 
     config = load_governance_config(config_path)
     manifest_path = config.collections["international_boundaries"].manifest_path
@@ -343,23 +323,6 @@ def publish_reconciliation(
         "comparison_sources": sorted(reconciliation["COMPARISON_SOURCE_ID"].unique()),
         "unresolved_marine_comparisons": int(len(unresolved)),
         "unresolved_marine_sections": sorted(unresolved["SECTION_NAME"].dropna().unique()),
-    }
-    manifest["related_artifacts"] = {
-        "authoritative_boundary_segments": _related_artifact(
-            segments_path,
-            rows=len(segments),
-            geometry_types=sorted(set(segments.geometry.geom_type.astype(str))),
-        ),
-        "country_water_polygons": _related_artifact(
-            country_path,
-            rows=len(countries),
-            geometry_types=sorted(set(countries.geometry.geom_type.astype(str))),
-        ),
-        "boundary_reconciliation": _related_artifact(
-            reconciliation_path,
-            rows=len(reconciliation),
-            geometry_types=sorted(set(reconciliation.geometry.geom_type.astype(str))),
-        ),
     }
     atomic_write_json(manifest_path, manifest, overwrite=True)
     return artifact_path

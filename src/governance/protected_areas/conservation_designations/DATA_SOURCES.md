@@ -16,3 +16,12 @@ The bounded 2026-10-10 planning-envelope query returned 154 BIOME=M IDs, all ret
 with stable before/after rosters. Old and new geometry-page retrieval dates remain distinct.
 Positive engineering-water-mask intersection is a separate selection diagnostic; neither
 complete IDs nor intersecting geometry establishes all conservation designations/current law.
+
+## Public handoff boundary
+
+Source evidence and native processing described here are distinct from public
+columns. The [flat product contract](../../../../docs/parquet-products.md) and
+[exact physical schema](../../../../docs/reference/columns.md) define delivery.
+OriginalData preserves source geometry/attributes and receipt evidence; native
+manifests, diagnostic products and unused scientific measures are internal build
+support. No source qualification is broadened by the application projection.

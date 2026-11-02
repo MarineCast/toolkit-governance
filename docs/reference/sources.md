@@ -1,70 +1,15 @@
 # Sources and rights
 
-The software is Apache-2.0. Source datasets have separate licenses, attribution,
-disclaimers, and redistribution terms. The table summarizes **configured source
-roles**, not a new check of provider availability or legal currency.
+Source-family DATA_SOURCES.md files are the authority for provider endpoints, versions, selectors, geometry interpretation, rights, citations and unresolved qualification. Public family pages link the applicable notes:
 
-Exact source URLs, archive pins/members, vintages, citations, and regional coverage
-are maintained in
-[`governance.yaml`](https://github.com/MarineCast/toolkit-governance/blob/fdc32276637117acce2fc0fb9595a12229d8df64/config/data/governance/governance.yaml).
-Built manifests add raw checksums and retrieval information where available.
+- [Administrative Boundaries](../families/administrative-boundaries.md)
+- [Coast Guard Sectors](../families/coast-guard-sectors.md)
+- [Critical Habitat](../families/critical-habitat.md)
+- [Exclusion Zones](../families/exclusion-zones.md)
+- [Fisheries Management Areas](../families/fisheries-management-areas.md)
+- [Marine Conservation Areas](../families/marine-conservation-areas.md)
+- [Vessel Routing & Regulations](../families/vessel-routing-regulations.md)
 
-| Source | Collections | Role and rights considerations |
-| --- | --- | --- |
-| NOAA MPA Inventory, pinned 2023 geodatabase | Marine protected areas | U.S. discovery/reference compilation; retain contributing management authority and governing-rule gaps |
-| DFO Oceans Act MPA service | Marine protected areas | Visual designated-MPA/zone polygons with regulation citations; regulation coordinates control |
-| DFO Areas of Interest service | Marine protected areas | Native interest points, not designated areas or proposed boundary polygons |
-| NOAA ONMS pinned boundary archives | National marine sanctuaries | Configured six-site West Coast GIS roster; retain source vintages, authority records, and legal/navigation disclaimers |
-| IBC digital boundary v1.3 archive | International boundaries | Mapping reference; preserve attribution, section scale, and the mapping-only disclaimer |
-| NOAA U.S. maritime services/local vector | International boundaries; federal waters | Reference limit lines; retain NOAA attribution and feature-specific citations, without promoting GIS to controlling authority |
-| Archived NRCan GeoBase CGB Level 1 | International boundaries; federal waters | Archived cartographic geometry with source agency, status, dates, and accuracy where available |
-| Local DFO Federal Marine Bioregions | International boundaries | Ecosystem-planning support with fuzzy boundaries, not international-boundary authority |
-| Provisioned seascape water-support GeoParquet | International boundaries | Derived spatial support; retain upstream rights/provenance, including historical producer labels |
-| BOEM/BSEE Submerged Lands Act boundary service | State/provincial waters | State seaward reference line; controlling official coordinates remain distinct |
-| WDFW Recreational Marine Area Code service | Management areas | One Washington recreational management system; retain source identity and rule reference |
-| DFO Pacific V3.1 subarea service | Management areas | Bounded original-ID/subarea reference, including qualified zero subareas; blank service licence metadata, no redistribution/current-law clearance |
-| ADF&G groundfish statistical areas | Management areas | Separate reporting system with geometry dates; reproduction/distribution requires ADF&G consent |
-| ODFW published 2016 archive | Marine protected areas | Pinned reserve/MPA/seabird placemarks; current OARs and redistribution qualification remain separate |
-| TC 2026 instrument | Fixed exclusion/speed zones | Closed Saturna/Pender and Swiftsure rings; quantities, units, clause dates and exceptions retained; Nitinat/animal-relative rules unresolved |
-| NOAA NMFS habitat polygon/line snapshots | Critical habitat | Provision bounded receipts; designation/proposal evidence is separate from complete current legal coverage |
-| FWS NWR and selected ECCC CPCAD records | Wildlife refuges | Selected systems only; retain source domain metadata, attribution, and reference limitations |
-| ECCC marine CPCAD class/status records | Conservation designations | Qualified classification views overlap existing evidence; do not sum as incremental protected coverage |
-| Census TIGER/Line 2025 counties | County/regional boundaries | Statistical/cartographic U.S. county equivalents, not Canadian coverage or current administrative authority |
-| BIA LAR and selected NRCan CLSS reserves | Tribal/First Nations catalog family | Distinct administrative reference systems; no inferred traditional territory, sovereignty, title, or fishing rights |
-| CHS routing and NOAA2026 routing references | Shipping lanes; traffic-separation schemes | Typed provider/component roles; retain original object/chart identity and planning/navigation disclaimers |
-| NGA World Port Index | Ports | Physical points with original fields/coordinates; no port jurisdiction polygon |
-| USCG sectors and CCG Western-region references | Coast Guard | Different agency unit types; retain source-specific rights and redistribution qualifications |
+OriginalData preserves provider attributes, source IDs, original extents, receipt scope and source time evidence. A publicly reachable service does not automatically permit redistribution. DFO sources with blank rights require source-specific review; ADF&G restrictions and unresolved USCG clearance remain binding qualifications. Keep appropriate attribution and modification/no-endorsement terms for Canadian and U.S. sources.
 
-## Family source notes
-
-The repository keeps detailed source and authority notes beside each producer:
-
-- [Marine protected areas](https://github.com/MarineCast/toolkit-governance/blob/fdc32276637117acce2fc0fb9595a12229d8df64/src/governance/protected_areas/marine_protected_areas/DATA_SOURCES.md)
-- [National marine sanctuaries](https://github.com/MarineCast/toolkit-governance/blob/fdc32276637117acce2fc0fb9595a12229d8df64/src/governance/protected_areas/national_marine_sanctuaries/DATA_SOURCES.md)
-- [International boundaries](https://github.com/MarineCast/toolkit-governance/blob/fdc32276637117acce2fc0fb9595a12229d8df64/src/governance/jurisdiction/international_boundaries/DATA_SOURCES.md)
-- [Federal maritime zones](https://github.com/MarineCast/toolkit-governance/blob/fdc32276637117acce2fc0fb9595a12229d8df64/src/governance/jurisdiction/federal_waters/DATA_SOURCES.md)
-- [State and provincial waters](https://github.com/MarineCast/toolkit-governance/blob/fdc32276637117acce2fc0fb9595a12229d8df64/src/governance/jurisdiction/state_provincial_waters/DATA_SOURCES.md)
-- [Fisheries management areas](https://github.com/MarineCast/toolkit-governance/blob/fdc32276637117acce2fc0fb9595a12229d8df64/src/governance/fisheries_management/management_areas/DATA_SOURCES.md)
-
-Additional implemented family notes are linked from [layers](../layers.md).
-The [source quality index](../sources.md) distinguishes current adapters from its pinned study baseline;
-[source acceptance](../source-acceptance.md) records retained study evidence and
-remaining qualifications. Source configurations and built manifests govern the
-inputs used by a selected workspace.
-
-## Reading provenance
-
-Keep **source vintage**, **retrieval time**, **effective dates**, **learned time**,
-and **build time** separate. A fresh download does not make an archived geometry
-new, and a new build does not establish current law. Family attributes and
-manifests retain these distinctions rather than assigning a single universal
-"as of" date.
-
-Before distributing any raw snapshot or derived artifact, inspect the source's
-`license`, `attribution`, `redistribution`, `legal_citation`, and `limitation`
-records in its manifest. Preserve citations and qualification when consuming
-or displaying products. Software licensing alone does not establish dataset
-redistribution permission.
-
-See [layers](../layers.md) for file inventories and
-[limitations](../limitations.md) for interpretation boundaries.
+Software is Apache-2.0. The wheel contains no acquired datasets. Local research processing neither grants data redistribution rights nor publishes data. No automatic hosting or transfer is part of a build.

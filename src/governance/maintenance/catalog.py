@@ -238,17 +238,7 @@ def build_catalog() -> dict[str, Any]:
         for collection_id in collection_ids:
             configured = config.collections.get(collection_id)
             if configured is None:
-                collections[collection_id] = {
-                    "category": category,
-                    "display_name": collection_id.replace("_", " ").title(),
-                    "implementation_status": "planned",
-                    "artifact": None,
-                    "manifest": None,
-                    "map_layer": False,
-                    "model_policy": "ineligible_not_implemented",
-                    "features": [],
-                }
-                continue
+                raise ValueError(f'Registered collection is not configured: {collection_id}')
             feature_values = [*CORE_FEATURES, *EXTRA_FEATURES.get(collection_id, ())]
             collections[collection_id] = {
                 "category": category,
@@ -260,7 +250,37 @@ def build_catalog() -> dict[str, Any]:
                 "model_policy": "ineligible_pending_temporal_leakage_review",
                 "features": [_feature(values) for values in feature_values],
             }
+    from governance.protected_areas.critical_habitat.interface import SCIENTIFIC_FEATURES as HABITAT_FEATURES
+    collections['critical_habitat']['scientific_features'] = HABITAT_FEATURES
+    from governance.protected_areas.wildlife_refuges.interface import SCIENTIFIC_FEATURES
+    collections['wildlife_refuges']['scientific_features'] = SCIENTIFIC_FEATURES
+    from governance.jurisdiction.county_regional_boundaries.interface import SCIENTIFIC_FEATURES as REGIONAL_FEATURES
+    collections['county_regional_boundaries']['scientific_features'] = REGIONAL_FEATURES
+    from governance.fisheries_management.management_areas.interface import SCIENTIFIC_FEATURES as MANAGEMENT_FEATURES
+    collections['management_areas']['scientific_features'] = MANAGEMENT_FEATURES
+    from governance.administrative_context.coast_guard_sectors.interface import SCIENTIFIC_FEATURES as COAST_GUARD_FEATURES
+    collections['coast_guard_sectors']['scientific_features'] = COAST_GUARD_FEATURES
+    from governance.jurisdiction.tribal_first_nations_areas.interface import SCIENTIFIC_FEATURES as TRIBAL_FEATURES
+    collections['tribal_first_nations_areas']['scientific_features'] = TRIBAL_FEATURES
+    from governance.jurisdiction.water_assignments import FAMILIES, scientific_features
+    for family in FAMILIES:
+        collections[family]['scientific_features'] = scientific_features(family)
+    from governance.protected_areas.marine_conservation_areas.interface import GROUP, REFERENCE, SCIENTIFIC_FEATURES as CONSERVATION_FEATURES, LEGACY
+    from governance.vessel_management.presentation import FAMILY_KEY, FAMILY_NAME, COLLECTIONS as ROUTING_COLLECTIONS, family_definition as routing_definition
+    from governance.jurisdiction.presentation import FAMILY_KEY as ADMIN_KEY, FAMILY_NAME as ADMIN_NAME, COLLECTIONS as ADMIN_COLLECTIONS
+    for collection in ADMIN_COLLECTIONS:
+        if collection in collections:
+            collections[collection]['presentation_family'] = ADMIN_KEY
+    for collection in ROUTING_COLLECTIONS:
+        if collection in collections:
+            collections[collection]['presentation_family'] = FAMILY_KEY
+    for collection in LEGACY:
+        if collection in collections:
+            collections[collection]['presentation_family'] = GROUP
     return {
+        "feature_families": {ADMIN_KEY: {"display_name": ADMIN_NAME, "source_collections": list(ADMIN_COLLECTIONS)}, FAMILY_KEY: routing_definition(), GROUP: {"display_name": "Marine Conservation Areas", "scientific_features": CONSERVATION_FEATURES, "source_collections": list(LEGACY)},
+                             REFERENCE: {"display_name": "Proposed / Interim Conservation References", "excluded_from_conservation_totals": True}},
+        "retired_collections": {"ports": {"owner": "toolkit-human", "reason": "Physical infrastructure points owned by toolkit-human; original source lineage retained"}},
         "schema_version": 1,
         "generated_by": "governance.maintenance.catalog",
         "area": "full_area",

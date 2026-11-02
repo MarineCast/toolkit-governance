@@ -40,18 +40,20 @@ jobs:
           sys.meta_path.insert(0, BlockApplication())
           import governance
           import governance.delivery
-          import governance.shared_contract
+          import governance.app_contract
+          import governance.run_settings
+          import governance.products
+          import governance.vessel_management.exclusion_zones.build
+          import governance.vessel_management.speed_restriction_zones.build
           import governance.jurisdiction.tribal_first_nations_areas.build
           import governance.administrative_context.coast_guard_sectors.build
           import governance.protected_areas.conservation_designations.build
-          import governance.administrative_context.ports.build
           import governance.protected_areas.critical_habitat.build
           import governance.jurisdiction.county_regional_boundaries.build
           import governance.protected_areas.wildlife_refuges.build
           import governance.vessel_management.shipping_lanes.build
           import governance.vessel_management.traffic_separation_schemes.build
           import governance.preflight
-          import governance.releases
           import governance.fisheries_management.management_areas.build
           import governance.jurisdiction.federal_waters.build
           import governance.jurisdiction.international_boundaries.build
@@ -61,10 +63,10 @@ jobs:
 
           root = files("governance")
           required = (
+              "resources/app_contract.json",
               "resources/config/common.yaml",
               "resources/config/data/governance/feature_catalog.yaml",
               "resources/config/data/governance/governance.yaml",
-              "resources/config/data/presentation_settings.yaml",
           )
           assert all(root.joinpath(*path.split("/")).is_file() for path in required)
           PY

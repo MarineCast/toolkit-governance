@@ -30,8 +30,10 @@ Provision explicitly bounded complete source snapshots with fresh explicit selec
 page receipts. The download wrapper refuses implicit nationwide acquisition. The selected
 query features preserve full native source geometry before established AOI clipping;
 partial support never establishes absence outside received features. Distinct source groups have
-no pooled territory metric. Published local generations must retain raw snapshots, metadata and
-rights evidence, native feature/part relations, metric dictionary and independent overlay checks.
+no pooled territory metric. Retained inputs must preserve raw snapshots, metadata and rights evidence.
+Public products retain original geometry and source identities with embedded
+field/lineage contracts; native feature/part relations and overlay checks remain
+scientific processing evidence, not a separate public generation layout.
 
 The bounded 2026-10-10 rebuild expands selectors to the configured study planning envelope,
 retaining all 23 returned BIA IDs and all 936 returned BC Indian Reserve IDs. Before/after
@@ -39,3 +41,27 @@ rosters match; geometry receipts include preserved older pages. These are comple
 receipts, not complete geography, all land classes, current source vintage or legal history.
 Invalid raw geometry is preserved and separately diagnosed; established native repair/clipping
 and downstream geometric validation do not certify cadastral accuracy.
+
+
+## Combined map interface — 2026-10-18
+
+The two source groups now feed a nullable mapped-area boolean and an all-overlap
+assignment list. Their separate metrics, classifications, source record identities,
+country/agency/boundary-type metadata and coverage remain support. This combines
+administrative/reserve reference membership only; it does not equate legal classes
+or pool territory areas. See [the delivery semantics](../../../../docs/parquet-products.md#tribal-first-nations-interface).
+The current retained data contain 215 BIA records (CLASSIFICATION 1 and 3, left
+undecoded) and 1,569 BC Indian Reserve records. These later grid-selected receipts
+supersede the historical 23/936 planning-envelope roster above; they still do not
+establish geographic completeness or current legal boundaries. Provider service
+metadata checked 2026-10-18 shows no BIA classification coded-value domain. No
+source refresh or class expansion accompanied this interface change.
+
+## Public handoff boundary
+
+Source evidence and native processing described here are distinct from public
+columns. The [flat product contract](../../../../docs/parquet-products.md) and
+[exact physical schema](../../../../docs/reference/columns.md) define delivery.
+OriginalData preserves source geometry/attributes and receipt evidence; native
+manifests, diagnostic products and unused scientific measures are internal build
+support. No source qualification is broadened by the application projection.

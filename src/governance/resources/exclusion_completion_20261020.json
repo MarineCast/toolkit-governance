@@ -1,0 +1,965 @@
+{
+  "DFO_reconciliation": {
+    "182": "282.401 m is primarily a water-only shoreline indentation in published part 1; comparison clipped to retained official PFMA subareas reduces it to 35.004 m. Other parts differ by 1.47\u20132.01 m. Native provider geometry preserved; residual coastal-vintage/precision differences are not certified legal equivalence.",
+    "191": "22.682 m is one additional GIS bend in published part 3 at (-123.22148619034863,48.849168155024415), absent from published coordinates. Other parts differ by 1.85\u20131.95 m. Conflicting provider depictions retained; DFO order 2015-293 boundary confirmation required before changing geometry."
+  },
+  "cfr": {
+    "165.1302": {
+      "source_document_sha256": "6c88fb764b2ddb2aec949298e6a16b080716a87005204e7ebb0547067b15ecaf",
+      "text": "(a) Location. The following is a security zone: The waters of the Hood Canal encompassed by a line commencing on the east shore of Hood Canal at latitude 47\u00b043\u203217\u2033 N., longitude 122\u00b044\u203244\u2033 W., thence to latitude 47\u00b043\u203232\u2033 N., longitude 122\u00b044\u203240\u2033 W.; thence to latitude 47\u00b043\u203250\u2033 N., longitude 122\u00b044\u203240\u2033 W.; thence to latitude 47\u00b044\u203224\u2033 N., longitude 122\u00b044\u203222\u2033 W.; thence to latitude 47\u00b045\u203247\u2033 N., longitude 122\u00b043\u203222\u2033 W.; thence to latitude 47\u00b046\u203223\u2033 N., longitude 122\u00b042\u203242\u2033 W.; thence to latitude 47\u00b046\u203223\u2033 N., longitude 122\u00b042\u203220\u2033 W.; thence to latitude 47\u00b046\u203220\u2033 N., longitude 122\u00b042\u203212\u2033 W.: thence southerly along the shoreline to the point of beginning.\n(b) Security zone anchorage. The following is a security zone anchorage: Area No. 2. Waters of Hood Canal within a circle of 1,000 yards diameter centered on a point located at latitude 47\u00b046\u203226\u2033 N., longitude 122\u00b042\u203249\u2033 W.\n(c) Special Regulations. (1) Section 165.33 paragraphs, (a), (e), and (f) do not apply to the following vessels or individuals on board those vessels:\n(i) Public vessels of the United States, other than United States Naval vessels.\n(ii) Vessels that are performing work at Naval Submarine Base Bangor pursuant to a contract with the United States Navy which requires their presence in the security zone.\n(iii) Any other vessels or class of vessels mutually agreed upon in advance by the Captain of the Port and Commanding Officer, Naval Submarine Base Bangor. Vessels operating in the security zone under this exemption must have previously obtained a copy of a certificate of exemption permitting their operation in the security zone from the Security Office, Naval Submarine Base Bangor. This written exemption shall state the date(s) on which it is effective and may contain any further restrictions on vessel operations within the security zone as have been previously agreed upon by the Captain of the Port and Commanding Officer, Naval Submarine Base Bangor. The certificate of exemption shall be maintained on board the exempted vessel so long as such vessel is operating in the security zone.\n(2) Any vessel authorized to enter or remain in the security zone may anchor in the security zone anchorage.\n(3) Other vessels desiring access to this zone shall secure permission from the Captain of the Port through the Security Office of the Naval Submarine Base Bangor. The request shall be forwarded in a timely manner to the Captain of the Port by the appropriate Navy official.\n(d) Enforcement. The U.S. Coast Guard may be assisted in the patrol and monitoring of this security zone by the U.S. Navy."
+    },
+    "165.1324": {
+      "source_document_sha256": "6c88fb764b2ddb2aec949298e6a16b080716a87005204e7ebb0547067b15ecaf",
+      "text": "(a) Safety and security zones. (1) The following area is a safety and security zone: All waters within the following points: a rectangle, starting at 47\u00b037\u203253\u2033 N/122\u00b023\u203207\u2033 W, thence south to position 47\u00b037\u203206\u2033 N/122\u00b023\u203207\u2033 W, thence east to position 47\u00b037\u203206\u2033 N/122\u00b022\u203243\u2033 W, thence north to position 47\u00b037\u203258\u2033 N/122\u00b022\u203243\u2033 W. This zone will be enforced only during the arrival or departure of Large Passenger Cruise Vessels at Pier 91, Seattle, Washington.\n(2) The following area is a safety and security zone: All waters within 100 yards of Pier 91, Seattle, Washington, at approximate position 47\u00b037\u203235\u2033 N/122\u00b023\u203200\u2033 W. This zone will be enforced only when a Large Passenger Cruise Vessel is moored at Pier 91.\n(b) Regulations. In accordance with the general regulations in 33 CFR part 165, subpart D, no person or vessel may enter or remain in either Safety and Security Zone except for vessels authorized by the Captain of the Port or Designated Representatives.\n(c) Definitions. The following definitions apply to this section:\nFacility Security Officer means the person designated as responsible for the development, implementation, revision and maintenance of the facility security plan and for liaison with the COTP and Company and Vessel Security Officers.\nLarge Passenger Cruise Vessel means any cruise ship over 100 feet in length carrying passengers for hire. Large Passenger Cruise Vessel does not include vessels inspected and certificated under 46 CFR, Chapter I, Subchapter T such as excursion vessels, sight seeing vessels, dinner cruise vessels, and whale watching vessels.\nOfficial Patrol means those persons designated by the Captain of the Port to monitor a Large Passenger Cruise Vessel security and safety zone, permit entry into the zone, give legally enforceable orders to persons or vessels within the zone and take other actions authorized by the Captain of the Port. Persons authorized in paragraph (e) to enforce this section are designated as the Official Patrol.\n(d) Authorization. To request authorization to operate within 100 yards of a Large Passenger Cruise Vessel that is moored at Pier 91, contact the on-scene Official Patrol on VHF-FM channel 16 or 13 or the Facility Security Officer at (206) 728-3688.\n(e) Enforcement. Any Coast Guard commissioned, warrant or petty officer may enforce the rules in this section. In the navigable waters of the United States to which this section applies, when immediate action is required and representatives of the Coast Guard are not present or not present in sufficient force to provide effective enforcement of this section in the vicinity of a Large Passenger Cruise Vessel, any Federal or Washington Law Enforcement Officer may enforce the rules contained in this section pursuant to 33 CFR 6.04-11. In addition, the Captain of the Port may be assisted by other Federal, state or local agencies in enforcing this section.\n(f) Waiver. The Captain of the Port Puget Sound may waive any of the requirements of this section for any vessel or class of vessels upon finding that a vessel or class of vessels, operational conditions or other circumstances are such that application of this section is unnecessary or impractical for the purpose of port security, safety or environmental safety."
+    },
+    "165.33": {
+      "source_document_sha256": "6c88fb764b2ddb2aec949298e6a16b080716a87005204e7ebb0547067b15ecaf",
+      "text": "Unless otherwise provided in the special regulations in subpart F of this part:\n(a) No person or vessel may enter or remain in a security zone without the permission of the Captain of the Port;\n(b) Each person and vessel in a security zone shall obey any direction or order of the Captain of the Port;\n(c) The Captain of the Port may take possession and control of any vessel in the security zone;\n(d) The Captain of the Port may remove any person, vessel, article, or thing from a security zone;\n(e) No person may board, or take or place any article or thing on board, any vessel in a security zone without the permission of the Captain of the Port; and\n(f) No person may take or place any article or thing upon any waterfront facility in a security zone without the permission of the Captain of the Port."
+    },
+    "334.1180": {
+      "source_document_sha256": "4b7d8e089cd85bb7aa9b50a3a850dfe3f588a4df06f9ac3cfb3d9c331be38367",
+      "text": "(a) The restricted area. A circular area immediately west of Smith Island with a radius of 1.25 nautical miles having its center at latitude 48\u00b019\u203211\u2033 North and longitude 122\u00b054\u203212\u2033 West. In the center of the area will be located a lighted and radar reflective buoy to serve as a navigational aid to mariners. The area will be used for air-to-surface target practice using non-explosive training devices.\n(b) The regulations. (1) No person, vessel or other watercraft shall enter or remain within the designated restricted area between 0700 and 1200 hours daily, local time except as authorized by the enforcing agency and as follows: The area will be open to commercial gill net fishing during scheduled fishing periods from June 15 to October 15 annually. The October 15 closure date will be extended by the enforcing agency if determined as advantageous to the commercial gill net fishing by the Washington State Department of Fisheries.\n(2) Prior to each target practice operation the restricted area will be patrolled by naval aircraft. Those persons and vessels found within the restricted area will be overflown by the aircraft at an altitude of not less than 300\u2032 in the direction in which the unauthorized person and vessel are to proceed to clear the area.\n(c) The regulations in this section shall be enforced by the Commandant, Thirteenth Naval District, Seattle, Washington, and such agencies as he may designate."
+    },
+    "334.1190": {
+      "source_document_sha256": "4b7d8e089cd85bb7aa9b50a3a850dfe3f588a4df06f9ac3cfb3d9c331be38367",
+      "text": "(a) Hood Canal in vicinity of Bangor\u2014(1) The area. All waters of Hood Canal between latitude 47\u00b046\u203200\u2033 and latitude 47\u00b042\u203200\u2033, exclusive of navigation lanes one-fourth nautical mile wide along the west shore and along the east shore south from the town of Bangor (latitude 47\u00b043\u203228\u2033).\n(2) The regulations. (i) The area will be used intermittently by the Navy for non-explosive torpedo ranging. Launching will be conducted only between 8:00 a.m., and sunset on days other than Saturdays, Sundays, and holidays. At no time will the navigation lanes generally paralleling the shore be closed to navigation.\n(ii) Navigation will be permitted within the area at all times except when naval exercises are in progress. No vessel shall enter or remain in the area when such exercises are in progress. Prior to commencement of an exercise, the Navy will make an aerial or surface reconnaissance of the area. Vessels under way and laying a course through the area will not be interfered with, but they shall not delay their progress. Vessels anchored or cruising in the area and vessels unobserved by the Navy reconnaissance which enter or are about to enter the area while a torpedo is in the water will be contacted by a Navy patrol boat and advised to steer clear. Torpedos will be tested only when all vessels or other craft have cleared the area.\n(iii) When operations are in progress, use of the area will be indicated by the presence of Naval vessels flying a \u201cBaker\u201d (red) flag.\n(iv) Notices of temporary suspension and revival of operations will be published in local newspapers and in Notice to Mariners published by the U.S. Coast Guard.\n(b) Dabob Bay in the vicinity of Quilcene\u2014(1) The area. All waters of Dabob Bay beginning at latitude 47\u00b039\u203227\u2033, longitude 122\u00b052\u203222\u2033; thence northeasterly to latitude 47\u00b040\u203219\u2033, longitude 122\u00b050\u203210\u2033; thence northeasterly to a point on the mean high water line at Takutsko Pt.; thence northerly along the mean high water line to latitude 47\u00b048\u203200\u2033; thence west on latitude 47\u00b048\u203200\u2033 to the mean high water line on the Bolton Peninsula; thence southwesterly along the mean high water line of the Bolton Peninsula to a point on longitude 122\u00b051\u203206\u2033; thence south on longitude 122\u00b051\u203206\u2033 to the mean high water line at Whitney Pt.; thence along the mean water line to a point on longitude 122\u00b051\u203215\u2033; thence southwesterly to the point of beginning.\n(2) The regulations. (i) Propeller-driven or other noise-generating craft shall not work their screws or otherwise generate other than incidental noise in the area during periods of actual testing, which will be indicated by flashing red beacons at strategic locations, and all craft shall keep well clear of vessels engaged in such testing.\n(ii) No vessel shall trawl or drag in the area.\n(iii) No vessel shall anchor in the area except between the shore and the 10-fathom depth line.\n(iv) Operations will normally be confined to the period from about 9:30 a.m., to 2:30 p.m., on Mondays through Fridays, and will normally consist of intermittent tests of less than 30 minutes duration, with boat passage permitted between tests. Transits of log-tows and other slow-moving traffic will be arranged on a mutually satisfactory individual basis as appropriate. Emergencies or high-priority projects may occasionally cause operations outside the periods specified above. No operations will be conducted on Sundays.\n(c) The regulations in this section shall be enforced by the Commandant, Thirteenth Naval District, and such agencies as he may designate."
+    },
+    "334.1220": {
+      "source_document_sha256": "4b7d8e089cd85bb7aa9b50a3a850dfe3f588a4df06f9ac3cfb3d9c331be38367",
+      "text": "(a) Hood Canal, Bangor; Naval restricted areas\u2014(1) Area No. 1. That area bounded by a line commencing on the east shore of Hood Canal at latitude 47 deg.46\u203218\u2033 N, longitude 122 deg.42\u203218\u2033 W; thence latitude 47 deg.46\u203232\u2033 N, longitude 122 deg.42\u203220\u2033 W; thence to latitude 47 deg.46\u203238\u2033 N, longitude 122 deg.42\u203252\u2033 W; thence to latitude 47 deg.44\u203215\u2033 N, longitude 122 deg.44\u203250\u2033 W; thence to latitude 47 deg.43\u203253\u2033 N, longitude 122 deg.44\u203258\u2033 W; thence to latitude 47 deg.43\u203217\u201d N, longitude 122 deg.44\u203249\u2033 W.\n(2) Area No. 2. Waters of Hood Canal within a circle of 1,000 yards diameter centered on a point located at latitude 47 deg.46\u203226\u2033 N, longitude 122 deg.42\u203249\u2033 W.\n(3) The regulations\u2014(i) Area No. 1. No person or vessel shall enter this area without permission from the Commander, Naval Submarine Base Bangor, or his/her authorized representative.\n(ii) Area No. 2. (A) The area will be used intermittently by the Navy for magnetic silencing operations.\n(B) Use of any equipment such as anchors, grapnels, etc., which may foul underwater installations within the restricted area, is prohibited at all times.\n(C) Dumping of any nonbuoyant objects in this area is prohibited.\n(D) Navigation will be permitted within that portion of this circular area not lying within Area No. 1 at all times except when magnetic silencing operations are in progress.\n(E) When magnetic silencing operations are in progress, use of the area will be indicated by display of quick flashing red beacons on the pier located in the southeast quadrant of the area.\n(4) Enforcement. The regulations in this subsection shall be enforced by the Commander, Naval Submarine Base Bangor, or his/her authorized representative."
+    },
+    "334.1250": {
+      "source_document_sha256": "4b7d8e089cd85bb7aa9b50a3a850dfe3f588a4df06f9ac3cfb3d9c331be38367",
+      "text": "(a) Carr Inlet, naval restricted areas\u2014(1) The area. The Waters of Carr Inlet bounded on the southeast by a line running from Gibson Point on Fox Island to Hyde Point on McNeil Island, on the northwest by a line running from Green Point (at latitude 47\u00b016\u203254\u2033 N, longitude 122\u00b041\u203233\u2033 W) to Penrose Point; plus that portion of Pitt Passage extending from Carr Inlet to Pitt Island, and that portion of Hale Passage extending from Carr Inlet southeasterly to a line drawn perpendicular to the channel 500 yards northwesterly of the Fox Island Bridge.\n(2) The regulations. (i) The area shall be used as an acoustic range for research studies and special noise trials. No explosive shall be used.\n(ii) No marine craft of any type shall at anytime approach or remain within one hundred yards of the hydrophone buoys. The hydrophone buoys will be anchored in Carr Inlet on a line perpendicular to the course line opposite Ketner's Point, and about one mile from the Fox Island shore. The course line, or range, will bear 134\u00b038\u203221\u2033 (314\u00b038\u203221\u2033) true, and will be marked by range beacons erected near the shoreline approximately one mile north-northeast of of Steilacoom and approximately two miles north-northeast of Home.\n(iii) Buoy Testing Area. No vessel shall, at anytime, anchor or tow a drag of any kind within 1,000 yards of the buoy testing area.\n(iv) The remainder of the area shall be open to navigation at all times except when the range is in use or when hydrophones are being calibrated. When the range is in use or hydrophones are being calibrated, quick flashing beacon lights will be displayed on signal towers located at Gibson Point, Green Point, Penrose Point, Pitt Island and Hyde Point. These beacon lights will be either red or green. The beacon lights will show quick flashing every two seconds. The ranging of vessels or calibration of hydrophones requiring retrictions will be conducted 24 hours per day for up to 5 days consecutively, and will total approximately 150 days spread throughout the year. Shutting off of beacon lights will indicate termination of use of the range. Insofar as possible, the schedule of operations giving the days the range will be in use for each forthcoming month will be published in local newspapers and in the local U.S. Coast Guard Notice to Mariners.\n(v) When the red beacon lights are displayed, indicating that the range is in use or hydrophones are being calibrated, navigation within the area will be restricted as follows:\n(a) As used in this section, the words \u201coperate, power vessel, and non-power vessel\u201d are defined as follows:\n(1) \u201cOperate\u201d: To be physically present in the designated area.\n(2) \u201cPower vessel\u201d: A vessel propelled principally by a mechanical propulsion system (i.e., gasoline, diesel, steam or electric drive to a propeller, pump jet, paddle wheel or other device), and being propelled by that means.\n(3) \u201cNon-power vessel\u201d: A vessel not equipped with a mechanical propulsion system, such as a rowboat, canoe, or sailboat propelled by oars, paddles, or sails, respectively.\n(b) Power vessels shall not operate within the area, except that traffic in either direction between Hale Passage and upper Carr Inlet, within 200 yards of the low water mark off Green Point, will be cleared by signal for approximately 15 minutes total time within this area at the termination of individual ranging runs, while the vessel being ranged takes position for the next run. Clearance to traverse the area around Green Point will be indicated by extinguishing the red flashing beacon lights and displaying the green flashing beacon lights on all signal towers.\n(c) Non-powered marine craft shall not operate within one mile of the course line bearing 134\u00b038\u203221\u2033 (314\u00b038\u203221\u2033) true, and within two miles to the southeast and two miles to the northwest of the hydrophone buoys situated in Carr Inlet opposite Ketner's Point; provided, however, non-powered craft may operate within four hundred yards of the low water mark on the northeast side of McNeil Island, within two hundred yards of the low water mark at Green Point, and within two hundred yards of the low water mark on the southwest shore of Fox Island.\n(d) Towboats shall have free access and egress to designated tow havens within Carr Inlet, as follows: The Navy will establish and maintain suitable mooring buoys for the use of tugs and their tows at the following points: (1) approximately 1,500 yards northwest of Gibson Point Light and approximately 400 yards offshore from the low water mark on the Fox Island shore; (2) approximately 1,500 yards northwest of Hyde Point, and approximately 400 yards offshore from the low water mark on McNeil Island shore; and (3) approximately 1,500 yards east of Wyckoff Shoal. Towboats will signal by radio (Marine Band Channel 14, 13, 12, or 6) or telephone as far in advance as possible of the time they enter the tow haven, such signals to be directed to \u201cCarr Inlet Range Control\u201d at the range instrument laboratory building located on Fox Island. The Navy shall promptly suspend operations when necessary to permit the access and egress of such tow traffic, and Carr Inlet Range Control shall signal the tows when the area is clear.\n(e) Through commercial traffic, including tows, to points within Carr Inlet, and through Carr Inlet, Pitt Passage, and Hale Passage to adjacent waters will be permitted free access and egress, as follows: Such traffic will signal by radio (Marine Band Channel 14, 13, 12, or 6) or telephone as far in advance as possible of the time they enter the area, such signals to be directed to \u201cCarr Inlet Range Control\u201d at the range instrument laboratory located on Fox Island. The Navy shall promptly suspend operations when necessary to permit the passage of such traffic, and Carr Inlet Range Control shall signal when the area is clear for passage.\n(f) The Warden of the McNeil Island penitentiary and his authorized representatives shall be permitted to operate within the area at any time, as may be necessary, for the patrol and search of escaped convicts.\n(g) Red or green signal flags will be displayed on the signal towers in case of failure of the red or green beacon lights. The display or the signal flags at the top of the flag masts will have the same significance as the beacon lights.\n(3) The regulations in this paragraph shall be enforced by the Commander, Naval Base, Seattle, and such agencies as he/she may designate.\n(b) [Reserved]"
+    },
+    "334.6": {
+      "source_document_sha256": "4b7d8e089cd85bb7aa9b50a3a850dfe3f588a4df06f9ac3cfb3d9c331be38367",
+      "text": "(a) Geographic coordinates expressed in terms of latitude or longitude, or both, are not intended for plotting on maps or charts whose reference horizontal datum is the North American Datum of 1983 (NAD 83), unless such geographic coordinates are expressly labeled NAD 83. Geographic coordinates without the NAD 83 reference may be plotted on maps or charts referenced to NAD 83 only after application of the appropriate corrections that are published on the particular map or chart being used.\n(b) For further information on NAD 83 and National Service nautical charts please contact: Director, Coast Survey (N/CG2), National Ocean Service, NOAA, 1315 East-West Highway, Station 6147, Silver Spring, MD 20910-3282."
+    }
+  },
+  "checked_at_utc": "2026-10-20T01:43:12.905005+00:00",
+  "fws_26_21_text": "(a) No person shall trespass, including but not limited to entering, occupying, using, or being upon, any national wildlife refuge, except as specifically authorized in this subchapter C or in other applicable Federal regulations.\n(b) No unconfined domestic animals, including but not limited to dogs, hogs, cats, horses, sheep and cattle, shall be permitted to enter upon any national wildlife refuge or to roam at large upon such an area, except as specifically authorized under the provisions of \u00a7 26.34, \u00a7 27.91 or \u00a7 29.2 of this subchapter C.",
+  "native_records": {
+    "fws:13532": {
+      "geometry_sha256": "7b729784315de92b9df92f07464c3b6d10151dac7de125337bfca8c35a11d61b",
+      "identity": {
+        "GlobalID": "de1449af-1577-4bfb-90a9-eddf529cd9f6",
+        "OBJECTID": "870",
+        "ORGCODE": "13532",
+        "ORGNAME": "SAN JUAN ISLANDS NATIONAL WILDLIFE REFUGE"
+      }
+    },
+    "fws:13533": {
+      "geometry_sha256": "dcc894048394e54aef122c1d8927bbb8f9e4fbbb2759ebd43eecb5d008792861",
+      "identity": {
+        "GlobalID": "3cb6ff25-7d18-4fee-b6b4-04c8b3c2b456",
+        "OBJECTID": "809",
+        "ORGCODE": "13533",
+        "ORGNAME": "PROTECTION ISLAND NATIONAL WILDLIFE REFUGE"
+      }
+    },
+    "mpa:WA102": {
+      "geometry_sha256": "fb5fc3afec8abbed1f0ade51f5e4a512163305cbf91b32b01ee0b6e9fee2391c",
+      "identity": {
+        "Design": "Shoreline Sanctuary Conservation Area",
+        "Site_ID": "WA102",
+        "Site_Name": "Brackett's Landing Shoreline Sanctuary Conservation Area",
+        "State": "WA"
+      }
+    },
+    "mpa:WA34": {
+      "geometry_sha256": "73f1149c186dec30d349b3126305b0dacca5d98d2b43b504faebdcd28537d6f8",
+      "identity": {
+        "Design": "Marine Preserve",
+        "Site_ID": "WA34",
+        "Site_Name": "Argyle Lagoon San Juan Islands Marine Preserve",
+        "State": "WA"
+      }
+    },
+    "mpa:WA44": {
+      "geometry_sha256": "893f466f16e1748483846002b333cecbe2b203ce521acd0331eeb0ef9aa1ee33",
+      "identity": {
+        "Design": "Marine Preserve",
+        "Site_ID": "WA44",
+        "Site_Name": "False Bay San Juan Islands Marine Preserve",
+        "State": "WA"
+      }
+    },
+    "mpa:WA47": {
+      "geometry_sha256": "512fc582231954a5e5f1bb058291fdd463433a294959546bafc17c24eef9faeb",
+      "identity": {
+        "Design": "Marine Preserve",
+        "Site_ID": "WA47",
+        "Site_Name": "Friday Harbor San Juan Islands Marine Preserve",
+        "State": "WA"
+      }
+    },
+    "mpa:WA508": {
+      "geometry_sha256": "627496b0ee59cea2e0927cd8c7ff8c16904e88ab2d2646d421fbfe6dc3c15394",
+      "identity": {
+        "Design": "Marine Preserve",
+        "Site_ID": "WA508",
+        "Site_Name": "Titlow Beach Marine Preserve",
+        "State": "WA"
+      }
+    },
+    "mpa:WA515": {
+      "geometry_sha256": "e8dbc305d9c5440ae0510732d482b13cfe867dca838219cedb30cbf0fba0f4df",
+      "identity": {
+        "Design": "Marine Preserve",
+        "Site_ID": "WA515",
+        "Site_Name": "Z's Reef Marine Preserve",
+        "State": "WA"
+      }
+    },
+    "mpa:WA516": {
+      "geometry_sha256": "067ebdae1d31d26ad752df01067ecc84930cc243ff69469dc48fa884372a9896",
+      "identity": {
+        "Design": "Marine Preserve",
+        "Site_ID": "WA516",
+        "Site_Name": "Admiralty Head Marine Preserve",
+        "State": "WA"
+      }
+    },
+    "mpa:WA518": {
+      "geometry_sha256": "1d3a7e47493a5a569a7a8a865fd30bcff09b080825ee33aef02298d39953785b",
+      "identity": {
+        "Design": "Marine Preserve",
+        "Site_ID": "WA518",
+        "Site_Name": "Colvos Passage Marine Preserve",
+        "State": "WA"
+      }
+    },
+    "mpa:WA529": {
+      "geometry_sha256": "f769ff0436bd51a228ed1d79061b462ff8e96fe8f25dd5e5d3bd7da5da36ca89",
+      "identity": {
+        "Design": "Underwater Park",
+        "Site_ID": "WA529",
+        "Site_Name": "Saltwater Underwater Park",
+        "State": "WA"
+      }
+    },
+    "mpa:WA600": {
+      "geometry_sha256": "22cde5337049082a4b48d6e2feff12c707d15b4112df94369ff828e126854609",
+      "identity": {
+        "Design": "Marine Preserve",
+        "Site_ID": "WA600",
+        "Site_Name": "Carkeek Park Marine Preserve",
+        "State": "WA"
+      }
+    },
+    "mpa:WA601": {
+      "geometry_sha256": "3f35e630a6a5db7a26499c3c5042796e1ee40abb3a37dacbfb7769900fcc720e",
+      "identity": {
+        "Design": "Marine Preserve",
+        "Site_ID": "WA601",
+        "Site_Name": "Discovery Park Marine Preserve",
+        "State": "WA"
+      }
+    },
+    "mpa:WA602": {
+      "geometry_sha256": "3b35bb7c1f6332666587f37bb30c4dbe59e8f71b3c7d11313f9d2601ae6ea99a",
+      "identity": {
+        "Design": "Marine Preserve",
+        "Site_ID": "WA602",
+        "Site_Name": "Emma Schmitz Memorial Marine Preserve",
+        "State": "WA"
+      }
+    },
+    "mpa:WA603": {
+      "geometry_sha256": "ccbaf455356bcb014539cf4ec402c7491966259b6fcf984d75bd0a0438a26e9e",
+      "identity": {
+        "Design": "Marine Preserve",
+        "Site_ID": "WA603",
+        "Site_Name": "Lincoln Park Marine Preserve",
+        "State": "WA"
+      }
+    },
+    "mpa:WA604": {
+      "geometry_sha256": "4509eb58b1cacbdf6e023f21d4c40054ee24afbabe07566149c7dcb00a476474",
+      "identity": {
+        "Design": "Marine Preserve",
+        "Site_ID": "WA604",
+        "Site_Name": "Golden Gardens Park Marine Preserve",
+        "State": "WA"
+      }
+    },
+    "mpa:WA605": {
+      "geometry_sha256": "df3a7e45cabab753d7b8f9acacd3cdc4a56dbf1a058934c14b818eefb282d869",
+      "identity": {
+        "Design": "Marine Preserve",
+        "Site_ID": "WA605",
+        "Site_Name": "Richey Viewpoint Marine Preserve",
+        "State": "WA"
+      }
+    },
+    "mpa:WA606": {
+      "geometry_sha256": "e96a16d589b0c93be2ed1d4dee527946fa1db72dc0b3968e0a749d19f019a5ca",
+      "identity": {
+        "Design": "Underwater Park",
+        "Site_ID": "WA606",
+        "Site_Name": "Edmonds Underwater Park",
+        "State": "WA"
+      }
+    },
+    "mpa:WA72": {
+      "geometry_sha256": "e60b10fddbcf6d0135f528b19ee6ca8e992242b1f79843fd5e63bb1adddd0d7d",
+      "identity": {
+        "Design": "Marine Preserve",
+        "Site_ID": "WA72",
+        "Site_Name": "Shaw Island San Juan Islands Marine Preserve",
+        "State": "WA"
+      }
+    },
+    "mpa:WA87": {
+      "geometry_sha256": "ee26a33d2290046b02b4059f74ae402fdaf944f78e415e23ac812338cb42186c",
+      "identity": {
+        "Design": "Marine Preserve",
+        "Site_ID": "WA87",
+        "Site_Name": "Yellow and Low Islands San Juan Islands Marine Preserve",
+        "State": "WA"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:77961": {
+      "geometry_sha256": "b194ea0a595930b0e518576a68ca5b43dd2fd7c597d30aea19a38d571b6ff2cb",
+      "identity": {
+        "DSNM": "US5OLMBD.000",
+        "INFORM": "Security Zone, 33 CFR 165.1321",
+        "OBJECTID": "77961",
+        "SORDAT": "20041210",
+        "SORIND": "US,US,reprt,L-1088/05"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:77962": {
+      "geometry_sha256": "1f36901cac59cf8067c0cc67fb9ef5685751305e384b86f66063851e97d8c657",
+      "identity": {
+        "DSNM": "US5OLMDF.000",
+        "INFORM": "33CFR 334.1250: Navigation regulations are published in Chapter 2 of the U.S. Coast Pilot for this geographic area. Refer to regulation section numbers.",
+        "OBJECTID": "77962",
+        "SORDAT": "201512",
+        "SORIND": "US,US,graph,Chart 18448"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:77963": {
+      "geometry_sha256": "b3702823ec927a055745c6ecddff2c6549a2c1914bb7c018741cd1675913e7e1",
+      "identity": {
+        "DSNM": "US5OLMDF.000",
+        "INFORM": "33CFR 334.1250: Navigation regulations are published in Chapter 2 of the U.S. Coast Pilot for this geographic area. Refer to regulation section numbers.",
+        "OBJECTID": "77963",
+        "SORDAT": "201512",
+        "SORIND": "US,US,graph,Chart 18448"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:77964": {
+      "geometry_sha256": "3246de5ca94861622258d2712e940cb0374e6dcc242584835998f7f6e79a2d2b",
+      "identity": {
+        "DSNM": "US5OLMDG.000",
+        "INFORM": "33CFR 334.1250: Navigation regulations are published in Chapter 2 of the U.S. Coast Pilot for this geographic area. Refer to regulation section numbers.",
+        "OBJECTID": "77964",
+        "SORDAT": "201512",
+        "SORIND": "US,US,graph,Chart 18448"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:77965": {
+      "geometry_sha256": "8cccb0b240f9dae3eed1e6e0e7387c49343d94923efba5db08e2b61df2e8482c",
+      "identity": {
+        "DSNM": "US5OLMDH.000",
+        "INFORM": "33CFR 334.1250: Navigation regulations are published in Chapter 2 of the U.S. Coast Pilot for this geographic area. Refer to regulation section numbers.",
+        "OBJECTID": "77965",
+        "SORDAT": "201512",
+        "SORIND": "US,US,graph,Chart 18448"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78915": {
+      "geometry_sha256": "e3354a6950ec6f3cd224c2304c44d978aa6070cb51666b7a738a30ed7c6e0f30",
+      "identity": {
+        "DSNM": "US5SEAAK.000",
+        "INFORM": "Regulated navigation area, 33 CFR 165.1329; (see note A)",
+        "OBJECTID": "78915",
+        "SORDAT": "20101208",
+        "SORIND": "US,US,reprt,L-1501/10"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78916": {
+      "geometry_sha256": "bd5a004df692a14413800fb652924a891d3777a89c1c21f6b746f597f814b5fe",
+      "identity": {
+        "DSNM": "US5SEABJ.000",
+        "INFORM": "33 CFR 165.1344",
+        "OBJECTID": "78916",
+        "SORDAT": "20221005",
+        "SORIND": "US,US,reprt,L-260-2022"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78917": {
+      "geometry_sha256": "ed4306fd7b4252107d67dd62edfc70f92b79e52d04d7f0ebfb5bedfb9255d0f3",
+      "identity": {
+        "DSNM": "US5SEABK.000",
+        "INFORM": "Regulated navigation area, 33 CFR 165.1329; (see note A)",
+        "OBJECTID": "78917",
+        "SORDAT": "20101208",
+        "SORIND": "US,US,reprt,l-1501/10"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78918": {
+      "geometry_sha256": "8db844cc8969a3e36fd6e079d6ff329029183623d4528bdf01b40746fd3b5078",
+      "identity": {
+        "DSNM": "US5SEABK.000",
+        "INFORM": "Regulated navigation area, 33 CFR 165.1311",
+        "OBJECTID": "78918",
+        "SORDAT": "20110701",
+        "SORIND": "US,US,graph,Chart 18453"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78919": {
+      "geometry_sha256": "00ad217b44b95bd98b2b65e9398ecde660bcee7b740461649036b14cdbc27756",
+      "identity": {
+        "DSNM": "US5SEABK.000",
+        "INFORM": "Regulated navigation area, 33 CFR 165.1329; (see note A)",
+        "OBJECTID": "78919",
+        "SORDAT": "20101208",
+        "SORIND": "US,US,reprt,L-1501/10"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78920": {
+      "geometry_sha256": "106c3e9bc3c6a03d5cd6d1bd7b1f26c84c4a16972d5f99a23c8c5a94b821ae64",
+      "identity": {
+        "DSNM": "US5SEABK.000",
+        "INFORM": "Security Zone; 33 CFR 165.1321; (see note A)",
+        "OBJECTID": "78920",
+        "SORDAT": "20040827",
+        "SORIND": "US,US,reprt,L-1280/04"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78921": {
+      "geometry_sha256": "3ca98c23f3f82d7c30eb235477ebb2d61542ef40412db7306fd0ac0c3a48e962",
+      "identity": {
+        "DSNM": "US5SEABK.000",
+        "INFORM": "Regulated navigation area, 33 CFR 165.1329; (see note A)",
+        "OBJECTID": "78921",
+        "SORDAT": "20200103",
+        "SORIND": "US,US,reprt,L-19-2020"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78922": {
+      "geometry_sha256": "f08ae61df3b54572f83bcea1c69c2a984fbdc2be70721a62f4b2963a26c4d23e",
+      "identity": {
+        "DSNM": "US5SEABK.000",
+        "INFORM": "Regulated navigation area, 33 CFR 165.1329; (see note A)",
+        "OBJECTID": "78922",
+        "SORDAT": "20101208",
+        "SORIND": "US,US,reprt,L-1501/10"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78923": {
+      "geometry_sha256": "1b1c14182b3ae34f412a2d949c3805bbc7bfd10ccf5e24cfd6364311b3edfb83",
+      "identity": {
+        "DSNM": "US5SEABL.000",
+        "INFORM": "Security Zone; 33 CFR 165.1321; (see note A)",
+        "OBJECTID": "78923",
+        "SORDAT": "20040827",
+        "SORIND": "US,US,reprt,L-1280/04"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78924": {
+      "geometry_sha256": "8381ae681c8d9df170ec69bef78fbedc06b7301bd35127370615bc97bbfd6a52",
+      "identity": {
+        "DSNM": "US5SEAEH.000",
+        "INFORM": "33 CFR 334.1240",
+        "OBJECTID": "78924",
+        "SORDAT": "20221022",
+        "SORIND": "US,US,reprt,L-264-2022"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78925": {
+      "geometry_sha256": "975f76f583026e6d1f39ed11bd4c4859e7a5d250ca68c1fc9d7ec5bf307b582f",
+      "identity": {
+        "DSNM": "US5SEAEI.000",
+        "INFORM": "33 CFR 334.1240",
+        "OBJECTID": "78925",
+        "SORDAT": "20221022",
+        "SORIND": "US,US,reprt,L-264-2022"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78926": {
+      "geometry_sha256": "f774dd6f2a44f468e1474cd2aeb60e4ddbd3578c003cf0091aee0c7d1d29d2ea",
+      "identity": {
+        "DSNM": "US5SEAEM.000",
+        "INFORM": "Regulated navigation area, 33 CFR 165.1338",
+        "OBJECTID": "78926",
+        "SORDAT": "20141021",
+        "SORIND": "US,US,reprt,L-2378/14"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78927": {
+      "geometry_sha256": "8a0173609560151719d4e1aa3f320f7ca0c5f9d136e59c96288f66006381d26a",
+      "identity": {
+        "DSNM": "US5SEAFH.000",
+        "INFORM": "33 CFR 334.1240",
+        "OBJECTID": "78927",
+        "SORDAT": "20221022",
+        "SORIND": "US,US,reprt,L-264-2022"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78928": {
+      "geometry_sha256": "1391f3473676c4da2971946a667406b74bd812a6f19ede986aa22c1316404fcd",
+      "identity": {
+        "DSNM": "US5SEAFH.000",
+        "INFORM": "33 CFR 334.1240",
+        "OBJECTID": "78928",
+        "SORDAT": "20221022",
+        "SORIND": "US,US,reprt,L-264-2022"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78929": {
+      "geometry_sha256": "07e99f1b4e5cfd33d8abc81eb71d7f24dff388218930bf224fe5c78884db7e80",
+      "identity": {
+        "DSNM": "US5SEAFH.000",
+        "INFORM": "33 CFR 334.1240",
+        "OBJECTID": "78929",
+        "SORDAT": "20221022",
+        "SORIND": "US,US,reprt,L-264-2022"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78930": {
+      "geometry_sha256": "4a37a8fe6d5e7a3476dc53a20cd9f45ab3c13ac7ef32567f061b494aa4a10a93",
+      "identity": {
+        "DSNM": "US5SEAFH.000",
+        "INFORM": "33 CFR 334.1240",
+        "OBJECTID": "78930",
+        "SORDAT": "20221022",
+        "SORIND": "US,US,reprt,L-264-2022"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78931": {
+      "geometry_sha256": "f728784249ffcdc4ef320b8b80b9c1080e5523de07e7daba2b62b8d57cee0360",
+      "identity": {
+        "DSNM": "US5SEAFH.000",
+        "INFORM": "33 CFR 334.1240",
+        "OBJECTID": "78931",
+        "SORDAT": "20221022",
+        "SORIND": "US,US,reprt,L-264-2022"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78934": {
+      "geometry_sha256": "575135a1fe768794264fd85d5ec7ffb3fc3b2bf3b6de462a3442ef19b873e563",
+      "identity": {
+        "DSNM": "US5SEAFI.000",
+        "INFORM": "33 CFR 334.1240",
+        "OBJECTID": "78934",
+        "SORDAT": "20221022",
+        "SORIND": "US,US,reprt,L-264-2022"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78936": {
+      "geometry_sha256": "2658d5edaf95866b168239e21da47d2f5c20279de36d0f1de92489437bd1b806",
+      "identity": {
+        "DSNM": "US5SEAFJ.000",
+        "INFORM": "Regulated navigation area, 33 CFR 165.1309",
+        "OBJECTID": "78936",
+        "SORDAT": "20010120",
+        "SORIND": "US,US,graph,Chart 18449"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78937": {
+      "geometry_sha256": "e055706dbebf94212808f1675d6f9a978490938432ffc1f25933242fb4a5fd4b",
+      "identity": {
+        "DSNM": "US5SEAFJ.000",
+        "INFORM": "33 CFR 334.1244",
+        "OBJECTID": "78937",
+        "SORDAT": "20130724",
+        "SORIND": "US,US,reprt,L-1419/13"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78940": {
+      "geometry_sha256": "f4750f226251c5596f337b013352ef39a317386237d0943fbfdba9271aa18968",
+      "identity": {
+        "DSNM": "US5SEAFL.000",
+        "INFORM": "33 CFR 165.1340: Navigation regulations are published in Chapter 2 of the U.S. Coast Pilot for this geographic area. Refer to regulation section numbers.",
+        "OBJECTID": "78940",
+        "SORDAT": "20180405",
+        "SORIND": "US,US,reprt,L-326-2018"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78948": {
+      "geometry_sha256": "40679b55d33000134916f1799f8c84f609c6d31408bc355298db4a17340a69d8",
+      "identity": {
+        "DSNM": "US5SEAGI.000",
+        "INFORM": "33 CFR 334.1230",
+        "OBJECTID": "78948",
+        "SORDAT": "20030812",
+        "SORIND": "US,US,graph,Chart 18446"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78956": {
+      "geometry_sha256": "8f60cc8f15d785657236a7f4037e7a8d165c9bd90a0e8f1bb85332ccd7e1e21f",
+      "identity": {
+        "DSNM": "US5SEAHE.000",
+        "INFORM": "33 CFR 334.1260.",
+        "OBJECTID": "78956",
+        "SORDAT": "20030222",
+        "SORIND": "US,US,graph,Chart 18458"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78958": {
+      "geometry_sha256": "68d08581d503cb4561dc94031feca0aa9100cdb839830cba02abec6af0776d5f",
+      "identity": {
+        "DSNM": "US5SEAHF.000",
+        "INFORM": "33 CFR 334.1260.",
+        "OBJECTID": "78958",
+        "SORDAT": "20030222",
+        "SORIND": "US,US,graph,Chart 18458"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78961": {
+      "geometry_sha256": "e06d4401529291be85cbf8d2a0b82d8fec4a99524332dc15bb1a8c80106b499d",
+      "identity": {
+        "DSNM": "US5SEAHG.000",
+        "INFORM": "33 CFR 165.1302.",
+        "OBJECTID": "78961",
+        "SORDAT": "20030222",
+        "SORIND": "US,US,graph,Chart 18458"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78962": {
+      "geometry_sha256": "c08618d793aed3dfd4c496c05bb89f844bb898fb56b16bbffa134f55727a5a63",
+      "identity": {
+        "DSNM": "US5SEAHG.000",
+        "INFORM": "Security Zone, 33 CFR 334.1220",
+        "OBJECTID": "78962",
+        "SORDAT": "20010719",
+        "SORIND": "US,US,reprt,L-1231/01"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78963": {
+      "geometry_sha256": "3ef00614ac9036b33418482670bef84c8a753c1c5a4e20d6b268d209b3ae1f6c",
+      "identity": {
+        "DSNM": "US5SEAHG.000",
+        "INFORM": "33 CFR 334.1220 & 33 CFR 165.1302.",
+        "OBJECTID": "78963",
+        "SORDAT": "20111129",
+        "SORIND": "US,US,reprt,DD-21194"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78964": {
+      "geometry_sha256": "d4b9c625bbda261517faf4834d4fb97220df411cb5b6dc45c36e18cef87e25a3",
+      "identity": {
+        "DSNM": "US5SEAHG.000",
+        "INFORM": "33 CFR 165.1302.",
+        "OBJECTID": "78964",
+        "SORDAT": "20030222",
+        "SORIND": "US,US,graph,Chart 18458"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78965": {
+      "geometry_sha256": "e06d4401529291be85cbf8d2a0b82d8fec4a99524332dc15bb1a8c80106b499d",
+      "identity": {
+        "DSNM": "US5SEAHG.000",
+        "INFORM": "Security Zone, 33 CFR 334.1220",
+        "OBJECTID": "78965",
+        "SORDAT": "20010719",
+        "SORIND": "US,US,reprt,L-1231/01"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78967": {
+      "geometry_sha256": "bd48f20b7b4dda1e6037c03896118e04a2ee5f7b1307009e986be6ddddebc9b3",
+      "identity": {
+        "DSNM": "US5SEAHG.000",
+        "INFORM": "33 CFR 34.1220 & 33 CFR 165.1302.",
+        "OBJECTID": "78967",
+        "SORDAT": "20030222",
+        "SORIND": "US,US,graph,Chart 18458"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78969": {
+      "geometry_sha256": "9a7f0fb35d447136ef5510c66c8a9eebf974c0a2d6c4d7fb739b8c288fa78f22",
+      "identity": {
+        "DSNM": "US5SEAHG.000",
+        "INFORM": "33 CFR 165.1302.",
+        "OBJECTID": "78969",
+        "SORDAT": "20030222",
+        "SORIND": "US,US,graph,Chart 18458"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78977": {
+      "geometry_sha256": "e5da3d8b9a8f1998cb5b274ba18a6175d1b9fe1b6e024019f704ac5c5c941cca",
+      "identity": {
+        "DSNM": "US5SEAHI.000",
+        "INFORM": "33 CFR 334.1230",
+        "OBJECTID": "78977",
+        "SORDAT": "20030812",
+        "SORIND": "US,US,graph,Chart 18446"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78988": {
+      "geometry_sha256": "64c9a87c38e68928edb25513a86403bcb8be86aecd3a72bbabcf46d53a5993e2",
+      "identity": {
+        "DSNM": "US5SEAIG.000",
+        "INFORM": "33 CFR 334.1220 & 33 CFR 165.1302.",
+        "OBJECTID": "78988",
+        "SORDAT": "20111129",
+        "SORIND": "US,US,reprt,DD-21194"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:78990": {
+      "geometry_sha256": "6228e7a39affae15fec58e7509f18ce47b89d02b62e41fd75057c87e08dd32ad",
+      "identity": {
+        "DSNM": "US5SEAIG.000",
+        "INFORM": "Security Zone, 33 CFR 334.1220",
+        "OBJECTID": "78990",
+        "SORDAT": "20010719",
+        "SORIND": "US,US,reprt,L-1231/01"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:79019": {
+      "geometry_sha256": "839f0cfd55a343140855cd1a0637d738b5ab003ed7608dbe382c01f9b14dbf33",
+      "identity": {
+        "DSNM": "US5SEAKN.000",
+        "INFORM": "33 CFR 334.1215",
+        "OBJECTID": "79019",
+        "SORDAT": "2003",
+        "SORIND": "US,US,reprt,Coast Pilot 7"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:79022": {
+      "geometry_sha256": "fdb85ddc42dfe2f59bed90f7ee4d104cf69132d768dcd9220b2171fa0fad5b2b",
+      "identity": {
+        "DSNM": "US5SEAKN.000",
+        "INFORM": "33 CFR 334.1215",
+        "OBJECTID": "79022",
+        "SORDAT": "2003",
+        "SORIND": "US,US,reprt,Coast Pilot 7"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:79027": {
+      "geometry_sha256": "8e72cb772bf2ca68c9b447c5c586e838b8c9930b80b9dd9b1e4e8bae6b34419b",
+      "identity": {
+        "DSNM": "US5SEALG.000",
+        "INFORM": "33 CFR 334.1270",
+        "OBJECTID": "79027",
+        "SORDAT": "20081223",
+        "SORIND": "US,US,reprt,L-117/09"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:79028": {
+      "geometry_sha256": "5206f5e6621cecf986213a1a66cc9b9341ad218dc15af94c07444cd9ddcf963c",
+      "identity": {
+        "DSNM": "US5SEALG.000",
+        "INFORM": "33 CFR 334.1270",
+        "OBJECTID": "79028",
+        "SORDAT": "20081223",
+        "SORIND": "US,US,reprt,L-117/09"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:79029": {
+      "geometry_sha256": "4260a5143a7539154a49a75e75104073499cbb1aff4f21c3e9053edc8a1303bd",
+      "identity": {
+        "DSNM": "US5SEALG.000",
+        "INFORM": "33 CFR 334.1270",
+        "OBJECTID": "79029",
+        "SORDAT": "20081223",
+        "SORIND": "US,US,reprt,L-117/09"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:79036": {
+      "geometry_sha256": "9373e6f22d594c085a234e37c4bf069a236918f86547d8f9fe708c0acf98961f",
+      "identity": {
+        "DSNM": "US5SEAMF.000",
+        "INFORM": "33 CFR 334.1210",
+        "OBJECTID": "79036",
+        "SORDAT": "200304",
+        "SORIND": "US,US,graph,Chart 18464"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:79037": {
+      "geometry_sha256": "7faabeaf61c2efe8fa8faba7390aa57ca5ba807231e3184b617804fff468bc6a",
+      "identity": {
+        "DSNM": "US5SEAMG.000",
+        "INFORM": "33 CFR 334.1270",
+        "OBJECTID": "79037",
+        "SORDAT": "20081223",
+        "SORIND": "US,US,reprt,L-117/09"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:79038": {
+      "geometry_sha256": "dbb760b64c9d7eacd2811f893909a348bbee9e1cf2f8f36aa00f1e2f465e8be5",
+      "identity": {
+        "DSNM": "US5SEAMG.000",
+        "INFORM": "33 CFR 334.1270",
+        "OBJECTID": "79038",
+        "SORDAT": "20081223",
+        "SORIND": "US,US,reprt,L-117/09"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:79040": {
+      "geometry_sha256": "60239f5c5b2f6cab3d7bb1d05c3d2fb108d7173a8ca00419c7f0c8838b7d3eb5",
+      "identity": {
+        "DSNM": "US5SEAMG.000",
+        "INFORM": "33 CFR 334.1210",
+        "OBJECTID": "79040",
+        "SORDAT": "200304",
+        "SORIND": "US,US,graph,Chart 18464"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:79041": {
+      "geometry_sha256": "ffbfb8841eb6a7886f73b3e6b30c9dcb28fabd0baa61734413d26f6208184f50",
+      "identity": {
+        "DSNM": "US5SEANF.000",
+        "INFORM": "33 CFR 334.1210",
+        "OBJECTID": "79041",
+        "SORDAT": "200304",
+        "SORIND": "US,US,graph,Chart 18464"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:79042": {
+      "geometry_sha256": "a215f937b3836b8d968c1d6f5e3d3457fafa1c2ae6003bee23750b58e842e50d",
+      "identity": {
+        "DSNM": "US5SEANG.000",
+        "INFORM": "33 CFR 334.1210",
+        "OBJECTID": "79042",
+        "SORDAT": "200304",
+        "SORIND": "US,US,graph,Chart 18464"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:79045": {
+      "geometry_sha256": "be564f0a3d1d21e839acea12b03e65e6d179fd1e8b47b06a8c202e2c38a4b5a9",
+      "identity": {
+        "DSNM": "US5SEAOF.000",
+        "INFORM": "33 CFR 334.1210: Navigation regulations are published in Chapter 2 of the U.S. Coast Pilot for this geographic area. Refer to regulation section numbers",
+        "OBJECTID": "79045",
+        "SORDAT": "200306",
+        "SORIND": "US,US,graph,Chart 18471"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:79046": {
+      "geometry_sha256": "a482dd0ecc4d944addc5ff2e240e86603eeff50604d9fdccfd7ddfc1807dd9f1",
+      "identity": {
+        "DSNM": "US5SEAOG.000",
+        "INFORM": "33 CFR 334.1210: Navigation regulations are published in Chapter 2 of the U.S. Coast Pilot for this geographic area. Refer to regulation section numbers",
+        "OBJECTID": "79046",
+        "SORDAT": "200306",
+        "SORIND": "US,US,graph,Chart 18471"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:79047": {
+      "geometry_sha256": "b1899f025603b68a90d707a44f04dd739a2d628b768a1f58fe73cfbeec9c0e18",
+      "identity": {
+        "DSNM": "US5SEAQH.000",
+        "INFORM": "33 CFR 334.1200",
+        "OBJECTID": "79047",
+        "SORDAT": "20020604",
+        "SORIND": "US,US,graph,Chart 18427"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:79391": {
+      "geometry_sha256": "e5da3d8b9a8f1998cb5b274ba18a6175d1b9fe1b6e024019f704ac5c5c941cca",
+      "identity": {
+        "DSNM": "US5WA12M.000",
+        "INFORM": "33 CFR 334.1230",
+        "OBJECTID": "79391",
+        "SORDAT": "20030812",
+        "SORIND": "US,US,graph,Chart 18446"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:79403": {
+      "geometry_sha256": "2fc7b62f01e85c85fd0f1542a7d42aad58fe79e1479da34f61cb5d349f6c7dff",
+      "identity": {
+        "DSNM": "US5WA15M.000",
+        "INFORM": "33 CFR 165.1340: Navigation regulations are published in Chapter 2 of the U.S. Coast Pilot for this geographic area. Refer to regulation section numbers.",
+        "OBJECTID": "79403",
+        "SORDAT": "20180405",
+        "SORIND": "US,US,reprt,L-326-2018"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:79405": {
+      "geometry_sha256": "f774dd6f2a44f468e1474cd2aeb60e4ddbd3578c003cf0091aee0c7d1d29d2ea",
+      "identity": {
+        "DSNM": "US5WA15M.000",
+        "INFORM": "Regulated navigation area, 33 CFR 165.1338",
+        "OBJECTID": "79405",
+        "SORDAT": "20141021",
+        "SORIND": "US,US,reprt,L-2378/14"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:79406": {
+      "geometry_sha256": "1ac6a865fa8983a5622b3679b83fc51ac3d9a55a06913a9a5992765acf7bf6e3",
+      "identity": {
+        "DSNM": "US5WA16M.000",
+        "INFORM": "33 CFR 334.1210: Navigation regulations are published in Chapter 2 of the U.S. Coast Pilot for this geographic area. Refer to regulation section numbers",
+        "OBJECTID": "79406",
+        "SORDAT": "200306",
+        "SORIND": "US,US,graph,Chart 18471"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:79417": {
+      "geometry_sha256": "76170f1bcbca0046872315c4d3e01dc27603886b66b1710990ec15f21bb9db52",
+      "identity": {
+        "DSNM": "US5WA1EO.000",
+        "INFORM": "33 CFR 334.1200",
+        "OBJECTID": "79417",
+        "SORDAT": "20020604",
+        "SORIND": "US,US,graph,Chart 18427"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:79418": {
+      "geometry_sha256": "6f237a49cd982e7b5ea72566a4df66d16a55568c600dca11b46e5b9182ac9582",
+      "identity": {
+        "DSNM": "US5WA1EP.000",
+        "INFORM": "33 CFR 334.1200",
+        "OBJECTID": "79418",
+        "SORDAT": "20020604",
+        "SORIND": "US,US,graph,Chart 18427"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:79419": {
+      "geometry_sha256": "e211aff8bad6288527113cfd7df1a879225a6f7da34a7a5de8f99922afc3e62e",
+      "identity": {
+        "DSNM": "US5WA1EP.000",
+        "INFORM": "33 CFR 334.1200",
+        "OBJECTID": "79419",
+        "SORDAT": "20020604",
+        "SORIND": "US,US,graph,Chart 18427"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:79542": {
+      "geometry_sha256": "1bac7ea3b5a7e03e98a8bc804de253222ee183517ff683ce608ed4f85e685dee",
+      "identity": {
+        "DSNM": "US5WA31M.000",
+        "INFORM": "33 CFR 334.1200",
+        "OBJECTID": "79542",
+        "SORDAT": "20020604",
+        "SORIND": "US,US,graph,Chart 18427"
+      }
+    },
+    "noaa_enc_harbor_rule_references_20261019:79543": {
+      "geometry_sha256": "55d44ea1351b884317225bb44781453264ed8b4418249a6e5e8ddb69da6520dc",
+      "identity": {
+        "DSNM": "US5WA31M.000",
+        "INFORM": "33 CFR 334.1200",
+        "OBJECTID": "79543",
+        "SORDAT": "20020604",
+        "SORIND": "US,US,graph,Chart 18427"
+      }
+    },
+    "noaa_enc_smith_reference_20261020:120420": {
+      "geometry_sha256": "df6a112a0d8772cdf83e55ff24c8b2524c878d4fc95e6499f7841ba84d92565f",
+      "identity": {
+        "DSNM": "US3WA1EF.000",
+        "INFORM": "33 CFR 334.1180: Navigation regulations are published in Chapter 2 of the U.S. Coast Pilot for this geographic area. Refer to regulation section numbers",
+        "OBJECTID": "120420",
+        "SORDAT": "201110",
+        "SORIND": "US,US,graph,Chart 18465"
+      }
+    },
+    "noaa_enc_torpedo_references_20261020:3729": {
+      "geometry_sha256": "9d2f20145ffc669a715ed4f2e5337e01596659670b6b83680380b264be3e6f4e",
+      "identity": {
+        "DSNM": "US5SEAGE.000",
+        "INFORM": "(NAVY II) Naval Operations Area, 33 CFR 334.1190",
+        "OBJECTID": "3729",
+        "SORDAT": "20030222",
+        "SORIND": "US,US,graph,Chart 18458"
+      }
+    },
+    "noaa_enc_torpedo_references_20261020:3730": {
+      "geometry_sha256": "e98c92ac7fc6d8a22b6de533022abac3c9b3c668409febeabed16b3b23628b93",
+      "identity": {
+        "DSNM": "US5SEAGF.000",
+        "INFORM": "(NAVY II) Naval Operations Area, 33 CFR 334.1190",
+        "OBJECTID": "3730",
+        "SORDAT": "20030222",
+        "SORIND": "US,US,graph,Chart 18458"
+      }
+    },
+    "noaa_enc_torpedo_references_20261020:3731": {
+      "geometry_sha256": "21b0e9a3a79ac3ac484b21bc012fc8e157ef65a9ee9ad0ab5272f0b7aa53036d",
+      "identity": {
+        "DSNM": "US5SEAGG.000",
+        "INFORM": "(NAVY II) Naval Operations Area, 33 CFR 334.1190",
+        "OBJECTID": "3731",
+        "SORDAT": "20030222",
+        "SORIND": "US,US,graph,Chart 18458"
+      }
+    },
+    "noaa_enc_torpedo_references_20261020:3733": {
+      "geometry_sha256": "2f0018a9445980e5c6ceff10f9cdb2bf8d59431ccf205f7d4aaf0373d7a26b03",
+      "identity": {
+        "DSNM": "US5SEAHE.000",
+        "INFORM": "(NAVY II) Naval Operations Area, 33 CFR 334.1190",
+        "OBJECTID": "3733",
+        "SORDAT": "20030222",
+        "SORIND": "US,US,graph,Chart 18458"
+      }
+    },
+    "noaa_enc_torpedo_references_20261020:3734": {
+      "geometry_sha256": "d6cffeb61b1194f7443111d5fd0a2c1f85c3e649430051e73223841cb7d2477a",
+      "identity": {
+        "DSNM": "US5SEAHE.000",
+        "INFORM": "(NAVY II) Naval Operations Area, 33 CFR 334.1190",
+        "OBJECTID": "3734",
+        "SORDAT": "20030222",
+        "SORIND": "US,US,graph,Chart 18458"
+      }
+    },
+    "noaa_enc_torpedo_references_20261020:3735": {
+      "geometry_sha256": "8fb5b4b76567557975e150db8d3f77c62a04c1147c053a193d1522ce13fafa50",
+      "identity": {
+        "DSNM": "US5SEAHF.000",
+        "INFORM": "(NAVY II) Naval Operations Area, 33 CFR 334.1190",
+        "OBJECTID": "3735",
+        "SORDAT": "20030222",
+        "SORIND": "US,US,graph,Chart 18458"
+      }
+    },
+    "noaa_enc_torpedo_references_20261020:3736": {
+      "geometry_sha256": "5ad7eed77cb871b49f1e19e1e7c7b02c6deaab299e7422ca2ff0c5b6a42afca6",
+      "identity": {
+        "DSNM": "US5SEAHF.000",
+        "INFORM": "(NAVY II) Naval Operations Area, 33 CFR 334.1190",
+        "OBJECTID": "3736",
+        "SORDAT": "20030222",
+        "SORIND": "US,US,graph,Chart 18458"
+      }
+    },
+    "noaa_enc_torpedo_references_20261020:3737": {
+      "geometry_sha256": "77be9e7d32090ae10ce1bb3dc1da87c0acc82b587a0b24684389646123f0cd09",
+      "identity": {
+        "DSNM": "US5SEAHG.000",
+        "INFORM": "(NAVY II) Naval Operations Area, 33 CFR 334.1190",
+        "OBJECTID": "3737",
+        "SORDAT": "20030222",
+        "SORIND": "US,US,graph,Chart 18458"
+      }
+    },
+    "noaa_enc_torpedo_references_20261020:3741": {
+      "geometry_sha256": "9d97bd56ff9738b39bc828d78b30d675303acef5a4731f35632e6279a2b6d4ee",
+      "identity": {
+        "DSNM": "US5SEAIE.000",
+        "INFORM": "(NAVY II) Naval Operations Area, 33 CFR 334.1190",
+        "OBJECTID": "3741",
+        "SORDAT": "20030222",
+        "SORIND": "US,US,graph,Chart 18458"
+      }
+    },
+    "noaa_enc_torpedo_references_20261020:3742": {
+      "geometry_sha256": "76496baaf76381f1f4dc1794d0d029e06a80b02711b239448aadf313ca117ba1",
+      "identity": {
+        "DSNM": "US5SEAIF.000",
+        "INFORM": "(NAVY II) Naval Operations Area, 33 CFR 334.1190",
+        "OBJECTID": "3742",
+        "SORDAT": "20030222",
+        "SORIND": "US,US,graph,Chart 18458"
+      }
+    }
+  },
+  "schema_version": 1,
+  "tc": {
+    "current_html_sha256": "53d88b024eeab76ca1dc01ee02e8b19742f0e1b8ba48d22b87606196b6db045a",
+    "full_page_byte_equivalence": "Not provable: prior raw HTML payload absent; old receipt/native source binding retained",
+    "legacy_html_sha256": "f60dfcdb32688a7bca30fa0eff08d3c4ca1fa49524575f32ef5957124b8bb426",
+    "legacy_payload_available": false,
+    "new_pin_disposition": "Current full instrument requalified for accepted fixed areas; all three coordinate rings and row labels reproduce retained originals exactly",
+    "selected_instrument_text": "Non-application Vessels 2 (1) This Interim Order does not apply to (a) a vessel that is in distress or providing assistance to a vessel or person in distress; (b) a vessel that is involved in pollution response operations; (c) a vessel that is avoiding an immediate or unforeseen danger; or (d) a vessel that is carrying a person referred to in paragraph (2)(a). Persons (2) This Interim Order does not apply to (a) an employee of the Government of Canada or a peace officer who is performing their duties, or a person who is assisting them or who is otherwise present at the request of the Government of Canada; or (b) a person who is operating a vessel referred to in any of paragraphs (1)(a) to (d). Approach Distance Prohibition Vessels 3 (1) A vessel must not approach within 1\u00a0000 m of a Southern Resident killer whale in the waters set out in Schedule 1. Exceptions (2) Subsection (1) does not apply to (a) a vessel in transit; or (b) a vessel carrying a person referred to in any of paragraphs 4(2)(a) to (c). Persons 4 (1) A person operating a vessel must not approach within 1\u00a0000 m of a Southern Resident killer whale in the waters set out in Schedule 1. Exceptions (2) Subsection (1) does not apply to (a) a person acting in a manner authorized under the Species at Risk Act; (b) a person authorized under subsection 38(1) of the Marine Mammal Regulations to disturb a Southern Resident killer whale; (c) a person fishing for marine mammals for experimental, scientific, educational or public display purposes in the manner set out in a licence issued under the Fishery (General) Regulations; or (d) a person operating a vessel referred to in paragraph 3(2)(a) or (b). Vessel Restricted Zones Vessels 5 (1) A vessel must not navigate in the waters set out in Schedule 2 on or before November 30, 2026. Exceptions (2) Subsection (1) does not apply to (a) a vessel being used to access a private residence, a commercial establishment or any other establishment providing a service, if travel in the waters set out in Schedule 2 is the only practical means of access and the vessel is navigating directly between (i) a location on Pender Island or Saturna Island and another location on one of those islands, (ii) a location on Pender Island or Saturna Island and another location beyond the waters set out in Schedule 2, (iii) a location on Pender Island or Saturna Island and a mooring buoy located in the waters set out in Schedule 2, or (iv) a mooring buoy located in the waters set out in Schedule 2 and a location beyond those waters; (b) a human-powered vessel navigating at a distance of 20 m or less from the shoreline \u2014 meaning the line where the water surface touches the land \u2014 in the waters set out in items 1 and 2 of Schedule 2; (c) a vessel being used to fish under a licence issued under the Aboriginal Communal Fishing Licences Regulations (i) for food, social or ceremonial purposes, or (ii) for domestic purposes under a treaty within the meaning of section 35 of the Constitution Act , 1982 ; or (d) a vessel carrying a person referred to in any of paragraphs 6(2)(a) to (f). Persons 6 (1) A person must not operate a vessel in the waters set out in Schedule 2 on or before November 30, 2026. Exceptions (2) Subsection (1) does not apply to (a) a person acting in a manner authorized under the Species at Risk Act; (b) a person authorized under subsection 38(1) of the Marine Mammal Regulations to disturb a Southern Resident killer whale; (c) a person fishing for marine mammals under the authority of the Marine Mammal Regulations; (d) a person fishing for marine mammals for experimental, scientific, educational or public display purposes in the manner set out in a licence issued under the Fishery (General) Regulations; (e) a person fishing under a licence issued under the Aboriginal Communal Fishing Licences Regulations (i) for food, social or ceremonial purposes, or (ii) for domestic purposes under a treaty within the meaning of section 35 of the Constitution Act, 1982; (f) an Indigenous person exercising an existing right, other than for fishing, for non-commercial purposes under section 35 of the Constitution Act, 1982; or (g) a person operating a vessel referred to in any of paragraphs 5(2)(a) to (d). Speed Restricted Zones Vessels 7 (1) A vessel must not proceed at a speed in excess of 10 knots over ground in the waters set out in Schedule 3 on or before November 30, 2026. Exceptions (2) Subsection (1) does not apply to a vessel that is operating without a motor. Persons 8 (1) A person must not operate a vessel at a speed in excess of 10 knots over ground in the waters set out in Schedule 3 on or before November 30, 2026. Exceptions (2) Subsection (1) does not apply to a person operating a vessel referred to in subsection 7(2). Repeal 9 The Interim Order for the Protection of the Killer Whale ( Orcinus orca ) in the Waters of Southern British Columbia, 2025 , made on May 30, 2025, is repealed. Coming into Force June 1, 2026 10 This Interim Order comes into force on June 1, 2026, but if it is made after that day, it comes into force on the day on which it is made. ",
+    "source_knowledge_at_utc": "2026-10-19T13:05:50.970852+00:00"
+  },
+  "wac_harvest_text": "(1) It is unlawful to fish for or possess fish, shellfish, or wildlife taken from any conservation area defined in chapter 220-303 WAC. (2) The following marine preserves are closed to the taking of fish, shellfish, and wildlife as indicated: (a) The Admiralty Head Marine Preserve is closed to the taking of fish and wildlife, and closed to the taking of shellfish except sea cucumbers and sea urchins. (b) The Colvos Passage Marine Preserve is closed to the taking of shellfish and wildlife, closed to all commercial harvest of fish, and closed to recreational harvest of fish except it is lawful to take salmon for personal use by trolling, defined as fishing from a vessel under power and in gear making forward progress. (c) The San Juan Island Marine Preserve is closed to the taking of shellfish except it is lawful to take crab from Parks Bay, and closed to the taking of food fish other than salmon except it is lawful to take herring and Yellow and Low Island Preserve is closed to the taking of food fish. (d) The Titlow Beach Marine Preserve is closed to the taking of shellfish and wildlife, closed to the commercial harvest of all fish, and closed to the recreational harvest of all fish except that it is lawful to take salmon if taken with artificial lures from shore or from a nonmotorized vessel. (e) The Z's Reef Marine Preserve is closed to the taking of shellfish and wildlife, closed to the commercial harvest of all fish, and closed to the recreational harvest of all fish except that it is lawful to take salmon with fly fishing gear as defined in WAC 220-310-150 . (f) The Seattle city park Marine Preserves (Golden Gardens, Carkeek, Lincoln, Discovery, Emma Schmitz, and Richey Viewpoint) are closed to removal of organisms from the intertidal areas, except that finfish may be harvested using hook and line gear, provided it is lawful under other WDFW fishing regulations. Any organism except finfish taken by hook and line in the intertidal area must be placed unharmed in the location it was found. Removal of organisms of unclassified marine invertebrates in numbers less than the daily limits is an infraction. All other penalties for larger numbers removed apply. (g) The Saltwater State Park Marine Preserve is closed to all recreational harvest. "
+}

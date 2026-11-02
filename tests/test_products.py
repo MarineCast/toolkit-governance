@@ -41,6 +41,7 @@ def test_build_has_only_resolution_parquets_catalog_and_originals(flat_inputs, t
     config, grid, raw = flat_inputs
     output = build_products([grid], tmp_path / 'Governance', config_path=config, allow_partial=True)
     assert not (config.parents[3] / 'data').exists()
+    assert not (config.parents[3] / 'audit').exists()
     assert validate_products(output) == {'status': 'passed', 'tables': 2, 'original_datasets': 1}
     assert {p.name for p in output.iterdir()} == {'governance-r6-static.parquet', 'governance-r8-static.parquet', 'catalog.json', 'OriginalData'}
     original = gpd.read_parquet(output / 'OriginalData/wdfw_recreational_marine_areas/geometry.parquet')
@@ -49,11 +50,16 @@ def test_build_has_only_resolution_parquets_catalog_and_originals(flat_inputs, t
     assert original.Unknown.isna().all()
     for resolution in (6, 8):
         table = pq.read_table(output / f'governance-r{resolution}-static.parquet')
+        assert table.column_names == ['h3_index', 'fisheries_management_area_count', 'fisheries_management_area_membership']
+        from governance.app_only import restore_support
+        table, _ = restore_support(table, json.loads(table.schema.metadata[b'governance']))
         assert table['management_areas__recorded_feature_count'].to_pylist() == [1]
         assert 'date' not in table.column_names
-        metadata = json.loads(table.schema.metadata[b'governance'])
+        metadata = json.loads(pq.read_schema(output / f'governance-r{resolution}-static.parquet').metadata[b'governance'])
         assert metadata['model_eligible'] is False
-        assert metadata['fields']['management_areas__recorded_polygon_union_area_fraction']['units'] == '1'
+        assert set(table.column_names) == {'h3_index', 'management_areas__recorded_feature_count', 'management_areas__feature_memberships_v1'}
+        assert metadata['fields']['fisheries_management_area_count']['units'] == 'count'
+        assert metadata['fields']['fisheries_management_area_count']['implicit_status'] == 'partial'
         assert 'data_release_id' not in metadata and 'native_manifests' not in metadata
     # A flat dataset itself is sufficient for a later offline rebuild. No ZIP/JSON copy.
     rebuilt = build_products([grid], tmp_path / 'rebuilt', config_path=config, original_data=output, allow_partial=True)
@@ -61,6 +67,16 @@ def test_build_has_only_resolution_parquets_catalog_and_originals(flat_inputs, t
         assert pq.read_table(output / f'governance-r{resolution}-static.parquet').equals(pq.read_table(rebuilt / f'governance-r{resolution}-static.parquet'), check_metadata=False)
     build_products([grid], output, config_path=config, original_data=output, allow_partial=True, overwrite=True)
     assert validate_products(output)['status'] == 'passed'
+
+
+def test_new_delivery_is_portable_without_workspace_sidecars(flat_inputs, tmp_path):
+    config, grid, _ = flat_inputs
+    output = build_products([grid], tmp_path/'Governance', config_path=config, allow_partial=True)
+    moved = output.rename(tmp_path/'moved-Governance')
+    assert validate_products(moved) == {'status':'passed','tables':2,'original_datasets':1}
+    catalog = json.loads((moved/'catalog.json').read_text())
+    assert 'audit_data' not in catalog
+    assert set(catalog['support_data']) == {'6','8'}
 
 
 def test_refuses_extra_files_and_changed_metric_bytes(flat_inputs, tmp_path):

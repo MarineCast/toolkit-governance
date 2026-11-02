@@ -74,6 +74,7 @@ class GovernanceSource:
     requested_grid_mask_sha256: str | None = None
     retrieved_at_utc: str | None = None
     immutable_full_source_archive: bool = False
+    selection_bbox: tuple[float, float, float, float] | None = None
 
 
 @dataclass(frozen=True)
@@ -106,11 +107,6 @@ class GovernanceConfig:
     snapshot_root: Path
     processed_root: Path
     coverage_matrix_path: Path
-    map_path: Path
-    map_manifest_path: Path
-    presentation_config_path: Path
-    inspection_simplify_tolerance_meters: float
-    category_colors: Mapping[str, str]
     catalog_path: Path
     coverage_regions: Mapping[str, str]
     sources: Mapping[str, GovernanceSource]
@@ -140,7 +136,7 @@ class GovernanceConfig:
 def load_governance_config(path: str | Path = DEFAULT_CONFIG_PATH, *, workspace: str | Path | None = None) -> GovernanceConfig:
     document = ConfigDocument.load(path, workspace=workspace, allowed_keys={
         "schema_version", "area", "common_config_path", "clipping", "raw", "output",
-        "inspection", "catalog_path", "coverage_regions", "sources", "collections", "selected_collection",
+        "catalog_path", "coverage_regions", "sources", "collections", "selected_collection",
     })
     raw = _mapping(document.data, "governance configuration")
     if type(raw.get("schema_version")) is not int or raw.get("schema_version") != 1:
@@ -162,10 +158,8 @@ def load_governance_config(path: str | Path = DEFAULT_CONFIG_PATH, *, workspace:
 
     raw_paths = _mapping(raw.get("raw"), "raw")
     output = _mapping(raw.get("output"), "output")
-    inspection = _mapping(raw.get("inspection"), "inspection")
     _keys(raw_paths, {"snapshot_root"}, "raw")
     _keys(output, {"processed_root", "coverage_matrix_path"}, "output")
-    _keys(inspection, {"map_path", "map_manifest_path", "presentation_config_path", "simplify_tolerance_meters", "category_colors"}, "inspection")
     region_values = _mapping(raw.get("coverage_regions"), "coverage_regions")
     regions = {
         str(region_id): str(_mapping(value, f"coverage_regions.{region_id}")["label"])
@@ -178,7 +172,7 @@ def load_governance_config(path: str | Path = DEFAULT_CONFIG_PATH, *, workspace:
     sources: dict[str, GovernanceSource] = {}
     for source_id, value in source_values.items():
         values = _mapping(value, f"sources.{source_id}")
-        _keys(values, {"provider", "acquisition_type", "url", "local_path", "snapshot_path", "archive_member", "archive_layer", "expected_sha256", "source_as_of", "license", "attribution", "legal_citation", "redistribution", "authority_scope", "source_status", "server_filter", "page_size", "source_limitation", "coverage", "selection_where", "requested_grid_mask_sha256", "immutable_full_source_archive"}, f"sources.{source_id}")
+        _keys(values, {"provider", "acquisition_type", "url", "local_path", "snapshot_path", "archive_member", "archive_layer", "expected_sha256", "source_as_of", "license", "attribution", "legal_citation", "redistribution", "authority_scope", "source_status", "server_filter", "page_size", "source_limitation", "coverage", "selection_where", "requested_grid_mask_sha256", "immutable_full_source_archive", "selection_bbox"}, f"sources.{source_id}")
         coverage = _mapping(values.get("coverage"), f"sources.{source_id}.coverage")
         if set(coverage) != set(regions):
             missing = sorted(set(regions).difference(coverage))
@@ -212,6 +206,12 @@ def load_governance_config(path: str | Path = DEFAULT_CONFIG_PATH, *, workspace:
             raise ValueError(f"Source {source_id!r} page_size must be a positive integer")
         if not isinstance(values.get("selection_where", "1=1"), str) or not values.get("selection_where", "1=1").strip():
             raise ValueError(f"Source {source_id!r} selection_where must be a nonempty string")
+        selection_bbox = None
+        if values.get('selection_bbox') is not None:
+            from .spatial import validate_bbox
+            selection_bbox = validate_bbox(values['selection_bbox'])
+            if any(status == 'complete' or str(status).startswith('complete_') for status in coverage.values()):
+                raise ValueError('A bounded partial source selection cannot declare complete regional coverage')
         sources[str(source_id)] = GovernanceSource(
             source_id=str(source_id),
             provider=str(values["provider"]),
@@ -235,6 +235,7 @@ def load_governance_config(path: str | Path = DEFAULT_CONFIG_PATH, *, workspace:
             coverage={str(key): str(status) for key, status in coverage.items()},
             selection_where=str(values.get("selection_where", "1=1")),
             requested_grid_mask_sha256=values.get("requested_grid_mask_sha256"),
+            selection_bbox=selection_bbox,
             immutable_full_source_archive=strict_bool(values.get("immutable_full_source_archive", False), f"sources.{source_id}.immutable_full_source_archive"),
         )
         source = sources[str(source_id)]
@@ -279,13 +280,6 @@ def load_governance_config(path: str | Path = DEFAULT_CONFIG_PATH, *, workspace:
             implementation_status=str(values.get("implementation_status", "planned")),
         )
 
-    simplify_tolerance = float(inspection.get("simplify_tolerance_meters", 0.0))
-    if not math.isfinite(simplify_tolerance) or simplify_tolerance < 0:
-        raise ValueError("inspection.simplify_tolerance_meters cannot be negative.")
-    category_colors = _mapping(inspection.get("category_colors"), "inspection.category_colors")
-    if set(category_colors) != VALID_CATEGORIES:
-        raise ValueError("inspection.category_colors must cover all governance categories.")
-
     return GovernanceConfig(
         document=document,
         area_name=area_name,
@@ -297,11 +291,6 @@ def load_governance_config(path: str | Path = DEFAULT_CONFIG_PATH, *, workspace:
         snapshot_root=document.resolve_path(str(raw_paths["snapshot_root"])),
         processed_root=document.resolve_path(str(output["processed_root"])),
         coverage_matrix_path=document.resolve_path(str(output["coverage_matrix_path"])),
-        map_path=document.resolve_path(str(inspection["map_path"])),
-        map_manifest_path=document.resolve_path(str(inspection["map_manifest_path"])),
-        presentation_config_path=document.resolve_path(str(inspection["presentation_config_path"])),
-        inspection_simplify_tolerance_meters=simplify_tolerance,
-        category_colors={str(key): str(value) for key, value in category_colors.items()},
         catalog_path=document.resolve_path(str(raw["catalog_path"])),
         coverage_regions=regions,
         sources=sources,

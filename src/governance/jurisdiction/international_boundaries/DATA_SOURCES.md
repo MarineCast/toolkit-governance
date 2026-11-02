@@ -1,6 +1,6 @@
 # International boundaries sources
 
-This layer publishes source-native Canada–United States boundary references and
+This layer normalizes source-native Canada–United States boundary references and
 derived country-water support polygons. It never creates a compromise line:
 source geometries are compared as published, retained independently, and are not
 snapped, averaged, or silently substituted for one another. Treaties,
@@ -60,31 +60,53 @@ is used only for full-domain spatial support, clipping, and labeled
 country-water reference polygons. Its manifest records its mixed upstream
 lineage. `LEGAL_BINDING_STATUS=derived_reference_geometry`,
 `SOURCE_ROLE=spatial_support_only`, and
-`SOURCE_LEGAL_STATUS=not_legal_authority` are mandatory on every published
+`SOURCE_LEGAL_STATUS=not_legal_authority` are mandatory on every derived
 country-water record.
 
 Country labels are checked against the archived NRCan CGB country-area polygon.
 That agreement is a QC test of allocation, not evidence that the assembled
 seascape exterior is a legal maritime limit.
 
-## Published products and unresolved segments
+## Internal normalization products and unresolved segments
 
-- `international_boundaries.parquet`: canonical mixed line/polygon inspection
+The following files are temporary build intermediates. They are not additional
+public Parquets or sidecars. The public handoff is the flat application contract
+and retained OriginalData; native processing preserves this scientific support.
+
+- `international_boundaries.parquet`: canonical mixed line/polygon reference
   layer, clipped to `full_area`.
-- `authoritative_boundary_segments.parquet`: source-authority-published IBC,
-  NOAA, and NRCan segments, with legal status, scale/accuracy, and
-  `BOUNDARY_QC_REASON`. “Authoritative” describes provenance, not legal effect.
-- `country_water_polygons.parquet`: derived seascape support polygons with
-  explicit country-allocation QC and non-authority status.
-- `boundary_reconciliation.parquet`: per-IBC-section, per-source sampled distance
-  results in EPSG:3347, including sample count, source scale, precision proxy,
-  median/P95/max distance, match fractions, and reconciliation status.
 - `manifest.json`: source checksums, clipping diagnostics, authority policy,
-  related-artifact checksums, and the enumerated unresolved marine sections.
+  reconciliation method and enumerated unresolved marine sections.
+
+Source line identities, legal status, scale/accuracy, country-support labels and
+`BOUNDARY_QC_REASON` remain in the canonical native table. Per-section comparison
+rows are calculated in memory to apply QC and summarize unresolved sections; no
+split geometry copies or reconciliation Parquet sidecar are written.
 
 The current reconciliation aligns the IBC line closely with the NOAA and CGB
 boundary references. Portland Canal remains only partially represented by the
 DFO/seascape support interface, while Southeast Alaska lies outside the northern
-coverage of those support products. Those support gaps are published as
+coverage of those support products. Those support gaps are recorded as
 unresolved comparisons; they are not repaired or snapped. Rebuild the artifacts
 to refresh the exact measured values and manifest counts.
+
+
+## Explorer interface, 2026-10-19
+
+Administrative Boundaries exposes International Boundary as a nullable intersection boolean, filtering the
+retained original international lines explicitly rather than treating every NOAA
+Maritime Boundary label or water-polygon perimeter as an international border.
+Original source geometry, attributes and identities remain in OriginalData. Native
+scientific/quality calculations remain internal; obsolete diagnostic columns and
+this family's standalone memberships are not exported. The declared country-water
+assignment columns retain the geographic support required by the application.
+See the [current boundary contract](../../../../docs/parquet-products.md#international-boundary-under-federal-waters-2026-10-19).
+
+## Public handoff boundary
+
+Source evidence and native processing described here are distinct from public
+columns. The [flat product contract](../../../../docs/parquet-products.md) and
+[exact physical schema](../../../../docs/reference/columns.md) define delivery.
+OriginalData preserves source geometry/attributes and receipt evidence; native
+manifests, diagnostic products and unused scientific measures are internal build
+support. No source qualification is broadened by the application projection.

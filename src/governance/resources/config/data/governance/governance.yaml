@@ -14,18 +14,6 @@ output:
   processed_root: data/processed/domain/governance
   coverage_matrix_path: data/processed/domain/governance/source_coverage_matrix.json
 
-inspection:
-  map_path: outputs/domains/governance/governance_layers.html
-  map_manifest_path: outputs/domains/governance/governance_layers_map_manifest.json
-  presentation_config_path: config/data/presentation_settings.yaml
-  simplify_tolerance_meters: 250
-  category_colors:
-    protected_areas: '#33A02C'
-    jurisdiction: '#1F78B4'
-    fisheries_management: '#E31A1C'
-    vessel_management: '#FF7F00'
-    administrative_context: '#6A3D9A'
-
 catalog_path: config/data/governance/feature_catalog.yaml
 
 coverage_regions:
@@ -157,6 +145,7 @@ sources:
     acquisition_type: arcgis
     url: https://egisp.dfo-mpo.gc.ca/arcgis/rest/services/open_data_donnees_ouvertes/ccg_gcc_regions/MapServer/0
     snapshot_path: data/raw/governance/ccg_western_region/features.pages.json
+    selection_where: "Name = 'Western'"
     source_as_of: 2021-03-31 inventory; published 2021-07-30; catalog modification is
       not source revision
     license: Open Government Licence - Canada v2.0; https://open.canada.ca/en/open-government-licence-canada
@@ -381,6 +370,34 @@ sources:
       us_federal_offshore: partial
       canadian_federal_offshore: unavailable
       international_boundary: not_applicable
+  bc_abms_regional_districts:
+    provider: Province of British Columbia, GeoBC / Ministry of Housing and Municipal Affairs
+    acquisition_type: arcgis
+    url: https://delivery.maps.gov.bc.ca/arcgis/rest/services/whse/bcgw_pub_whse_legal_admin_boundaries/MapServer/16
+    snapshot_path: data/raw/governance/bc_abms_regional_districts/snapshot.json
+    page_size: 1
+    source_as_of: live service snapshot; record update dates retained separately
+    license: Open Government Licence - British Columbia
+    attribution: Contains information licensed under the Open Government Licence - British Columbia
+    legal_citation: Letters Patent metes and bounds prevail over digital mapping discrepancies
+    redistribution: https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61
+    authority_scope: BC ABMS regional district administrative polygons; not marine ownership
+    source_status: available_after_download
+    server_filter: false
+    source_limitation: Official regional district polygons, including source-mapped water extents only.
+      No offshore extension or nearest-district assignment. Northern Rockies Regional Municipality
+      is excluded by this source; Stikine is not a regional district. Receipt completeness is
+      not complete geographic support or current legal certification. OIC and update dates
+      do not create a dated legal history. Catalogue d1aff64e-dbfe-45a6-af97-582b7f6418b9.
+    coverage:
+      california: not_applicable
+      oregon: not_applicable
+      washington: not_applicable
+      alaska: not_applicable
+      british_columbia_canada: partial
+      us_federal_offshore: not_applicable
+      canadian_federal_offshore: partial
+      international_boundary: not_applicable
   fws_national_wildlife_refuges:
     provider: U.S. Fish and Wildlife Service, National Wildlife Refuge System, Division
       of Realty
@@ -398,6 +415,7 @@ sources:
     authority_scope: Official selected refuge-system reference inventory; no legal compliance
       or exhaustive geographic authority
     source_status: available_after_download
+    selection_where: "RSL_TYPE = 'NWR'"
     server_filter: true
     page_size: 10
     source_limitation: "Only RSL_TYPE=NWR; not acquisition-approved boundaries, all\
@@ -419,6 +437,7 @@ sources:
     acquisition_type: arcgis
     url: https://maps-cartes.ec.gc.ca/arcgis/rest/services/CWS_SCF/CPCAD/MapServer/0
     snapshot_path: data/raw/governance/eccc_wildlife_areas_sanctuaries/features.pages.json
+    selection_where: "TYPE_E IN ('National Wildlife Area', 'Marine National Wildlife Area', 'Migratory Bird Sanctuary')"
     source_as_of: dynamic_at_retrieval
     license: Open Government Licence - Canada; https://open.canada.ca/en/open-government-licence-canada
     attribution: Environment and Climate Change Canada, CPCAD reporting partners
@@ -1192,6 +1211,57 @@ sources:
       international_boundary: not_applicable
     snapshot_path: data/raw/governance/dfo_pacific_fishery_management_areas/features.pages.json
     page_size: 10
+  eccc_marbled_murrelet_marine_critical_habitat:
+    provider: Environment and Climate Change Canada - Canadian Wildlife Service
+    acquisition_type: arcgis
+    url: https://maps-cartes.ec.gc.ca/arcgis/rest/services/CWS_SCF/CriticalHabitat/MapServer/3
+    snapshot_path: data/raw/governance/eccc_marbled_murrelet_marine_critical_habitat/features.pages.json
+    source_as_of: dynamic_at_retrieval
+    license: Open Government Licence - Canada
+    attribution: Environment and Climate Change Canada / Parks Canada; National Critical Habitat Dataset
+    legal_citation: Species at Risk Act; final amended Marbled Murrelet recovery strategy (2023), sections 7.1.4-7.1.6 and Table 9
+    redistribution: Retain ECCC attribution, source identity and conditional biophysical habitat qualifications
+    authority_scope: Geographic marine reference areas; required habitat attributes must be present; not controlling legal geometry
+    source_status: available_after_download
+    server_filter: true
+    selection_bbox: [-129.48230286187587, 45.875084185370454, -122.06369308406447, 51.550387523832356]
+    selection_where: COSEWIC_ID = 39 AND RD_Status = 1 AND OBJECTID IN (21704,21707,21709,21710,21711,21712,21715,21716,21717,21718,21720)
+    page_size: 1
+    source_limitation: Exactly eleven reviewed public marine Marbled Murrelet reference areas from the final 2023 amended recovery strategy. Critical habitat occurs only where required biophysical features are present; the full polygon is not confirmed habitat. Identification is partial and concerns adult breeding-period requirements in Salish Sea and nearby waters. Posted Final is recovery-document status, not blanket current legal protection. Terrestrial nesting records and withheld abalone locations are excluded.
+    coverage:
+      california: not_applicable
+      oregon: not_applicable
+      washington: not_applicable
+      alaska: not_applicable
+      british_columbia_canada: partial
+      us_federal_offshore: not_applicable
+      canadian_federal_offshore: partial
+      international_boundary: not_applicable
+  dfo_aquatic_critical_habitat:
+    provider: Fisheries and Oceans Canada
+    acquisition_type: arcgis
+    url: https://egisp.dfo-mpo.gc.ca/arcgis/rest/services/open_data_donnees_ouvertes/dfo_sara_critical_habitat/MapServer/0
+    snapshot_path: data/raw/governance/dfo_aquatic_critical_habitat/features.pages.json
+    source_as_of: dynamic_at_retrieval
+    license: Open Government Licence - Canada
+    attribution: Fisheries and Oceans Canada - Species at Risk Program
+    legal_citation: Species at Risk Act; species recovery documents and action plans
+    redistribution: Retain DFO attribution, Open Government Licence - Canada and source qualifications
+    authority_scope: Published aquatic critical-habitat reference geometry; not controlling legal text
+    source_status: available_after_download
+    server_filter: true
+    selection_bbox: [-129.48230286187587, 45.875084185370454, -122.06369308406447, 51.550387523832356]
+    page_size: 1
+    source_limitation: Bounded selected aquatic habitat features, not national coverage. Provider CH_STATUS_E=Final/Proposed is retained without resolving to final or designated. Bounding-box habitat descriptors and some riparian habitat are omitted by the provider. Full original geometry and bilingual attributes are retained; no effective dates are inferred.
+    coverage:
+      california: not_applicable
+      oregon: not_applicable
+      washington: not_applicable
+      alaska: not_applicable
+      british_columbia_canada: partial
+      us_federal_offshore: not_applicable
+      canadian_federal_offshore: partial
+      international_boundary: not_applicable
   noaa_critical_habitat_polygon:
     provider: NOAA National Marine Fisheries Service
     acquisition_type: arcgis
@@ -1250,35 +1320,6 @@ sources:
       us_federal_offshore: partial
       canadian_federal_offshore: not_applicable
       international_boundary: not_applicable
-  nga_world_port_index:
-    provider: National Geospatial-Intelligence Agency
-    acquisition_type: local_vector
-    url: https://msi.nga.mil/api/publications/world-port-index?output=json
-    snapshot_path: data/raw/governance/nga_world_port_index/ports.parquet
-    source_as_of: dynamic_at_retrieval
-    license: NGA MSI legal disclaimer and commercial-use warning apply; source-specific
-      redistribution rights not independently cleared
-    attribution: National Geospatial-Intelligence Agency, World Port Index
-    legal_citation: Not a legal boundary or jurisdiction source
-    redistribution: Local reference use only for this release; review https://msi.nga.mil/legal-sec
-      and /commercial-use before redistribution
-    authority_scope: NGA-published physical port point reference; no inferred authority
-      or jurisdiction
-    source_status: available_after_download
-    server_filter: false
-    source_limitation: Published port point locations, not port footprints, exhaustive
-      harbor inventory, current navigation advice, legal jurisdiction or regulatory
-      status. All original NGA attributes retained as source values without interpretation.
-    coverage:
-      california: partial
-      oregon: partial
-      washington: partial
-      alaska: partial
-      british_columbia_canada: partial
-      us_federal_offshore: partial
-      canadian_federal_offshore: partial
-      international_boundary: partial
-
   odfw_marine_reserves_2016:
     provider: Oregon Department of Fish and Wildlife
     acquisition_type: direct_archive
@@ -1344,8 +1385,8 @@ sources:
     provider: Transport Canada
     acquisition_type: direct_archive
     url: https://tc.canada.ca/en/interim-order-protection-killer-whale-orcinus-orca-waters-southern-british-columbia
-    snapshot_path: data/raw/governance/tc_srkw_interim_order_2026/instrument.html
-    expected_sha256: f60dfcdb32688a7bca30fa0eff08d3c4ca1fa49524575f32ef5957124b8bb426
+    snapshot_path: data/raw/governance/exclusion_reference_documents/tc-live-20261019.html
+    expected_sha256: 53d88b024eeab76ca1dc01ee02e8b19742f0e1b8ba48d22b87606196b6db045a
     source_as_of: Interim Order version 2026-05-22; retrieved qualification 2026-10-13
     license: Government of Canada published instrument; source terms and attribution
       retained
@@ -1371,6 +1412,227 @@ sources:
       us_federal_offshore: not_applicable
       canadian_federal_offshore: partial
       international_boundary: not_applicable
+
+  uscg_lockheed_rna_20261015:
+    provider: United States Coast Guard
+    acquisition_type: direct_archive
+    url: https://www.ecfr.gov/api/versioner/v1/full/2026-10-15/title-33.xml?part=165&section=165.1336
+    snapshot_path: data/raw/governance/uscg_lockheed_rna_20261015/instrument.xml
+    expected_sha256: 8868d0730ca664896b82065ef4f7126929013b72702139ad8f44ec3bb2a4088e
+    source_as_of: eCFR point-in-time 2026-10-15; 33 CFR 165.1336(a)(2) only
+    license: U.S. federal regulatory text; local research reference, no broader rights claim
+    attribution: U.S. Coast Guard; Office of the Federal Register; eCFR
+    legal_citation: 33 CFR 165.1336(a)(2), (b)(1)-(3), (c); 77 FR 21435
+    redistribution: Local research derivative; no publication or hosting authorized
+    authority_scope: One Lockheed Shipyard regulated navigation area; seabed activities, not ordinary transit
+    source_status: available_after_download
+    server_filter: false
+    source_limitation: Only the four-corner NAD83 area (a)(2). Shoreline-dependent area (a)(1) omitted. Source snapshot is not an effective-date or enforcement history. Treaty, remediation and waiver provisions remain in full text.
+    coverage:
+      california: not_applicable
+      oregon: not_applicable
+      washington: partial
+      alaska: not_applicable
+      british_columbia_canada: not_applicable
+      us_federal_offshore: unknown
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+
+  dfo_pacific_closure_references_20261019:
+    provider: Fisheries and Oceans Canada
+    acquisition_type: direct_archive
+    url: https://egisp.dfo-mpo.gc.ca/arcgis/rest/services/Pacific/PSSI_FRIM_Fishing_Regulations/MapServer/0/query?geometry=-129.7%2C45.9%2C-121.5%2C51.5&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&f=geojson&where=TypeEN+IN+%28%27Rockfish+Conservation+Area%27%2C%27Glass+Sponge+Reef+Fishery+Closure%27%2C%27Reef+Fishery+Closure%27%2C%27Glass+Sponge+Reef+Marine+Refuge%27%29&outFields=%2A&orderByFields=OBJECTID&resultRecordCount=500&outSR=4326
+    snapshot_path: data/raw/governance/exclusion_inventory_20261019/dfo-closure-geometry.geojson
+    expected_sha256: 93090a0aeaa874c3a7dc23aa79a54cfe445a27e7297715ea5701114bc3f3da9c
+    source_as_of: DFO PSSI FRIM closure GIS snapshot 2026-10-19; named query in study
+      planning envelope
+    license: Canada Open Government Licence where applicable; DFO map disclaimer retained
+    attribution: Fisheries and Oceans Canada
+    legal_citation: Fisheries Act; DFO RCA and Pacific glass sponge reef activity guides;
+      exact variation orders unresolved
+    redistribution: Local research reference only; no external hosting or broader rights
+      clearance asserted
+    authority_scope: Named reviewed activity restrictions only; source countries and
+      rule types not equivalent
+    source_status: available_after_download
+    server_filter: false
+    source_limitation: Partial official reference. Geometry and agency/CFR rule context
+      linked; current enforcement, complete notices, exact legal-coordinate shorelines,
+      broader restrictions and history not established.
+    coverage:
+      california: not_applicable
+      oregon: not_applicable
+      washington: not_applicable
+      alaska: not_applicable
+      british_columbia_canada: partial
+      us_federal_offshore: not_applicable
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+    selection_bbox:
+    - -129.7
+    - 45.9
+    - -121.5
+    - 51.5
+  noaa_enc_harbor_rule_references_20261019:
+    provider: NOAA Office of Coast Survey
+    acquisition_type: direct_archive
+    url: https://encdirect.noaa.gov/arcgis/rest/services/encdirect/enc_harbour/MapServer/197/query?objectIds=79045%2C79028%2C79027%2C79417%2C78930%2C78936%2C78922%2C78923%2C79022%2C79037%2C78924%2C79542%2C79419%2C78937%2C78940%2C79405%2C77963%2C77962%2C78990%2C78918%2C78917%2C79406%2C78958%2C79041%2C78967%2C78964%2C78961%2C78965%2C78962%2C78988%2C79047%2C78928%2C78929%2C78934%2C79391%2C78926%2C78956%2C79029%2C79418%2C78916%2C78919%2C78915%2C79019%2C79042%2C79046%2C78925%2C78977%2C79403%2C78963%2C78927%2C78948%2C77961%2C79036%2C78920%2C79040%2C78969%2C79038%2C79543%2C78931%2C78921%2C77964%2C77965&outFields=%2A&outSR=4326&f=geojson
+    snapshot_path: data/raw/governance/exclusion_inventory_20261019/noaa-rule-geometry.geojson
+    expected_sha256: 2250616d803dbed65f1ac370bfc49beacfc573128f1dc6b509000f1f9f97408d
+    source_as_of: NOAA harbor ENC GIS snapshot 2026-10-19; explicit named rule references
+      only
+    license: U.S. federal chart-derived information; source disclaimers apply; no navigation
+      certification
+    attribution: NOAA Office of Coast Survey
+    legal_citation: Named 33 CFR Parts 165 and 334; eCFR 2026-10-15 rule text retained
+    redistribution: Local research reference only; no external hosting or broader rights
+      clearance asserted
+    authority_scope: Named reviewed activity restrictions only; source countries and
+      rule types not equivalent
+    source_status: available_after_download
+    server_filter: false
+    source_limitation: Partial official reference. Geometry and agency/CFR rule context
+      linked; current enforcement, complete notices, exact legal-coordinate shorelines,
+      broader restrictions and history not established.
+    coverage:
+      california: not_applicable
+      oregon: not_applicable
+      washington: partial
+      alaska: not_applicable
+      british_columbia_canada: not_applicable
+      us_federal_offshore: not_applicable
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+    selection_bbox:
+    - -129.7
+    - 45.9
+    - -121.5
+    - 51.5
+  uscg_theafoss_rna_20261015:
+    provider: United States Coast Guard
+    acquisition_type: direct_archive
+    url: https://www.ecfr.gov/api/versioner/v1/full/2026-10-15/title-33.xml?part=165
+    snapshot_path: data/raw/governance/exclusion_inventory_20261019/part165.xml
+    expected_sha256: 6c88fb764b2ddb2aec949298e6a16b080716a87005204e7ebb0547067b15ecaf
+    source_as_of: eCFR point-in-time 2026-10-15; only 165.1329(a)(1)-(2) coordinate
+      rings
+    license: U.S. federal regulatory text; source attribution retained
+    attribution: United States Coast Guard
+    legal_citation: 33 CFR 165.1329(a)(1)-(2), (b), (c)
+    redistribution: Local research reference only; no external hosting or broader rights
+      clearance asserted
+    authority_scope: Named reviewed activity restrictions only; source countries and
+      rule types not equivalent
+    source_status: available_after_download
+    server_filter: false
+    source_limitation: Partial official reference. Geometry and agency/CFR rule context
+      linked; current enforcement, complete notices, exact legal-coordinate shorelines,
+      broader restrictions and history not established.
+    coverage:
+      california: not_applicable
+      oregon: not_applicable
+      washington: partial
+      alaska: not_applicable
+      british_columbia_canada: not_applicable
+      us_federal_offshore: not_applicable
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+
+  dnd_wg_active_reference_20261020:
+    provider: Department of National Defence; Canadian Coast Guard NOTMAR
+    acquisition_type: direct_archive
+    url: https://www.notmar.gc.ca/publications/annual/section-f/f35-en
+    snapshot_path: data/raw/governance/exclusion_qualification_20261020/notmar-f35.html
+    expected_sha256: 508f18f9573a9dde66f0150feca9edce939c81367560a629b04d79121ce425e8
+    source_as_of: NOTMAR 2026 annual edition through monthly edition 09; received 2026-10-20
+    license: Government of Canada published notice; source attribution and notice disclaimers
+      retained
+    attribution: Department of National Defence; Canadian Coast Guard NOTMAR
+    legal_citation: NOTMAR 35 explanatory notes 5(b), 7 and hazardous-area diagram;
+      National Defence Act / Defence Controlled Access Area Regulations as cited
+    redistribution: Local research reference only; no external hosting or source redistribution
+      authorized
+    authority_scope: WG five-point active area only; not the larger operations envelope
+      or all Canadian military areas
+    source_status: available_after_download
+    server_filter: false
+    source_limitation: Fixed active-area research reference; entry restriction applies
+      only while WG is active, subject to Winchelsea Control authorization. Printed
+      precision 0.01 arc-minute; no operational activation dates. Exact pinned diagram
+      companion required; HTML-only acquisition fails closed until companion is explicitly
+      retained and checked.
+    coverage:
+      california: not_applicable
+      oregon: not_applicable
+      washington: not_applicable
+      alaska: not_applicable
+      british_columbia_canada: partial
+      us_federal_offshore: not_applicable
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+
+  noaa_enc_torpedo_references_20261020:
+    provider: NOAA Office of Coast Survey
+    acquisition_type: direct_archive
+    url: https://encdirect.noaa.gov/arcgis/rest/services/encdirect/enc_harbour/MapServer/162/query?where=INFORM+LIKE+%27%25334.1190%25%27&geometry=-129.7%2C45.9%2C-121.5%2C51.5&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=%2A&outSR=4326&orderByFields=OBJECTID&resultRecordCount=100&f=geojson
+    snapshot_path: data/raw/governance/exclusion_completion_20261020/noaa-harbor-torpedo.geojson
+    expected_sha256: 05a425095959386139f91e87fcaeef875b8a33c9f4e488a668629eee70cfd747
+    source_as_of: NOAA chart snapshot received 2026-10-20; named static reference only
+    license: U.S. federal chart-derived information; source disclaimers retained
+    attribution: NOAA Office of Coast Survey; cited USACE/Navy authority
+    legal_citation: 33 CFR 334.1190(a)/(b)
+    redistribution: Local research reference only; no external source-data hosting authorized
+    authority_scope: Named CFR-linked provider chart references only
+    source_status: available_after_download
+    server_filter: false
+    source_limitation: Chart depiction is not surveyed legal boundary. Activity-specific
+      exceptions, source datum and unknown present activation remain explicit. No fabricated
+      daily history.
+    coverage:
+      california: not_applicable
+      oregon: not_applicable
+      washington: partial
+      alaska: not_applicable
+      british_columbia_canada: not_applicable
+      us_federal_offshore: not_applicable
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+    selection_bbox:
+    - -129.7
+    - 45.9
+    - -121.5
+    - 51.5
+  noaa_enc_smith_reference_20261020:
+    provider: NOAA Office of Coast Survey
+    acquisition_type: direct_archive
+    url: https://encdirect.noaa.gov/arcgis/rest/services/encdirect/enc_coastal/MapServer/141/query?where=INFORM+LIKE+%27%25334.1180%25%27&geometry=-129.7%2C45.9%2C-121.5%2C51.5&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=%2A&outSR=4326&resultRecordCount=20&f=geojson
+    snapshot_path: data/raw/governance/exclusion_completion_20261020/noaa-coastal-smith-141.geojson
+    expected_sha256: c8a58306b56641e086c932341010aa089c47ba35a2e5dd47c4224752d936a86c
+    source_as_of: NOAA chart snapshot received 2026-10-20; named static reference only
+    license: U.S. federal chart-derived information; source disclaimers retained
+    attribution: NOAA Office of Coast Survey; cited USACE/Navy authority
+    legal_citation: 33 CFR 334.1180; datum caveat 334.6
+    redistribution: Local research reference only; no external source-data hosting authorized
+    authority_scope: Named CFR-linked provider chart references only
+    source_status: available_after_download
+    server_filter: false
+    source_limitation: Chart depiction is not surveyed legal boundary. Activity-specific
+      exceptions, source datum and unknown present activation remain explicit. No fabricated
+      daily history.
+    coverage:
+      california: not_applicable
+      oregon: not_applicable
+      washington: partial
+      alaska: not_applicable
+      british_columbia_canada: not_applicable
+      us_federal_offshore: not_applicable
+      canadian_federal_offshore: not_applicable
+      international_boundary: not_applicable
+    selection_bbox:
+    - -129.7
+    - 45.9
+    - -121.5
+    - 51.5
 
 collections:
   shipping_lanes:
@@ -1403,10 +1665,11 @@ collections:
 
   county_regional_boundaries:
     category: jurisdiction
-    display_name: U.S. county-equivalent reference inventory
-    normalization_profile: census_county_reference_2025
+    display_name: Regional Boundaries
+    normalization_profile: county_bc_regional_reference
     source_ids:
     - census_counties_2025
+    - bc_abms_regional_districts
     artifact_path: data/processed/domain/governance/jurisdiction/county_regional_boundaries/county_regional_boundaries.parquet
     manifest_path: data/processed/domain/governance/jurisdiction/county_regional_boundaries/manifest.json
     color: '#8856A7'
@@ -1518,27 +1781,17 @@ collections:
   critical_habitat:
     category: protected_areas
     display_name: Critical Habitat reference inventory
-    normalization_profile: noaa_nmfs_critical_habitat_reference
+    normalization_profile: noaa_dfo_eccc_marine_critical_habitat_reference
     source_ids:
     - noaa_critical_habitat_polygon
     - noaa_critical_habitat_line
+    - dfo_aquatic_critical_habitat
+    - eccc_marbled_murrelet_marine_critical_habitat
     artifact_path: data/processed/domain/governance/protected_areas/critical_habitat/critical_habitat.parquet
     manifest_path: data/processed/domain/governance/protected_areas/critical_habitat/manifest.json
     color: '#8856A7'
     default_visible: false
     implementation_status: implemented_partial
-  ports:
-    category: administrative_context
-    display_name: Ports reference inventory
-    normalization_profile: nga_world_port_index_points
-    source_ids:
-    - nga_world_port_index
-    artifact_path: data/processed/domain/governance/administrative_context/ports/ports.parquet
-    manifest_path: data/processed/domain/governance/administrative_context/ports/manifest.json
-    color: '#8856A7'
-    default_visible: false
-    implementation_status: implemented_partial
-
   coast_guard_sectors:
     category: administrative_context
     display_name: Distinct USCG sector and CCG region references
@@ -1578,10 +1831,19 @@ collections:
 
   exclusion_zones:
     category: vessel_management
-    display_name: Fixed vessel exclusion zones
-    normalization_profile: tc_2026_closed_fixed_zones
+    display_name: Exclusion Zones static activity restriction references
+    normalization_profile: bounded_static_restriction_references
     source_ids:
     - tc_srkw_interim_order_2026
+    - uscg_lockheed_rna_20261015
+    - dfo_pacific_closure_references_20261019
+    - noaa_enc_harbor_rule_references_20261019
+    - uscg_theafoss_rna_20261015
+    - fws_national_wildlife_refuges
+    - noaa_enc_torpedo_references_20261020
+    - noaa_enc_smith_reference_20261020
+    - dnd_wg_active_reference_20261020
+    - noaa_mpa_inventory_2023
     artifact_path: data/processed/domain/governance/vessel_management/exclusion_zones/zones.parquet
     manifest_path: data/processed/domain/governance/vessel_management/exclusion_zones/manifest.json
     color: '#FF7F00'

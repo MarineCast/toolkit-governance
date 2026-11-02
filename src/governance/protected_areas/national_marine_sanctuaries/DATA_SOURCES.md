@@ -1,6 +1,6 @@
 # NOAA national marine sanctuaries
 
-This collection publishes the six current NOAA Office of National Marine
+This collection normalizes the six configured NOAA Office of National Marine
 Sanctuaries (ONMS) boundaries intersecting the toolkit's `full_area`: Channel
 Islands, Chumash Heritage, Cordell Bank, Greater Farallones, Monterey Bay, and
 Olympic Coast.
@@ -46,11 +46,24 @@ The [ONMS Federal Register notice registry](https://sanctuaries.noaa.gov/managem
 is the amendment-history discovery source. The eCFR and official Federal
 Register editions remain controlling.
 
-## Outputs
+## Internal normalization outputs
+
+These files are temporary build intermediates, not standalone public deliveries.
+Public output is the flat H3 contract plus retained OriginalData; only fields
+declared by `resources/app_contract.json` reach the application handoff.
 
 - `national_marine_sanctuaries.parquet`: canonical full-AOI native geometry,
   retaining separate source polygon parts and overlapping sanctuaries
-- `sanctuary_authority_records.json`: one non-spatial designation and authority
-  record per current sanctuary
 - `manifest.json`: source snapshots, retrieval times, checksums, geometry-part
-  counts, source vintages, roster completeness, and area-QC policy
+  counts, source vintages, roster completeness, area-QC policy, and one authority
+  record per current sanctuary. Authority records are embedded here, without a
+  separate JSON sidecar.
+
+## Public handoff boundary
+
+Source evidence and native processing described here are distinct from public
+columns. The [flat product contract](../../../../docs/parquet-products.md) and
+[exact physical schema](../../../../docs/reference/columns.md) define delivery.
+OriginalData preserves source geometry/attributes and receipt evidence; native
+manifests, diagnostic products and unused scientific measures are internal build
+support. No source qualification is broadened by the application projection.
