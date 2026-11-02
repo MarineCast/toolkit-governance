@@ -24,7 +24,6 @@ result = build_products(
     config_path='/path/to/workspace/config/data/governance/governance.yaml',
     original_data='/path/to/retained/Governance',
     allow_partial=True,
-    keep_workspace_data=True,
 )
 print(validate_products(result))
 ```

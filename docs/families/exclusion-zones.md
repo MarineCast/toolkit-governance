@@ -16,8 +16,8 @@ These are the display features at each supplied resolution. Additional embedded 
 
 | Display name | Exact column | Type / unit |
 | --- | --- | --- |
-| Exclusion Zone Count | `exclusion_zones__recorded_feature_count` | int64 / count |
-| Exclusion Zone Assignment | `exclusion_zones__feature_memberships_v1` | governance_memberships_v1 / recorded membership |
+| Exclusion Zone Count | `exclusion_zone_count` | int64 / count |
+| Exclusion Zone Assignment | `exclusion_zone_membership` | list<string> / readable names |
 
 ### Exclusion Zone Count
 
@@ -25,13 +25,13 @@ Distinct source-backed feature IDs with positive-dimensional intersections
 
 ### Exclusion Zone Assignment
 
-One entry per distinct GOVERNANCE_FEATURE_ID with positive-dimensional cell intersection; paired source records retain labels and sorted intersecting native part IDs
+Sorted distinct readable names of recorded features intersecting the cell; full paired source records and native part IDs remain in scientific support embedded in v5 final Parquets (external audits for legacy products).
 
 ## Identity and missingness
 
 Vessel entry, seabed disturbance/anchoring, fishing and landing access are separate activities; ordinary transit can remain permitted. Keep activation, seasonal intervals, vessel applicability, exceptions, legal citations and evidence gaps attached. Temporary/moving zones and shoreline-dependent boundaries are incomplete. Full-cell intersection can include geometry outside the reporting water mask; it is not water-only coverage.
 
-Memberships retain all source-qualified IDs, paired labels and sorted geometry-part lineage; no dominant match is selected. A null value means unknown/unavailable support, not zero or absence. Current partial inventories do not justify empty lists, false flags or zero counts in unmatched cells. Numeric fractions are dimensionless (0–1), not percentages; counts count the documented identity, not native parts.
+Public membership columns contain sorted distinct readable names. External audits retain all source-qualified IDs, paired labels and sorted geometry-part lineage; no dominant match is selected. A null value means unknown/unavailable support, not zero or absence. Current partial inventories do not justify empty lists, false flags or zero counts in unmatched cells. Numeric fractions are dimensionless (0–1), not percentages; counts count the documented identity, not native parts.
 
 ## Update and use
 

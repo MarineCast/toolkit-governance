@@ -70,8 +70,11 @@ def test_normal_build_and_offline_originals_rebuild_keep_only_combined_fields(tm
     replay=build_products([grid],tmp_path/'replay',config_path=path,original_data=output,allow_partial=True)
     for res in (6,8):
         table=pq.read_table(output/f'governance-r{res}-static.parquet')
-        assert set(table.column_names)=={'h3_index',*RETAINED}
-        assert table[COUNT].to_pylist()==[2]
+        assert set(table.column_names)=={'h3_index','coast_guard_membership'}
+        from governance.app_only import restore_support
+        restored, _ = restore_support(table, json.loads(table.schema.metadata[b'governance']))
+        assert set(restored.column_names)=={'h3_index',*RETAINED}
+        assert restored[COUNT].to_pylist()==[2]
         assert table.equals(pq.read_table(replay/f'governance-r{res}-static.parquet'),check_metadata=False)
 
 

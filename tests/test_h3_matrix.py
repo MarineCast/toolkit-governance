@@ -103,6 +103,26 @@ def test_line_union_and_point_count(grid_path):
     assert columns["POLYGON_COVERAGE_FRAC"].to_pylist() == [None, None]
 
 
+@pytest.mark.parametrize('geometry_metrics', [False, True])
+def test_clipped_line_endpoint_is_not_point_membership_and_is_grid_independent(tmp_path, geometry_metrics):
+    cell = h3.latlng_to_cell(48.5, -123, 6)
+    vertices = [(lon, lat) for lat, lon in h3.cell_to_boundary(cell)]
+    west = min(vertices)
+    line = LineString([(west[0] - .1, west[1]), west])
+    neighbor = min(h3.grid_disk(cell, 1), key=lambda c: h3.cell_to_latlng(c)[1])
+    for cells in ([cell], [cell, neighbor]):
+        path = tmp_path / 'grid.parquet'
+        pq.write_table(pa.table({'h3_index': cells}), path)
+        grid = _grid(path)
+        assert line.intersection(grid.geometry.iloc[0]).geom_type == 'Point'
+        result = overlay_collection(grid, native_frame([line]), completeness='partial', length_crs='EPSG:32610',
+                                    include_geometry_metrics=geometry_metrics)
+        assert result['FEATURE_COUNT'][0].as_py() is None
+        assert result['FEATURE_MEMBERSHIPS_V1'][0].as_py() is None
+        if geometry_metrics:
+            assert result['POINT_COUNT'][0].as_py() is None
+
+
 def test_complete_named_roster_does_not_imply_grid_absence(grid_path):
     grid = _grid(grid_path)
     native = native_frame([grid.geometry.iloc[0]])

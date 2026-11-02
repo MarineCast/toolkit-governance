@@ -1,0 +1,101 @@
+{
+  "review_date": "2026-11-01",
+  "status": "passed",
+  "scope": "Full retained-original regional rebuild on every delivered R6/R8 H3 key",
+  "build_seconds": 2152.388,
+  "comparison_seconds": 28.764,
+  "package_version": "0.5.0",
+  "overlay_method": "native-inventory-overlay-1.3.1",
+  "baseline_contract": 4,
+  "rebuilt_contract": 5,
+  "wheel_sha256": "1aa8a5f5361aebe9fe81b7da1b9b1630bc43e06223ffa3f3840f6a5b219fdc7f",
+  "source_snapshot_sha256": "c4fbf8f262bd8e8a18e4e9caec7d8db5af816ea9527b08dfca9eeb5c412f9948",
+  "retained_catalog_sha256": "2d3ee30ae3b1c843e4f753e451529c6d295e52ca9e9c005bd02d95bf3923a950",
+  "candidate_catalog_sha256": "6a33cd0325e50d086ce693752089581e7e333f7708dca8dde8900f7f6d8209d0",
+  "environment": {
+    "python": "3.14.6 | packaged by conda-forge | (main, Jun 12 2026, 08:47:56) [Clang 20.1.8 ]",
+    "toolkit-governance": "0.5.0",
+    "pyarrow": "24.0.0",
+    "geopandas": "1.1.4",
+    "pandas": "3.0.3",
+    "numpy": "2.4.6",
+    "shapely": "2.1.2",
+    "h3": "4.4.1",
+    "pyproj": "3.7.2"
+  },
+  "collections": 16,
+  "original_datasets": 49,
+  "network": "disabled for build; no acquisition",
+  "consumer_sibling_imports": "blocked during installed build",
+  "resolutions": {
+    "6": {
+      "rows": 2621,
+      "public_features": 20,
+      "public_feature_values": 52420,
+      "public_changed_values": 0,
+      "scientific_columns": 61,
+      "scientific_changed_values": 0,
+      "h3_keys_equal": true,
+      "row_order_equal": true,
+      "public_schema_equal": true,
+      "scientific_schema_equal": true,
+      "spatial_semantics_equal": true,
+      "temporal_semantics_equal": true,
+      "units_and_support_equal": true,
+      "source_sha256": "866f4e4f8ddca70340fde131929c0d6d1ad08c5b17d74e3bc9cca6080457e78c",
+      "candidate_sha256": "ff9668df64f42877ef8f62dd11cdf00577dc3a14058bcaa6b3df80dcac847a2d"
+    },
+    "8": {
+      "rows": 88243,
+      "public_features": 20,
+      "public_feature_values": 1764860,
+      "public_changed_values": 0,
+      "scientific_columns": 61,
+      "scientific_changed_values": 0,
+      "h3_keys_equal": true,
+      "row_order_equal": true,
+      "public_schema_equal": true,
+      "scientific_schema_equal": true,
+      "spatial_semantics_equal": true,
+      "temporal_semantics_equal": true,
+      "units_and_support_equal": true,
+      "source_sha256": "34ac3d7d06492bb2bbf872d9ab8c452a9a98959f417f9fcd97446bf10ad35a8f",
+      "candidate_sha256": "d64dfc0720709cec9e62de63b7c1fde8b3e191483822f35852590ca49a9dd40b"
+    }
+  },
+  "all_public_values_exact": true,
+  "all_scientific_support_exact": true,
+  "all_original_attributes_geometry_and_receipts_exact": true,
+  "byte_identical_original_files": 49,
+  "source_catalog_entries_equal": true,
+  "preservation": {
+    "checked_at_utc": "2026-11-01T19:51:21.247871+00:00",
+    "delivery_files": 52,
+    "delivery_inventory_and_all_bytes_unchanged": true,
+    "required_legacy_audits": 2,
+    "required_legacy_audit_bytes_unchanged": true,
+    "catalog_sha256": "2d3ee30ae3b1c843e4f753e451529c6d295e52ca9e9c005bd02d95bf3923a950",
+    "changed_files": []
+  },
+  "runtime_cleanup": {
+    "native_coverage_overlay_temps_removed_by_builder": true,
+    "no_workspace_cache_retained": true,
+    "no_external_audit_created": true,
+    "temporary_candidate_and_all_runtime_staging_removed": true,
+    "temporary_root_removed": true,
+    "manually_removed_bytes": 485513666,
+    "all_manifest_listed_temporary_paths_removed": true
+  },
+  "limitations": [
+    "Grid membership is the complete existing delivery, not an independent proof of original grid construction.",
+    "Retained original replay; no provider refresh, legal qualification or model eligibility upgrade.",
+    "Temporary candidate only; existing delivery was not replaced."
+  ],
+  "documentation_checks": {
+    "strict_mkdocs": "passed",
+    "git_diff_check": "passed",
+    "Knowledge_properties_new_links_and_whitespace": "passed"
+  },
+  "code_and_packaged_resources_unchanged_since_build": true,
+  "completed_at_utc": "2026-11-01T19:51:21.280510+00:00"
+}

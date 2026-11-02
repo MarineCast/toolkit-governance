@@ -62,6 +62,9 @@ def overlay_collection(
     extent = box(*grid.total_bounds)
     indexes = native.sindex.query(extent, predicate="intersects")
     local = native.iloc[indexes].copy().reset_index(drop=True)
+    # Clipping can collapse a line to a point or a polygon to an edge. The
+    # original feature dimension governs its positive-intersection criterion.
+    dimensions = shapely.get_dimensions(local.geometry.to_numpy())
     local.geometry = local.geometry.intersection(extent)
     projected = local.to_crs(6933)
     lengths = Transformer.from_crs(6933, length_crs, always_xy=True).transform if include_geometry_metrics else None
@@ -75,9 +78,7 @@ def overlay_collection(
         for cell_index, feature_index, geometry in zip(
             pairs[0], pairs[1], intersections
         ):
-            dimension = int(
-                shapely.get_dimensions(projected.geometry.iloc[feature_index])
-            )
+            dimension = int(dimensions[feature_index])
             positive = (
                 (dimension == 2 and geometry.area > 0)
                 or (dimension == 1 and geometry.length > 0)

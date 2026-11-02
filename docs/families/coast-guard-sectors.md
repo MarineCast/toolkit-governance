@@ -16,7 +16,7 @@ These are the display features at each supplied resolution. Additional embedded 
 
 | Display name | Exact column | Type / unit |
 | --- | --- | --- |
-| Coast Guard Assignment | `coast_guard_sectors__feature_memberships_v1` | governance_memberships_v1 / recorded membership |
+| Coast Guard Assignment | `coast_guard_membership` | list<string> / readable names |
 
 ### Coast Guard Assignment
 
@@ -26,7 +26,7 @@ Coast Guard administrative assignment: retained CCG region and USCG sector polyg
 
 USCG FID and CCG OBJECTID_1 remain paired with source names and native part IDs. A unit count in support metadata is not a count of equivalent operational jurisdictions. USCG redistribution clearance is unresolved; CCG source terms and its cartographic vintage remain in source notes.
 
-Memberships retain all source-qualified IDs, paired labels and sorted geometry-part lineage; no dominant match is selected. A null value means unknown/unavailable support, not zero or absence. Current partial inventories do not justify empty lists, false flags or zero counts in unmatched cells. Numeric fractions are dimensionless (0–1), not percentages; counts count the documented identity, not native parts.
+Public membership columns contain sorted distinct readable names. External audits retain all source-qualified IDs, paired labels and sorted geometry-part lineage; no dominant match is selected. A null value means unknown/unavailable support, not zero or absence. Current partial inventories do not justify empty lists, false flags or zero counts in unmatched cells. Numeric fractions are dimensionless (0–1), not percentages; counts count the documented identity, not native parts.
 
 ## Update and use
 

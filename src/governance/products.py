@@ -57,11 +57,21 @@ def validate_metric_table(table, metadata):
     if application:
         from .app_contract import contract
         expected = contract()
-        if (application.get('version') != expected['version']
+        allowed = expected['support_columns'] if application.get('version') == 1 else expected['legacy_columns'] if application.get('version') == 2 else expected['columns']
+        if (application.get('version') not in (1, 2, 3, 4, 5)
                 or table.column_names != application.get('columns')
-                or set(table.column_names).difference(expected['columns'])
+                or set(table.column_names).difference(allowed + ['date'])
                 or resolution not in expected['resolutions']):
             raise ValueError('Application schema/version/resolution mismatch')
+    if 'app_only_audit' in metadata or 'embedded_support' in metadata:
+        if not application or application.get('version') not in (2, 3, 4, 5):
+            raise ValueError('Projected governance requires application contract v2–v5')
+        from .app_only import restore_support
+        restored, original = restore_support(table, metadata)
+        validate_metric_table(restored, original)
+        return
+    if application and application.get('version') in (2, 3, 4, 5):
+        raise ValueError('Projected governance requires scientific support')
     keys = ['h3_index']
     if metadata['temporal']['type'] == 'dynamic':
         if 'date' not in table.column_names or not (pa.types.is_date(table['date'].type) or pa.types.is_timestamp(table['date'].type)) or table['date'].null_count:
@@ -90,6 +100,8 @@ def validate_metric_table(table, metadata):
                 raise ValueError(f'Missing metric must be null: {name}')
             if value is not None and (not math.isfinite(value) or value < 0 or (field['units'] == '1' and value > 1)):
                 raise ValueError(f'Invalid metric value: {name}')
+    from .shared.presence import validate_presence_flags
+    validate_presence_flags(table, metadata)
 
 
 def validate_products(directory):
@@ -99,6 +111,8 @@ def validate_products(directory):
     if catalog.get('schema_version') != 1 or catalog.get('domain') != 'governance' or not catalog.get('tables'):
         raise ValueError('Unsupported data catalog')
     expected = {'catalog.json'}
+    if (root / 'REVIEW_RESULTS.txt').is_file():
+        expected.add('REVIEW_RESULTS.txt')
     for resolution, variants in catalog['tables'].items():
         if not variants or set(variants).difference({'static', 'dynamic'}):
             raise ValueError('At most static and dynamic tables per resolution')
@@ -112,6 +126,10 @@ def validate_products(directory):
             table = pq.read_table(path)
             metadata = json.loads(table.schema.metadata[METADATA_KEY])
             validate_metric_table(table, metadata)
+            if metadata.get('app_only_audit') != catalog.get('audit_data', {}).get(str(resolution), {}).get(kind):
+                raise ValueError('Catalog/audit binding mismatch')
+            if metadata.get('embedded_support') != catalog.get('support_data', {}).get(str(resolution), {}).get(kind):
+                raise ValueError('Catalog/embedded support binding mismatch')
             if table.num_rows != binding['rows'] or metadata['spatial']['h3_resolution'] != int(resolution) or metadata['temporal']['type'] != kind:
                 raise ValueError('Catalog/table grain mismatch')
             if metadata['original_data'] != catalog['original_data'] or set(metadata['collections']) != set(catalog['areas']):
@@ -206,11 +224,13 @@ def cleanup_workspace_data(output_directory, *, config_path=DEFAULT_CONFIG_PATH,
     entries = list(root.rglob('*'))
     if any(p.is_symlink() for p in entries):
         return keep('contains a symbolic link')
-    protected = [output, *config.document.include_chain, config.common_config_path,
+    catalog = json.loads((output / 'catalog.json').read_text())
+    audit_paths = [binding['path'] for variants in catalog.get('audit_data', {}).values()
+                   for binding in variants.values()]
+    protected = [output, *audit_paths, *config.document.include_chain, config.common_config_path,
                  config.catalog_path, *protected_paths]
     if any(Path(p).resolve().is_relative_to(root) for p in protected):
         return keep('contains output, configuration or a protected build input')
-    catalog = json.loads((output / 'catalog.json').read_text())
     retained = {}
     for source_id, binding in catalog['original_data'].items():
         metadata = pq.read_schema(_member(output, binding['path'])).metadata
@@ -352,9 +372,13 @@ def _export_products(matrix_path, output_directory, *, config_path=DEFAULT_CONFI
             from .app_contract import project_app_contract
             product = project_app_contract(product, metadata)
             validate_metric_table(product, metadata)
+            from .app_only import compact_table
+            product, metadata = compact_table(product, metadata)
+            validate_metric_table(product, metadata)
+            catalog.setdefault('support_data', {})[str(int(resolution))] = {'static': metadata['embedded_support']}
             name = f'governance-r{int(resolution)}-static.parquet'
             destination = staging / name
-            pq.write_table(product.replace_schema_metadata({METADATA_KEY: _json(metadata)}), destination, compression='zstd')
+            pq.write_table(product.replace_schema_metadata({**(product.schema.metadata or {}), METADATA_KEY: _json(metadata)}), destination, compression='zstd')
             if not product.equals(pq.read_table(destination), check_metadata=False):
                 raise ValueError('Metric readback mismatch')
             catalog['tables'][str(int(resolution))] = {'static': {'path': name, 'sha256': sha256_file(destination), 'rows': product.num_rows}}
@@ -365,6 +389,8 @@ def _export_products(matrix_path, output_directory, *, config_path=DEFAULT_CONFI
         from .app_contract import annotate_catalog as annotate_app_catalog
         annotate_app_catalog(catalog, sources, staging)
         (staging / 'catalog.json').write_bytes(_json(catalog) + b'\n')
+        if (output / 'REVIEW_RESULTS.txt').is_file():
+            shutil.copy2(output / 'REVIEW_RESULTS.txt', staging / 'REVIEW_RESULTS.txt')
         validate_products(staging)
         if output.exists():
             output.rename(backup)

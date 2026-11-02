@@ -124,10 +124,10 @@ def test_normal_build_and_export_populate_the_same_family_offline(tmp_path,monke
     source.snapshot_path.parent.mkdir(parents=True);source.snapshot_path.write_text(json.dumps(snapshot_fixture(source,raw)))
     grid=tmp_path/'grid.parquet';pq.write_table(pa.table({'H3_INDEX':[h3.latlng_to_cell(48.5,-123.5,6)],'H3_RESOLUTION':[6]}),grid)
     out=build_products([grid],tmp_path/'result',config_path=path,allow_partial=True,keep_workspace_data=True)
-    table=pq.read_table(out/'governance-r6-static.parquet');assert table[COUNT].to_pylist()==[1]
+    table=pq.read_table(out/'governance-r6-static.parquet');assert table['conservation_area_count'].to_pylist()==[1]
     metadata=json.loads(table.schema.metadata[b'governance'])
     assert 'marine_protected_areas__recorded_feature_count' not in metadata['fields']
-    assert metadata['fields'][COUNT]['units'] == 'count'
+    assert metadata['fields']['conservation_area_count']['units'] == 'count'
     assert validate_products(out)['status']=='passed'
     rebuild=build_products([grid],tmp_path/'rebuild',config_path=path,original_data=out,allow_partial=True,keep_workspace_data=True)
     assert table.equals(pq.read_table(rebuild/'governance-r6-static.parquet'),check_metadata=False)

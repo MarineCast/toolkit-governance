@@ -9,12 +9,13 @@ It has no application or sibling-toolkit runtime dependency. Start with README.m
 - Write one static and at most one dynamic metric Parquet per supplied H3 resolution in
   `Data/Governance`, a small `catalog.json` with update times per collection/domain area,
   and one source GeoParquet per dataset under `OriginalData/<source-id>/geometry.parquet`.
+- Full product tables contain exactly twenty selected feature columns plus `h3_index`, using concise `_count`, `_membership`, `has_` and explicit fraction names; the alias map preserves native identities. All public membership values are readable string lists. New v5 products embed typed memberships, support arrays and original schema/metadata inside the final Parquet; no audit sidecars or coverage files survive a successful ordinary build. Preserve required external audit bindings for legacy v2–v4 products; never delete them while a retained product still depends on them.
 - Public rows are H3 cell × metric columns; dynamic rows add a typed source-backed `date`.
   Preserve supplied grid membership and resolution. Never manufacture a dated history
   from source retrieval/build times, establishment years or unknown effective dates.
 - No public releases, generation directories, current pointers, manifests, crosswalks or
   duplicated native/study bundles. Native products/manifests and reconciliation outputs
-  are temporary implementation intermediates. Production entry points are build/export/validate, explicit acquisition, initialization and
+  are temporary implementation intermediates. Production entry points are build/export/validate, explicit acquisition, offline `compact-data` projection, initialization and
   read-only catalog/preflight. Query/get, inspection, study and release runtimes are not public APIs.
 - OriginalData preserves original retrieved feature extents and attributes before toolkit
   clipping, source IDs, receipt scopes and date evidence. Store shared sources once.

@@ -137,6 +137,6 @@ def test_normal_build_and_offline_originals_rebuild_compact_interface(tmp_path, 
     replay = build_products([grid], tmp_path / 'replay', config_path=config_path, original_data=output, allow_partial=True)
     for resolution in (6, 8):
         table = pq.read_table(output / f'governance-r{resolution}-static.parquet')
-        assert set(table.column_names) == {'h3_index', COUNT, ASSIGNMENT}
-        assert table[COUNT].to_pylist() == [1]
+        assert set(table.column_names) == {'h3_index', 'county_district_count', 'county_district_membership'}
+        assert table['county_district_count'].to_pylist() == [1]
         assert table.equals(pq.read_table(replay / f'governance-r{resolution}-static.parquet'), check_metadata=False)

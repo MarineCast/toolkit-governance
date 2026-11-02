@@ -22,10 +22,10 @@ def project_app_contract(table, metadata):
         raise ValueError('Application products support H3 resolutions 6 and 8')
     available = set(table.column_names)
     if set(metadata.get('collections', {})) == set(specification['source_collections']):
-        missing = set(specification['columns']) - available
+        missing = set(specification['support_columns']) - available
         if missing:
             raise ValueError(f'Missing production application columns: {sorted(missing)}')
-    retained = [name for name in specification['columns'] if name in available]
+    retained = [name for name in specification['support_columns'] if name in available]
     fields = metadata['fields']
     # Subset configurations are useful for bounded source builds. Every retained
     # membership must still carry its complete count/status dependency closure.
@@ -53,10 +53,10 @@ def project_app_contract(table, metadata):
             for source, record in metadata['sources'].items()
         }
     metadata['application_contract'] = {
-        'version': specification['version'],
+        'version': 1,
         'columns': retained,
         'supported_resolutions': specification['resolutions'],
-        'compatibility_columns': [name for name in specification['compatibility_columns'] if name in retained],
+        'compatibility_columns': [name for name in specification['legacy_compatibility_columns'] if name in retained],
         'identity_policy': 'Source-qualified records, overlapping memberships and native part IDs retained unchanged',
     }
     return table.select(retained)

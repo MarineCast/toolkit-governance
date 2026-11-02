@@ -55,8 +55,10 @@ def test_catalog_dates_require_explicit_data_update_evidence(tmp_path):
 
 def test_packaged_contract_is_unique_and_scoped():
     spec = contract()
-    assert len(spec['columns']) == len(set(spec['columns'])) == 61
+    assert len(spec['columns']) == len(set(spec['columns'])) == 21
     assert len(spec['features']) == 20
     assert len(spec['families']) == 7
     assert spec['resolutions'] == [6, 8]
-    assert len(spec['compatibility_columns']) == 4
+    assert spec['compatibility_columns'] == []
+    assert len(spec['support_columns']) == 61
+    assert spec['columns'] == ['h3_index'] + [f['column'] for f in spec['features']]

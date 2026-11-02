@@ -20,9 +20,9 @@ These are the display features at each supplied resolution. Additional embedded 
 
 | Display name | Exact column | Type / unit |
 | --- | --- | --- |
-| Marine Conservation Area Count | `marine_conservation_areas__recorded_feature_count` | int64 / count |
-| Marine Conservation Area Coverage | `marine_conservation_areas__recorded_polygon_union_area_fraction` | double / fraction |
-| Marine Conservation Area Assignment | `marine_conservation_assignment__feature_memberships_v1` | governance_memberships_v1 / recorded membership |
+| Marine Conservation Area Count | `conservation_area_count` | int64 / count |
+| Marine Conservation Area Coverage | `conservation_area_coverage_fraction` | double / fraction |
+| Marine Conservation Area Assignment | `conservation_area_membership` | list<string> / readable names |
 
 ### Marine Conservation Area Count
 
@@ -36,13 +36,13 @@ Union of all eligible source polygons intersected with full H3 polygon / full H3
 
 All designated marine conservation site memberships plus explicitly labeled Proposed and Interim references. Reference display IDs qualify the original site ID by status; original source records, site IDs and geometry part IDs remain retained. The same site may have designated and interim zones. Assignment entries are not the Marine Conservation Area Count. Proposed/interim references remain excluded from that designated Count and Coverage. Race Rocks AOI is a point; no boundary or area is inferred. Stripes show overlapping memberships, not area shares. Missing component support remains unknown.
 
-The combined `marine_conservation_assignment__feature_memberships_v1` is a derived display field. Physical designated and proposed/interim membership columns remain separate in the [handoff schema](../reference/columns.md).
+The combined `conservation_area_membership` is a derived display field. Physical designated and proposed/interim membership columns remain separate in the [handoff schema](../reference/columns.md).
 
 ## Identity and missingness
 
 PA, OECM, sanctuary and other designation classes remain distinct. Assignment includes explicitly labeled Proposed and Interim entries, but designated Count and Coverage exclude them. Reference display IDs qualify site identity by status; a site can have designated and interim zones. Race Rocks AOI remains a point with no invented area. Membership stripes indicate overlap, not shares of cell area.
 
-Memberships retain all source-qualified IDs, paired labels and sorted geometry-part lineage; no dominant match is selected. A null value means unknown/unavailable support, not zero or absence. Current partial inventories do not justify empty lists, false flags or zero counts in unmatched cells. Numeric fractions are dimensionless (0–1), not percentages; counts count the documented identity, not native parts.
+Public membership columns contain sorted distinct readable names. External audits retain all source-qualified IDs, paired labels and sorted geometry-part lineage; no dominant match is selected. A null value means unknown/unavailable support, not zero or absence. Current partial inventories do not justify empty lists, false flags or zero counts in unmatched cells. Numeric fractions are dimensionless (0–1), not percentages; counts count the documented identity, not native parts.
 
 ## Update and use
 

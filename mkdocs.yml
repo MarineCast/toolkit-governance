@@ -59,6 +59,7 @@ nav:
       - "Marine Conservation Areas": families/marine-conservation-areas.md
       - "Vessel Routing & Regulations": families/vessel-routing-regulations.md
   - Product contract: parquet-products.md
+  - Reproducibility and maps: reproducibility-review.md
   - Coverage and refresh: coverage.md
   - Configuration: configuration.md
   - Reference:

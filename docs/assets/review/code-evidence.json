@@ -1,0 +1,252 @@
+{
+  "review_date": "2026-10-29",
+  "base_commit": "01f0c03a656167cbe6ee982c2b75c33575363bea",
+  "working_tree": "pre-existing uncommitted changes included",
+  "source_config_sha256": "f2adc9707df9d3e47a905c23a6f46cc536fc75f496e1c0838bf3a0ef912a7747",
+  "fingerprint_method": "sorted source/config relative path bytes followed by file bytes; exclude __pycache__ and egg-info",
+  "wheel_sha256": "983e14511edc4e3d3bd1e6ab33af5441743efb1304a41fe807bfefffe771282b",
+  "tests": "282 passed",
+  "pip_check": "No broken requirements found",
+  "retained_validation": {
+    "status": "passed",
+    "tables": 2,
+    "original_datasets": 49
+  },
+  "python": "3.14.6 | packaged by conda-forge | (main, Jun 12 2026, 08:47:56) [Clang 20.1.8 ]",
+  "dependencies": {
+    "geopandas": "1.1.4",
+    "numpy": "2.4.6",
+    "pandas": "3.0.3",
+    "h3": "4.4.1",
+    "pyarrow": "24.0.0",
+    "pydantic": "2.13.4",
+    "pyproj": "3.7.2",
+    "PyYAML": "6.0.3",
+    "requests": "2.34.2",
+    "shapely": "2.1.2",
+    "matplotlib": "3.11.0",
+    "mkdocs": "1.6.1",
+    "mkdocs-material": "9.6.23"
+  },
+  "catalog_sha256": "2d3ee30ae3b1c843e4f753e451529c6d295e52ca9e9c005bd02d95bf3923a950",
+  "original_bindings": {
+    "adfg_groundfish_statistical_areas": {
+      "path": "OriginalData/adfg_groundfish_statistical_areas/geometry.parquet",
+      "sha256": "b81f0f69e0d5b77056c0e9a0c134a6bb89ac1d72c13252ee9ffa81fdb6531262"
+    },
+    "bc_abms_regional_districts": {
+      "path": "OriginalData/bc_abms_regional_districts/geometry.parquet",
+      "sha256": "18bbfb47adae99f1a93e2d30518c5ec8e1688466e321b1938ace4bda2d91ed1b"
+    },
+    "bia_administrative_lar": {
+      "path": "OriginalData/bia_administrative_lar/geometry.parquet",
+      "sha256": "ec2ede2b68495c639d193fb8aa74b81f940850dea75a05541322f6e14911281d"
+    },
+    "boem_submerged_lands_boundary": {
+      "path": "OriginalData/boem_submerged_lands_boundary/geometry.parquet",
+      "sha256": "26202cfa836768cf5a603bdfdbc3d9401a9223ae7ac53c96065a2a47716081d6"
+    },
+    "ccg_western_region": {
+      "path": "OriginalData/ccg_western_region/geometry.parquet",
+      "sha256": "d97541b16648246f8820353d1437a86ea02f68b2728a3e8e8f2c79d220f3a2cb"
+    },
+    "census_counties_2025": {
+      "path": "OriginalData/census_counties_2025/geometry.parquet",
+      "sha256": "5b33f14cd2333c4ecc36937af1ded22a6bd8120b35ab9ee3dc4632f1f2d2a260"
+    },
+    "chs_routing_layer_2": {
+      "path": "OriginalData/chs_routing_layer_2/geometry.parquet",
+      "sha256": "d2ff0a817d4c420b03368d1144b9221937f4799858d5e3bf6aa33aa2ff21189d"
+    },
+    "chs_routing_layer_3": {
+      "path": "OriginalData/chs_routing_layer_3/geometry.parquet",
+      "sha256": "d1d5b3600a2aa4364831301290de9636c27b3ca3d0e36e5236e29fb65ee6ebb9"
+    },
+    "chs_routing_layer_4": {
+      "path": "OriginalData/chs_routing_layer_4/geometry.parquet",
+      "sha256": "3af4a194842478f3acf8036d9e1591c9fb4c788a5435b5ae074f3d9587cd6e8f"
+    },
+    "chs_routing_layer_5": {
+      "path": "OriginalData/chs_routing_layer_5/geometry.parquet",
+      "sha256": "a934d3cddc36f6e1760b2f59f42dc0c3fcf29af8143334f15af586d535965813"
+    },
+    "dfo_aquatic_critical_habitat": {
+      "path": "OriginalData/dfo_aquatic_critical_habitat/geometry.parquet",
+      "sha256": "48f8c307b52dc7217231b04bef2df0248b956728e746c96a0ac3656899726d40"
+    },
+    "dfo_federal_marine_bioregions_support": {
+      "path": "OriginalData/dfo_federal_marine_bioregions_support/geometry.parquet",
+      "sha256": "28c5fae1127991987381c917e0faa8ac7fea0aa0ed6fb6ff3d02eba5aefcb72f"
+    },
+    "dfo_oceans_act_areas_of_interest": {
+      "path": "OriginalData/dfo_oceans_act_areas_of_interest/geometry.parquet",
+      "sha256": "629e45b357175e596738c506bb0518259c7271f2de7d09e40cbea6dc6366b51d"
+    },
+    "dfo_oceans_act_marine_protected_areas": {
+      "path": "OriginalData/dfo_oceans_act_marine_protected_areas/geometry.parquet",
+      "sha256": "d45176233cb1b7cae7e03bf1f30a8ea64166f240725957669a046971bff0c0a8"
+    },
+    "dfo_pacific_closure_references_20261019": {
+      "path": "OriginalData/dfo_pacific_closure_references_20261019/geometry.parquet",
+      "sha256": "faba996dc68def1c6dd31392550b1faf43cfc535c4ca43ed8609684d9fe41fa4"
+    },
+    "dfo_pacific_fishery_management_areas": {
+      "path": "OriginalData/dfo_pacific_fishery_management_areas/geometry.parquet",
+      "sha256": "a74451ce3fbe1039943bb8a2013ba09a5988cdc3638046dddf90556d4ea67ba5"
+    },
+    "dnd_wg_active_reference_20261020": {
+      "path": "OriginalData/dnd_wg_active_reference_20261020/geometry.parquet",
+      "sha256": "f83dcdd98f993af739dfb9ff8f1fcaf86d540ff29b26cca66d72d27862a214bd"
+    },
+    "eccc_marbled_murrelet_marine_critical_habitat": {
+      "path": "OriginalData/eccc_marbled_murrelet_marine_critical_habitat/geometry.parquet",
+      "sha256": "bb1484c31dc81756d2a0f077b19f223ad942534a87ebe5dec5d1e9e9feebb04e"
+    },
+    "eccc_marine_classification": {
+      "path": "OriginalData/eccc_marine_classification/geometry.parquet",
+      "sha256": "e00955f6c37db5a4257df4afb4ffc68e00381b2a2cbbc97aee4fd9e1df5b05fd"
+    },
+    "eccc_wildlife_areas_sanctuaries": {
+      "path": "OriginalData/eccc_wildlife_areas_sanctuaries/geometry.parquet",
+      "sha256": "66c2651d26bb1def15a5d05f7b9156485fcac3cc01c15e3585b44bbe3548d2c0"
+    },
+    "fws_national_wildlife_refuges": {
+      "path": "OriginalData/fws_national_wildlife_refuges/geometry.parquet",
+      "sha256": "2042acb54bf74d299e841b56dfe09217019cd70e9616417ca4e06a90b0e84ed0"
+    },
+    "international_boundary_commission_v1_3": {
+      "path": "OriginalData/international_boundary_commission_v1_3/geometry.parquet",
+      "sha256": "b492ebcd4a67f1ad5276b5990e6b547d9842e98811bb3ab6ec32045307a40786"
+    },
+    "noaa_critical_habitat_line": {
+      "path": "OriginalData/noaa_critical_habitat_line/geometry.parquet",
+      "sha256": "8a25b71bd939164bf28ead670dce12264db668059c598d8b808d398596e69247"
+    },
+    "noaa_critical_habitat_polygon": {
+      "path": "OriginalData/noaa_critical_habitat_polygon/geometry.parquet",
+      "sha256": "cbd281dcaeec42f9f86eafe3fd190d8eab135b7f60ccf52cd83d1ab1fed23273"
+    },
+    "noaa_enc_harbor_rule_references_20261019": {
+      "path": "OriginalData/noaa_enc_harbor_rule_references_20261019/geometry.parquet",
+      "sha256": "f1b4d25cc60660fd9cb1066f68351a9fd3645cd98e4f29a530a743a6b0ca5551"
+    },
+    "noaa_enc_smith_reference_20261020": {
+      "path": "OriginalData/noaa_enc_smith_reference_20261020/geometry.parquet",
+      "sha256": "6e0cda7eeb9d2841209bf039a96fb737b5aab72aa8d7b255b9e39d4658d41101"
+    },
+    "noaa_enc_torpedo_references_20261020": {
+      "path": "OriginalData/noaa_enc_torpedo_references_20261020/geometry.parquet",
+      "sha256": "252598dfb45114004bd4d07d9bbf594536b7febd00dda98cbf8b5a573aa361a8"
+    },
+    "noaa_mpa_inventory_2023": {
+      "path": "OriginalData/noaa_mpa_inventory_2023/geometry.parquet",
+      "sha256": "9507bfdd0e198d104e2a0b6cf85c2a2a232ebe1551c4d9fc28b1bce221d0b912"
+    },
+    "noaa_onms_channel_islands_boundary": {
+      "path": "OriginalData/noaa_onms_channel_islands_boundary/geometry.parquet",
+      "sha256": "bc58ab2a0449940e07399bd6c8e40f1c8c0f493f6d929dbccb75b89770a6436b"
+    },
+    "noaa_onms_chumash_heritage_boundary": {
+      "path": "OriginalData/noaa_onms_chumash_heritage_boundary/geometry.parquet",
+      "sha256": "c9d79a5b39652db130e288bd3ca0154ff5b39341e4f905b9d08994d65dcc5aa3"
+    },
+    "noaa_onms_cordell_bank_boundary": {
+      "path": "OriginalData/noaa_onms_cordell_bank_boundary/geometry.parquet",
+      "sha256": "63904e8399d63111b43737c9d88ea56a678736a8af83876f8e05e5f6db7b2095"
+    },
+    "noaa_onms_greater_farallones_boundary": {
+      "path": "OriginalData/noaa_onms_greater_farallones_boundary/geometry.parquet",
+      "sha256": "385ab6a45c95f2c51517fc7b25568dd3fe864433deb4834fb580e4b0629ddfdd"
+    },
+    "noaa_onms_monterey_bay_boundary": {
+      "path": "OriginalData/noaa_onms_monterey_bay_boundary/geometry.parquet",
+      "sha256": "d613e6e8884d73f52b47222c1f2254b2032cb040ad4f837f10e24d837c85437b"
+    },
+    "noaa_onms_olympic_coast_boundary": {
+      "path": "OriginalData/noaa_onms_olympic_coast_boundary/geometry.parquet",
+      "sha256": "155d19ac6f94c1aa2474ab893232e6f57d94f09f72a0421555ac197843b8715b"
+    },
+    "noaa_routing_2026": {
+      "path": "OriginalData/noaa_routing_2026/geometry.parquet",
+      "sha256": "3d747950609567c2b0ddf6c6301a6b96e54d463575a7c2204ff28ce374fc9ffd"
+    },
+    "noaa_us_contiguous_zone_dynamic": {
+      "path": "OriginalData/noaa_us_contiguous_zone_dynamic/geometry.parquet",
+      "sha256": "dc368ff1159c6548ef1dd3640d78907333c404a60e87051cafb98d7d9060ace3"
+    },
+    "noaa_us_eez_dynamic": {
+      "path": "OriginalData/noaa_us_eez_dynamic/geometry.parquet",
+      "sha256": "2e7a6c15d519aecefc8e437f147847d8ad3ea6ec41a1e41f693c91e6ab502a55"
+    },
+    "noaa_us_maritime_limits": {
+      "path": "OriginalData/noaa_us_maritime_limits/geometry.parquet",
+      "sha256": "3ee67df4ef56015f1e945715ab852286e21b549bc850d29dab642f641bc70e82"
+    },
+    "noaa_us_territorial_sea_dynamic": {
+      "path": "OriginalData/noaa_us_territorial_sea_dynamic/geometry.parquet",
+      "sha256": "6cee561712a0cfdeb7bdaf933360e9fbd952dd4cfefc5aa336c55a67ea173841"
+    },
+    "nrcan_canadian_geopolitical_boundaries_lines": {
+      "path": "OriginalData/nrcan_canadian_geopolitical_boundaries_lines/geometry.parquet",
+      "sha256": "eb2e6c00436ba1867d5ad35c85b04cc0152f85f0e3bac04629109922381462cf"
+    },
+    "nrcan_canadian_geopolitical_country_area": {
+      "path": "OriginalData/nrcan_canadian_geopolitical_country_area/geometry.parquet",
+      "sha256": "10069e35625d25dedb789b9f61ebdd2ea0967d620a0073eebd2a0b6d74a535b7"
+    },
+    "nrcan_indian_reserves": {
+      "path": "OriginalData/nrcan_indian_reserves/geometry.parquet",
+      "sha256": "a5ab877a2d2f3e39104af9ca499a44cb4b51d279d2be768ab749f68daa96cb08"
+    },
+    "odfw_marine_reserves_2016": {
+      "path": "OriginalData/odfw_marine_reserves_2016/geometry.parquet",
+      "sha256": "b58ff165ea41769df04970ddc954a63ba07884fb079862453973ca977dc545e6"
+    },
+    "seascape_territorial_water_support": {
+      "path": "OriginalData/seascape_territorial_water_support/geometry.parquet",
+      "sha256": "7cef1e7b369393b7a991d5f65ae26151ddd6545809133e7c95416602d29ede66"
+    },
+    "tc_srkw_interim_order_2026": {
+      "path": "OriginalData/tc_srkw_interim_order_2026/geometry.parquet",
+      "sha256": "e819b1e43a6fea93784a26da1442132bcc68527ff1739e8b9251700f0dbbf488"
+    },
+    "uscg_app_sectors": {
+      "path": "OriginalData/uscg_app_sectors/geometry.parquet",
+      "sha256": "7b3f37ac118dad62c30374726c39edaa01d934cfcb88816def8dc9c2cebf1f7e"
+    },
+    "uscg_lockheed_rna_20261015": {
+      "path": "OriginalData/uscg_lockheed_rna_20261015/geometry.parquet",
+      "sha256": "bd9795f2e9548ef1348e9274ba6ea55c094e833553769171d20c0a5a8e1e0536"
+    },
+    "uscg_theafoss_rna_20261015": {
+      "path": "OriginalData/uscg_theafoss_rna_20261015/geometry.parquet",
+      "sha256": "e7c534a3b1849f27aea6f2df8d54c6ad86b30b489fe6b65955da9fb01d877050"
+    },
+    "wdfw_recreational_marine_areas": {
+      "path": "OriginalData/wdfw_recreational_marine_areas/geometry.parquet",
+      "sha256": "7b7b0e1c6001d4b23eef0fb6c1294233e39da9fd9c35b91774ab246ce6619dcc"
+    }
+  },
+  "delivered_tables": {
+    "governance-r6-static.parquet": {
+      "sha256": "866f4e4f8ddca70340fde131929c0d6d1ad08c5b17d74e3bc9cca6080457e78c",
+      "rows": 2621,
+      "external_audit_sha256": "c4703a8d2933d532ca17897820995587154c83abb6adc16c7abfe094e4a05175"
+    },
+    "governance-r8-static.parquet": {
+      "sha256": "34ac3d7d06492bb2bbf872d9ab8c452a9a98959f417f9fcd97446bf10ad35a8f",
+      "rows": 88243,
+      "external_audit_sha256": "92a3274a0fa788221c9b79ae54053d0ff82f4f5c0e442fc43a31eeb472e1718a"
+    }
+  },
+  "comparison": "Exact sampled value parity: True",
+  "consumer_imports_blocked": [
+    "orcacast",
+    "seascape",
+    "applications_data_explorer"
+  ],
+  "docs": "mkdocs build --strict passed",
+  "whitespace": "git diff --check passed",
+  "maps": "all five corrected renders visually inspected",
+  "replay_scope": "37 R6 and 42 R8 cells; all twenty fields; not full delivery or history"
+}

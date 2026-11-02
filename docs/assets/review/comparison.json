@@ -1,0 +1,313 @@
+{
+  "validation": {
+    "status": "passed",
+    "tables": 2,
+    "original_datasets": 49
+  },
+  "resolutions": {
+    "6": {
+      "rows": 37,
+      "keys_equal": true,
+      "columns_equal": true,
+      "temporal_equal": true,
+      "spatial_semantics_equal": true,
+      "input_sha256": "866f4e4f8ddca70340fde131929c0d6d1ad08c5b17d74e3bc9cca6080457e78c",
+      "output_sha256": "acbd705461db4df4cc82860c3837da96a835ff874dce432906992893d0774115",
+      "grid_sha256": "1aec176e195c1ed6fa19a2cc8d0722647591063f7e5609e0a80c91a5ea7f437c",
+      "fields": {
+        "county_district_count": {
+          "nulls_actual": 5,
+          "nulls_expected": 5,
+          "min": 1,
+          "max": 2,
+          "differences": []
+        },
+        "critical_habitat_count": {
+          "nulls_actual": 19,
+          "nulls_expected": 19,
+          "min": 1,
+          "max": 79,
+          "differences": []
+        },
+        "exclusion_zone_count": {
+          "nulls_actual": 26,
+          "nulls_expected": 26,
+          "min": 1,
+          "max": 3,
+          "differences": []
+        },
+        "fisheries_management_area_count": {
+          "nulls_actual": 5,
+          "nulls_expected": 5,
+          "min": 1,
+          "max": 4,
+          "differences": []
+        },
+        "has_mapped_tribal_area": {
+          "nulls_actual": 30,
+          "nulls_expected": 30,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "has_international_boundary": {
+          "nulls_actual": 35,
+          "nulls_expected": 35,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "conservation_area_count": {
+          "nulls_actual": 23,
+          "nulls_expected": 23,
+          "min": 1,
+          "max": 4,
+          "differences": []
+        },
+        "conservation_area_coverage_fraction": {
+          "nulls_actual": 23,
+          "nulls_expected": 23,
+          "min": 0.0022653828415371124,
+          "max": 1.0,
+          "differences": []
+        },
+        "has_routing_reference": {
+          "nulls_actual": 29,
+          "nulls_expected": 29,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "county_district_membership": {
+          "nulls_actual": 5,
+          "nulls_expected": 5,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "critical_habitat_membership": {
+          "nulls_actual": 19,
+          "nulls_expected": 19,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "exclusion_zone_membership": {
+          "nulls_actual": 26,
+          "nulls_expected": 26,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "fisheries_management_area_membership": {
+          "nulls_actual": 5,
+          "nulls_expected": 5,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "speed_restriction_zone_membership": {
+          "nulls_actual": 35,
+          "nulls_expected": 35,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "mapped_tribal_area_membership": {
+          "nulls_actual": 30,
+          "nulls_expected": 30,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "state_province_membership": {
+          "nulls_actual": 6,
+          "nulls_expected": 6,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "country_membership": {
+          "nulls_actual": 5,
+          "nulls_expected": 5,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "coast_guard_membership": {
+          "nulls_actual": 0,
+          "nulls_expected": 0,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "vessel_routing_membership": {
+          "nulls_actual": 29,
+          "nulls_expected": 29,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "conservation_area_membership": {
+          "nulls_actual": 23,
+          "nulls_expected": 23,
+          "min": null,
+          "max": null,
+          "differences": []
+        }
+      }
+    },
+    "8": {
+      "rows": 42,
+      "keys_equal": true,
+      "columns_equal": true,
+      "temporal_equal": true,
+      "spatial_semantics_equal": true,
+      "input_sha256": "34ac3d7d06492bb2bbf872d9ab8c452a9a98959f417f9fcd97446bf10ad35a8f",
+      "output_sha256": "27194dff1ace00186af803131efa4044e169908385f83387829700ab3adb88ec",
+      "grid_sha256": "cc6d924a094c3cf3062f1f3ba0bea4cadb3edc3e67cd3d98f1fa5fc0ee219a96",
+      "fields": {
+        "county_district_count": {
+          "nulls_actual": 4,
+          "nulls_expected": 4,
+          "min": 1,
+          "max": 2,
+          "differences": []
+        },
+        "critical_habitat_count": {
+          "nulls_actual": 24,
+          "nulls_expected": 24,
+          "min": 1,
+          "max": 13,
+          "differences": []
+        },
+        "exclusion_zone_count": {
+          "nulls_actual": 40,
+          "nulls_expected": 40,
+          "min": 1,
+          "max": 1,
+          "differences": []
+        },
+        "fisheries_management_area_count": {
+          "nulls_actual": 5,
+          "nulls_expected": 5,
+          "min": 1,
+          "max": 2,
+          "differences": []
+        },
+        "has_mapped_tribal_area": {
+          "nulls_actual": 39,
+          "nulls_expected": 39,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "has_international_boundary": {
+          "nulls_actual": 40,
+          "nulls_expected": 40,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "conservation_area_count": {
+          "nulls_actual": 29,
+          "nulls_expected": 29,
+          "min": 1,
+          "max": 1,
+          "differences": []
+        },
+        "conservation_area_coverage_fraction": {
+          "nulls_actual": 29,
+          "nulls_expected": 29,
+          "min": 0.05481469365637274,
+          "max": 1.0,
+          "differences": []
+        },
+        "has_routing_reference": {
+          "nulls_actual": 36,
+          "nulls_expected": 36,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "county_district_membership": {
+          "nulls_actual": 4,
+          "nulls_expected": 4,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "critical_habitat_membership": {
+          "nulls_actual": 24,
+          "nulls_expected": 24,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "exclusion_zone_membership": {
+          "nulls_actual": 40,
+          "nulls_expected": 40,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "fisheries_management_area_membership": {
+          "nulls_actual": 5,
+          "nulls_expected": 5,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "speed_restriction_zone_membership": {
+          "nulls_actual": 40,
+          "nulls_expected": 40,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "mapped_tribal_area_membership": {
+          "nulls_actual": 39,
+          "nulls_expected": 39,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "state_province_membership": {
+          "nulls_actual": 10,
+          "nulls_expected": 10,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "country_membership": {
+          "nulls_actual": 10,
+          "nulls_expected": 10,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "coast_guard_membership": {
+          "nulls_actual": 2,
+          "nulls_expected": 2,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "vessel_routing_membership": {
+          "nulls_actual": 38,
+          "nulls_expected": 38,
+          "min": null,
+          "max": null,
+          "differences": []
+        },
+        "conservation_area_membership": {
+          "nulls_actual": 29,
+          "nulls_expected": 29,
+          "min": null,
+          "max": null,
+          "differences": []
+        }
+      }
+    }
+  }
+}

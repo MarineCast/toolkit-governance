@@ -20,13 +20,13 @@ These are the display features at each supplied resolution. Additional embedded 
 
 | Display name | Exact column | Type / unit |
 | --- | --- | --- |
-| County / District Count | `county_regional_boundaries__recorded_feature_count` | int64 / count |
-| Tribal / First Nations Area | `tribal_first_nations_areas__mapped_area` | bool / boolean |
-| International Boundary | `federal_waters__international_boundary` | bool / boolean |
-| County / District Assignment | `county_regional_boundaries__feature_memberships_v1` | governance_memberships_v1 / recorded membership |
-| Tribal / First Nations Assignment | `tribal_first_nations_areas__feature_memberships_v1` | governance_memberships_v1 / recorded membership |
-| State / Province Assignment | `state_provincial_waters__assignment__feature_memberships_v1` | governance_memberships_v1 / recorded membership |
-| Country Assignment | `federal_waters__assignment__feature_memberships_v1` | governance_memberships_v1 / recorded membership |
+| County / District Count | `county_district_count` | int64 / count |
+| Tribal / First Nations Area | `has_mapped_tribal_area` | bool / boolean |
+| International Boundary | `has_international_boundary` | bool / boolean |
+| County / District Assignment | `county_district_membership` | list<string> / readable names |
+| Tribal / First Nations Assignment | `mapped_tribal_area_membership` | list<string> / readable names |
+| State / Province Assignment | `state_province_membership` | list<string> / readable names |
+| Country Assignment | `country_membership` | list<string> / readable names |
 
 ### County / District Count
 
@@ -60,7 +60,7 @@ Geographic country assignment from retained model-water polygons; not federal ad
 
 County GEOIDs and BC LGL_ADMIN_AREA_ID stay source-qualified. BIA LARID differs from its source OBJECTID; NRCan adminAreaId differs from its source record ID. Names never substitute for these identities. Stikine is retained as original evidence but excluded from regional-district membership. Northern Rockies is not substituted from another layer.
 
-Memberships retain all source-qualified IDs, paired labels and sorted geometry-part lineage; no dominant match is selected. A null value means unknown/unavailable support, not zero or absence. Current partial inventories do not justify empty lists, false flags or zero counts in unmatched cells. Numeric fractions are dimensionless (0–1), not percentages; counts count the documented identity, not native parts.
+Public membership columns contain sorted distinct readable names. External audits retain all source-qualified IDs, paired labels and sorted geometry-part lineage; no dominant match is selected. A null value means unknown/unavailable support, not zero or absence. Current partial inventories do not justify empty lists, false flags or zero counts in unmatched cells. Numeric fractions are dimensionless (0–1), not percentages; counts count the documented identity, not native parts.
 
 ## Update and use
 

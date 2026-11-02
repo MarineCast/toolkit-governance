@@ -16,8 +16,8 @@ These are the display features at each supplied resolution. Additional embedded 
 
 | Display name | Exact column | Type / unit |
 | --- | --- | --- |
-| Management Area Count | `management_areas__recorded_feature_count` | int64 / count |
-| Management Area | `management_areas__feature_memberships_v1` | governance_memberships_v1 / recorded membership |
+| Management Area Count | `fisheries_management_area_count` | int64 / count |
+| Management Area | `fisheries_management_area_membership` | list<string> / readable names |
 
 ### Management Area Count
 
@@ -25,13 +25,13 @@ Distinct source-backed feature IDs with positive-dimensional intersections
 
 ### Management Area
 
-One entry per distinct GOVERNANCE_FEATURE_ID with positive-dimensional cell intersection; paired source records retain labels and sorted intersecting native part IDs
+Sorted distinct readable names of recorded features intersecting the cell; full paired source records and native part IDs remain in scientific support embedded in v5 final Parquets (external audits for legacy products).
 
 ## Identity and missingness
 
 Codes are qualified by system: WDFW recreational codes, dfo.pacific.pfma.subareas and ADF&G reporting codes are not interchangeable. Qualified DFO subarea zero is a real code, not missingness; original NAME and LABEL discrepancies remain. Subareas do not manufacture whole-area geometry, fishery/gear applicability or legal history. DFO reuse rights are unresolved and ADF&G distribution requires consent.
 
-Memberships retain all source-qualified IDs, paired labels and sorted geometry-part lineage; no dominant match is selected. A null value means unknown/unavailable support, not zero or absence. Current partial inventories do not justify empty lists, false flags or zero counts in unmatched cells. Numeric fractions are dimensionless (0–1), not percentages; counts count the documented identity, not native parts.
+Public membership columns contain sorted distinct readable names. External audits retain all source-qualified IDs, paired labels and sorted geometry-part lineage; no dominant match is selected. A null value means unknown/unavailable support, not zero or absence. Current partial inventories do not justify empty lists, false flags or zero counts in unmatched cells. Numeric fractions are dimensionless (0–1), not percentages; counts count the documented identity, not native parts.
 
 ## Update and use
 

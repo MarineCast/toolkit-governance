@@ -42,6 +42,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             sub.add_argument('--matrix', required=True, type=Path)
     sub = commands.add_parser('validate-data', help='Check the flat catalog, checksums, and embedded contracts.')
     sub.add_argument('directory', type=Path)
+    sub = commands.add_parser('compact-data', help='Keep selected features plus H3, with scientific support inside final Parquets.')
+    sub.add_argument('directory', type=Path)
+    sub.add_argument('--audit-directory', type=Path, help=argparse.SUPPRESS)
     sub = commands.add_parser('clean-workspace', help='Remove disposable workspace data after verifying saved outputs and originals.')
     sub.add_argument('directory', type=Path, help='Verified flat governance output to retain.')
     sub.add_argument('--config', default=None)
@@ -80,6 +83,9 @@ def _dispatch(args):
     elif args.command == 'validate-data':
         from .products import validate_products
         print(json.dumps(validate_products(args.directory), indent=2))
+    elif args.command == 'compact-data':
+        from .compact import compact_products
+        print(json.dumps(compact_products(args.directory, audit_directory=args.audit_directory), indent=2))
     elif args.command == 'clean-workspace':
         from .products import cleanup_workspace_data
         cleanup_workspace_data(args.directory, config_path=args.config)

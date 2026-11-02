@@ -16,8 +16,8 @@ These are the display features at each supplied resolution. Additional embedded 
 
 | Display name | Exact column | Type / unit |
 | --- | --- | --- |
-| Critical Habitat Count | `critical_habitat__recorded_feature_count` | int64 / count |
-| Critical Habitat Assignment | `critical_habitat__feature_memberships_v1` | governance_memberships_v1 / recorded membership |
+| Critical Habitat Count | `critical_habitat_count` | int64 / count |
+| Critical Habitat Assignment | `critical_habitat_membership` | list<string> / readable names |
 
 ### Critical Habitat Count
 
@@ -25,13 +25,13 @@ Distinct source-backed feature IDs with positive-dimensional intersections
 
 ### Critical Habitat Assignment
 
-One entry per distinct GOVERNANCE_FEATURE_ID with positive-dimensional cell intersection; paired source records retain labels and sorted intersecting native part IDs
+Sorted distinct readable names of recorded features intersecting the cell; full paired source records and native part IDs remain in scientific support embedded in v5 final Parquets (external audits for legacy products).
 
 ## Identity and missingness
 
 NOAA proposed/final meanings remain source-specific. DFO Final/Proposed stays unresolved. ECCC marine reference polygons identify habitat only where required biophysical attributes occur; they do not confirm habitat throughout the polygon. The posted Final recovery document does not establish blanket current legal protection. Terrestrial murrelet nesting components are excluded.
 
-Memberships retain all source-qualified IDs, paired labels and sorted geometry-part lineage; no dominant match is selected. A null value means unknown/unavailable support, not zero or absence. Current partial inventories do not justify empty lists, false flags or zero counts in unmatched cells. Numeric fractions are dimensionless (0–1), not percentages; counts count the documented identity, not native parts.
+Public membership columns contain sorted distinct readable names. External audits retain all source-qualified IDs, paired labels and sorted geometry-part lineage; no dominant match is selected. A null value means unknown/unavailable support, not zero or absence. Current partial inventories do not justify empty lists, false flags or zero counts in unmatched cells. Numeric fractions are dimensionless (0–1), not percentages; counts count the documented identity, not native parts.
 
 ## Update and use
 

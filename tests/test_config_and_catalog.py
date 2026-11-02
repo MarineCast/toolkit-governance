@@ -86,6 +86,9 @@ def test_governance_root_is_public_surface_and_shared_code_is_packaged() -> None
         "preflight.py",
         "products.py",
         "app_contract.py",
+        "app_only.py",
+        "app_view.py",
+        "compact.py",
         "run_settings.py",
         "memberships.py",
     }

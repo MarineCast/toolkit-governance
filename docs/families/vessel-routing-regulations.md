@@ -18,9 +18,9 @@ These are the display features at each supplied resolution. Additional embedded 
 
 | Display name | Exact column | Type / unit |
 | --- | --- | --- |
-| Routing / regulation recorded | `vessel_routing_regulations__recorded_reference` | bool / boolean |
-| Speed Restriction Zones | `speed_restriction_zones__feature_memberships_v1` | governance_memberships_v1 / recorded membership |
-| Shipping Lanes & Traffic Separation Zones | `vessel_routing_regulations__traffic_separation_zones__feature_memberships_v1` | governance_memberships_v1 / recorded membership |
+| Routing / regulation recorded | `has_routing_reference` | bool / boolean |
+| Speed Restriction Zones | `speed_restriction_zone_membership` | list<string> / readable names |
+| Shipping Lanes & Traffic Separation Zones | `vessel_routing_membership` | list<string> / readable names |
 
 ### Routing / regulation recorded
 
@@ -28,17 +28,17 @@ True means at least one retained routing/regulation reference feature is recorde
 
 ### Speed Restriction Zones
 
-One entry per distinct GOVERNANCE_FEATURE_ID with positive-dimensional cell intersection; paired source records retain labels and sorted intersecting native part IDs
+Sorted distinct readable names of recorded features intersecting the cell; full paired source records and native part IDs remain in scientific support embedded in v5 final Parquets (external audits for legacy products).
 
 ### Shipping Lanes & Traffic Separation Zones
 
-One entry per distinct GOVERNANCE_FEATURE_ID with positive-dimensional cell intersection; paired source records retain labels and sorted intersecting native part IDs
+Sorted distinct readable names of recorded features intersecting the cell; full paired source records and native part IDs remain in scientific support embedded in v5 final Parquets (external audits for legacy products).
 
 ## Identity and missingness
 
 CHS identity uses object type plus LNAM when available, otherwise snapshot OBJECTID; repeated chart records and ENC_NAME remain paired. NOAA original source FIDs remain retained. These are source object identities, not guaranteed unique physical routes. Recommended routes are not mandatory restrictions. TC speed, season, clause and exceptions remain source attributes; Nitinat coastline-dependent geometry is excluded pending qualified support.
 
-Memberships retain all source-qualified IDs, paired labels and sorted geometry-part lineage; no dominant match is selected. A null value means unknown/unavailable support, not zero or absence. Current partial inventories do not justify empty lists, false flags or zero counts in unmatched cells. Numeric fractions are dimensionless (0–1), not percentages; counts count the documented identity, not native parts.
+Public membership columns contain sorted distinct readable names. External audits retain all source-qualified IDs, paired labels and sorted geometry-part lineage; no dominant match is selected. A null value means unknown/unavailable support, not zero or absence. Current partial inventories do not justify empty lists, false flags or zero counts in unmatched cells. Numeric fractions are dimensionless (0–1), not percentages; counts count the documented identity, not native parts.
 
 ## Update and use
 
